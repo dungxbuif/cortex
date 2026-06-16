@@ -36,3 +36,4 @@ Use this file to group work into milestones or major phases.
 | --- | --- | --- | --- |
 | M0 | Establish SDLC agent framework | active | TBD |
 | M1 | Phase 2: Develop Harness CLI (Hard Enforcement) | ready | [PHASE-2.md](phases/PHASE-2.md) |
+| M2 | Cortex app MVP ticket plan from raw spec | ready | [PHASE-APP-1.md](phases/PHASE-APP-1.md) |

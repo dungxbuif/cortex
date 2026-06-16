@@ -19,10 +19,22 @@ shared_fields: [functional_requirements, non_functional_requirements]
 
 | ID | Requirement | Priority | Source | Status |
 | --- | --- | --- | --- | --- |
-| TBD | TBD | TBD | TBD | draft |
+| REQ-001 | Provide an OpenAI-compatible API to accept chat requests from Open WebUI. | High | `spec.md` | draft |
+| REQ-002 | Extract intents and parameters via LLM to invoke deterministic Domain APIs (Orchestrator). | High | `spec.md` | draft |
+| REQ-003 | **Finance**: Record income, expense, and transfer transactions across various wallets. | High | `finance.md` | draft |
+| REQ-004 | **Finance**: Track asset investments (Gold, Stock) and calculate Net Worth without treating investments as living expenses. | High | `finance.md` | draft |
+| REQ-005 | **Finance**: Generate financial reports, budget alerts, and categorize transactions. | Medium | `finance.md` | draft |
+| REQ-006 | **Second Brain**: Capture insights and notes into an Inbox Database buffer. | Medium | `spec.md` | draft |
+| REQ-007 | **Second Brain**: Perform RAG (Retrieval-Augmented Generation) queries against a local Obsidian Vault. | Medium | `spec.md` | draft |
+| REQ-008 | **Homelab**: Perform read-only RAG and QA against the pulled Homelab repository. | Medium | `spec.md` | draft |
+| REQ-009 | Sync and index data from external canonical sources (Git repos, Obsidian vault) for RAG. | High | `spec.md` | draft |
 
 ## Non-Functional Requirements
 
 | ID | Requirement | Category | Status |
 | --- | --- | --- | --- |
-| TBD | TBD | TBD | draft |
+| NFR-001 | **Module Boundary**: Domain modules must not contain LLM prompts or ReAct loops. | Architecture | draft |
+| NFR-002 | **Source of Truth**: The Homelab module must be strictly read-only from the chat interface. | Security | draft |
+| NFR-003 | **Source of Truth**: Second Brain must only write to a database buffer, never directly to the local Vault files via chat. | Security | draft |
+| NFR-004 | **Auditing**: All API tool calls, syncs, indexings, writes, and permission denials must be logged. | Compliance | draft |
+| NFR-005 | **Citations**: RAG answers must provide citations if relying on indexed documents. | UX / Accuracy | draft |

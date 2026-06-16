@@ -19,7 +19,8 @@ All notable changes should be recorded here.
 
 ## [Unreleased]
 
-*(No unreleased changes)*
+### Added
+- Added Cortex app MVP planning artifacts from `docs/raw_spec/`: `PHASE-APP-1`, six draft JIRA-style `CORTEX-N` app tickets, backlog/roadmap links, and validation matrix rows. App tickets are grouped by epic: Epic 1 Base Platform, Epic 2 Finance App, Epic 3 Second Brain App, and Epic 4 Homelab App.
 
 ## [1.1.1] - 2026-06-07
 

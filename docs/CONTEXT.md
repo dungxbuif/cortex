@@ -32,10 +32,10 @@ updated: TBD
 
 ## Current Status
 
-- Status: Initial SDLC agent framework scaffold.
+- Status: Initial SDLC agent framework scaffold plus Cortex app MVP ticket planning.
 - Active backlog: `docs/work/BACKLOG.md`
-- Current queue focus: None.
-- Active phase: None.
+- Current queue focus: `BL-APP-001` after `BL-001`, pending human priority choice.
+- Active phase: `docs/work/phases/PHASE-APP-1.md`
 - Active ticket: None.
 - Active bug: None.
 
@@ -49,6 +49,8 @@ Establish the markdown framework that keeps human and AI agents aligned across p
 - `docs/`
 - `docs/templates/`
 - `docs/standards/`
+- `docs/work/phases/PHASE-APP-1.md`
+- `docs/work/tickets/CORTEX-*.md`
 
 ## Recent Decisions
 
@@ -57,15 +59,20 @@ Establish the markdown framework that keeps human and AI agents aligned across p
 - Use markdown-only enforcement for v1.
 - Use `docs/work/phases/` for multi-ticket work.
 - Use pay-as-you-go documentation for brownfield projects.
+- Preserve existing harness `PHASE-2`; use `PHASE-APP-1` for Cortex app MVP planning from `docs/raw_spec/`.
+- Treat app implementation tickets as high-risk unless proven otherwise because they touch API, data, security, runtime, external sources, or multi-domain behavior.
+- Use JIRA-style ticket keys for app work: `CORTEX-1`, `CORTEX-2`, etc.
+- Group app work by epic: Epic 1 Base Platform, Epic 2 Finance App, Epic 3 Second Brain App, Epic 4 Homelab App.
+- Plan API/domain contracts before orchestrator integration; `CORTEX-6` stays inside Epic 1 but depends on the base API tickets.
 
 ## Next Steps
 
-- Review `docs/work/BACKLOG.md` before selecting the next work item.
-- Create the first roadmap or phase when implementation work begins.
-- Fill product and architecture master docs as the project becomes concrete.
+- Choose whether `BL-001` or `BL-APP-001` is the next active queue item.
+- If app work proceeds, start with Epic 1 Base Platform: `CORTEX-1` detail design before implementation.
+- Reconcile raw app spec into master requirements and architecture docs during implementation tickets.
 - Add project-specific human standards under `docs/standards/`.
 
 ## Open Questions
 
-- No project-specific technology stack has been selected yet.
-- No product requirements have been finalized yet.
+- Should Cortex app MVP (`BL-APP-001`) preempt framework standards finalization (`BL-001`)?
+- Confirm whether Epic 1 should include any additional base ticket before `CORTEX-1`.

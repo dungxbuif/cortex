@@ -42,6 +42,12 @@ Policy lives in `docs/standards/VALIDATION.md`. This matrix is runtime project s
 | Requirement | Phase | Ticket/Bug | Contract/Behavior | Unit | Integration | E2E | UAT | Platform/Manual | Docs Review | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | TBD | TBD | TBD | Add rows when requirements, tickets, or bugs are created | no | no | no | no | no | no | planned | none |
+| Epic 1 Base permission/audit | PHASE-APP-1 | CORTEX-1 | Capability policy gates module operations and append-only audit APIs record sensitive operations safely | yes | yes | no | yes | no | yes | planned | Ticket acceptance criteria |
+| Epic 1 Base RAG/indexing | PHASE-APP-1 | CORTEX-2 | Shared RAG/indexing APIs parse, redact, chunk, retrieve, cite sources, and exclude disallowed sources | yes | yes | no | yes | no | yes | planned | Ticket acceptance criteria |
+| Epic 1 Base runtime | PHASE-APP-1 | CORTEX-6 | OpenAI-compatible chat runtime validates tool calls and delegates through pre-planned API boundaries | yes | yes | no | yes | no | yes | planned | Ticket acceptance criteria |
+| Epic 2 Finance App | PHASE-APP-1 | CORTEX-5 | Finance transaction APIs validate natural language writes, confirm ambiguity/high impact, and audit persistence | yes | yes | no | yes | no | yes | planned | Ticket acceptance criteria |
+| Epic 3 Second Brain App | PHASE-APP-1 | CORTEX-3 | Capture APIs store temporary notes without direct Vault writes or RAG access to capture buffer | yes | yes | no | yes | no | yes | planned | Ticket acceptance criteria |
+| Epic 4 Homelab App | PHASE-APP-1 | CORTEX-4 | Homelab sync/index/RAG APIs are read-only, redacted, cited by repo path and commit, and deny edits/actions | yes | yes | no | yes | yes | yes | planned | Ticket acceptance criteria |
 
 ## Rules
 

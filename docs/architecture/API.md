@@ -1,38 +1,52 @@
 ---
-artifact_type: api_contract_index
+artifact_type: api_doc
 id: API-MASTER
 status: draft
 owner: shared
-human_fields: [contract_intent, approval]
-ai_fields: [contract_rows, errors, auth_notes, versioning, linked_decisions]
-shared_fields: [status, trace]
+human_fields: [public_contracts, authentication_rules]
+ai_fields: [endpoints, schemas, error_codes]
+shared_fields: [status]
 ---
 
-# API
+# API Contracts
 
 ## Field Ownership
 
-- Human owns public contract intent and approval for contract changes.
-- AI maintains contract rows, errors, auth notes, versioning, and linked decisions.
+- Human owns public contracts and authentication rules.
+- AI maintains endpoints, schemas, and error codes.
 
-## API Surface
+## Public Contracts
 
-Document HTTP endpoints, RPC methods, events, CLI commands, or any other public contract.
+The primary interface to Cortex is the OpenAI-compatible `/v1/chat/completions` API. All UI interactions happen through this single proxy layer.
 
-| Contract | Type | Auth | Status | Notes |
-| --- | --- | --- | --- | --- |
-| TBD | TBD | TBD | draft | TBD |
+## Domain APIs
 
-## Errors
+The domain modules do not expose REST HTTP endpoints individually; they expose Go function signatures (or internal RPCs) that the Orchestrator's Tool Adapter invokes. Below are the core Domain APIs defined for the modules.
 
-| Error | Meaning | Consumer Impact |
-| --- | --- | --- |
-| TBD | TBD | TBD |
+### Finance Module
 
-## Versioning
+- `CreateTransaction(command)`: Record income, expense, or cash transfers.
+- `CreateTransfer(command)`: Move money between wallets.
+- `RecordAssetTransaction(command)`: Buy, sell, or receive dividends for investments.
+- `GetFinancialReport(query)`: Return aggregated cash flow and expense reporting.
+- `GetNetWorth(query)`: Calculate total asset values minus liabilities.
+- `CreateCategory(command)` / `CreateWallet(command)`: Master data management.
 
-TBD
+### Second Brain Module
 
-## Linked Decisions
+- `CaptureNote(command)`: Save an idea/note to the temporary capture buffer database.
+- `QueryVault(query)`: Search indexed Obsidian vault items via RAG.
+- `GetSyncStatus(query)`: Check the last time the Vault mirror was updated.
 
-- TBD
+### Homelab Module
+
+- `SearchDocs(query)`: RAG query over the Homelab documentation.
+- `GetServiceCatalog()`: List deployed Homelab services.
+
+## Error Handling
+
+APIs should return structured errors (via Go `error` interfaces) mapped to the following concepts:
+- `NeedsConfirmation`: The request lacks confidence and the Orchestrator must ask the user (e.g. fuzzy category matching).
+- `ValidationError`: Missing required fields (e.g. amount <= 0).
+- `Conflict`: Resource already exists.
+- `NotFound`: Entity missing.
