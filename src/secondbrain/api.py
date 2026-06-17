@@ -5,6 +5,7 @@ from typing import Any
 
 from .repository import SqliteSecondBrainRepository
 from .service import SecondBrainService
+from .homelab import HomelabService
 
 
 def create_app(repository: SqliteSecondBrainRepository | None = None) -> Any:
@@ -21,6 +22,7 @@ def create_app(repository: SqliteSecondBrainRepository | None = None) -> Any:
 
     app = FastAPI(title="Cortex Second Brain API")
     service = SecondBrainService(repository=repository)
+    homelab_service = HomelabService(repository=repository)
 
     @app.post("/api/v1/capture")
     def create_capture(payload: dict[str, Any]) -> dict[str, Any]:
@@ -47,6 +49,36 @@ def create_app(repository: SqliteSecondBrainRepository | None = None) -> Any:
             top_k=int(payload.get("top_k", 5)),
         )
         return [_serialize(asdict(result)) for result in results]
+
+    @app.post("/api/v1/homelab/sync")
+    def sync_homelab(payload: dict[str, Any]) -> dict[str, Any]:
+        res = homelab_service.sync_repository(
+            repo_path=str(payload.get("repo_path", "")),
+            repo_url=str(payload.get("repo_url", "github.com/dungxbuif/Homelab")),
+            branch=str(payload.get("branch", "main")),
+            commit_sha=str(payload.get("commit_sha", "latest")),
+            owner_id=str(payload.get("owner_id", "homelab")),
+        )
+        return _serialize(res)
+
+    @app.post("/api/v1/homelab/search")
+    def search_homelab(payload: dict[str, Any]) -> list[dict[str, Any]]:
+        results = homelab_service.search_knowledge(
+            query=str(payload.get("query", "")),
+            owner_id=str(payload.get("owner_id", "homelab")),
+            top_k=int(payload.get("top_k", 5)),
+        )
+        return [_serialize(asdict(result)) for result in results]
+
+    @app.post("/api/v1/homelab/validate-links")
+    def validate_links(payload: dict[str, Any]) -> dict[str, Any]:
+        broken = homelab_service.validate_markdown_links(
+            repo_path=str(payload.get("repo_path", ""))
+        )
+        return {
+            "status": "completed",
+            "broken_links": _serialize(broken),
+        }
 
     return app
 

@@ -48,3 +48,4 @@ _bmad-output/
 .agent/
 # Second Brain Real Vault Test Data
 /src/secondbrain/tests/testdata/
+/exam/

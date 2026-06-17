@@ -32,18 +32,33 @@ updated: TBD
 
 ## Current Status
 
-- Status: Epic 2 Second Brain core services completed and verified. Epic 3 Homelab Readonly QA is ready for planning.
+- Status: Epic 3 Homelab Readonly RAG & Link Validation completed and verified. Epic 4 Audit & Permissions is ready for planning.
 - Active backlog: `docs/work/BACKLOG.md`
-- Current queue focus: `BL-005`
-- Active phase: docs/work/phases/PHASE-3-homelab.md
-- Active ticket: docs/work/tickets/CTX-301.md, docs/work/tickets/CTX-302.md
+- Current queue focus: `BL-006`
+- Active phase: docs/work/phases/PHASE-4-audit-policy.md
+- Active ticket: docs/work/tickets/CTX-401.md, docs/work/tickets/CTX-402.md
 - Active bug: None.
 
 ## Current Focus
 
-Complete Epic 2 Second Brain core services (capture buffer, sync status, and Vault RAG retrieval) using real Google Gemini embeddings and checksum-based sync optimization. Prepare detail design and implementation plan for Epic 3: Homelab read-only QA.
+Complete Epic 3 Homelab Readonly RAG & Link Validation, verifying it successfully runs over the real exam directory. Prepare detail design and implementation plan for Epic 4: Audit & Permissions.
 
 ## Recently Touched Areas
+
+- `AGENTS.md`
+- `docs/CONTEXT.md`
+- `docs/work/VALIDATION_MATRIX.md`
+- `docs/work/BACKLOG.md`
+- `docs/work/phases/PHASE-3-homelab.md`
+- `docs/work/tickets/epic-3/CTX-301.md`
+- `docs/work/tickets/epic-3/CTX-302.md`
+- `docs/work/tickets/epic-3/DETAIL_DESIGN.md`
+- `src/secondbrain/homelab.py`
+- `src/secondbrain/repository.py`
+- `src/secondbrain/api.py`
+- `src/secondbrain/models.py`
+- `src/secondbrain/tests/test_homelab.py`
+- `src/secondbrain/tests/test_api_runtime.py`
 
 - `AGENTS.md`
 - `docs/`
@@ -90,10 +105,9 @@ Complete Epic 2 Second Brain core services (capture buffer, sync status, and Vau
 
 ## Next Steps
 
-- Prepare the DETAIL_DESIGN.md and implementation plan for Epic 3 Homelab Readonly QA.
-- Implement readonly query, sync, catalog, and validation APIs for the Homelab module.
-- Verify the Homelab indexing pipeline and RAG search with commit-specific citations.
+- Prepare the DETAIL_DESIGN.md and implementation plan for Epic 4 Audit & Permissions.
+- Implement event logging and capability guard policy service in Go/Python.
 
 ## Open Questions
 
-- Should we check real data of the Homelab repository to design the IaC and markdown parsers? (Confirmed: User wants to align/prepare for next sprint)
+- None.

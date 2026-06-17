@@ -32,9 +32,28 @@ class FastAPIRuntimeTest(unittest.TestCase):
         self.assertIn("/api/v1/capture", paths)
         self.assertIn("/api/v1/sync/status", paths)
         self.assertIn("/api/v1/search", paths)
+        self.assertIn("/api/v1/homelab/sync", paths)
+        self.assertIn("/api/v1/homelab/search", paths)
+        self.assertIn("/api/v1/homelab/validate-links", paths)
         self.assertEqual(self.repository.embedding_column_type(), "vector")
 
         client = TestClient(app)
+        
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            with open(temp_path / "README.md", "w") as f:
+                f.write("# README\nLink to [other](./other.md)\n")
+            
+            validate_res = client.post(
+                "/api/v1/homelab/validate-links",
+                json={"repo_path": temp_dir}
+            )
+            self.assertEqual(validate_res.status_code, 200)
+            self.assertIn("broken_links", validate_res.json())
+            self.assertEqual(len(validate_res.json()["broken_links"]), 1)
+
         create_response = client.post(
             "/api/v1/capture",
             json={

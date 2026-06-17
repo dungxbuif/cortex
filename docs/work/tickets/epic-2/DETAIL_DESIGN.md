@@ -15,9 +15,9 @@ shared_fields:
   - open_questions
 trace:
   ticket:
-    - ../CTX-201.md
-    - ../CTX-202.md
-    - ../CTX-203.md
+    - ./CTX-201.md
+    - ./CTX-202.md
+    - ./CTX-203.md
 ---
 
 # Epic 2 Detail Design: Second Brain Services (Python AI Service)
