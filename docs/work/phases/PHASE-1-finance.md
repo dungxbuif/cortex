@@ -1,7 +1,7 @@
 ---
 artifact_type: phase
 id: PHASE-1
-status: ready
+status: in_review
 owner: human
 human_fields:
   - goal
@@ -23,7 +23,16 @@ trace:
   roadmap: ROADMAP
   requirements: []
   tickets:
-    - ../tickets/CTX-101.md\n    - ../tickets/CTX-102.md\n    - ../tickets/CTX-103.md\n    - ../tickets/CTX-104.md\n    - ../tickets/CTX-105.md\n    - ../tickets/CTX-106.md\n    - ../tickets/CTX-107.md\n    - ../tickets/CTX-108.md
+    - ../tickets/epic-1/CTX-101.md
+    - ../tickets/epic-1/CTX-102.md
+    - ../tickets/epic-1/CTX-103.md
+    - ../tickets/epic-1/CTX-104.md
+    - ../tickets/epic-1/CTX-105.md
+    - ../tickets/epic-1/CTX-106.md
+    - ../tickets/epic-1/CTX-107.md
+    - ../tickets/epic-1/CTX-108.md
+    - ../tickets/epic-1/CTX-109.md
+  detail_design: ../tickets/epic-1/DETAIL_DESIGN.md
 ---
 
 # PHASE-1: Finance Domain APIs
@@ -33,3 +42,7 @@ Finance Domain APIs
 
 ## Scope
 Implementation of associated tickets.
+
+## Detail Design
+
+- [Epic 1 Finance Services Detail Design](../tickets/epic-1/DETAIL_DESIGN.md)

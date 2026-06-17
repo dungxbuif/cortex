@@ -21,6 +21,14 @@ All notable changes should be recorded here.
 
 ### Added
 - Added Cortex app MVP planning artifacts from `docs/raw_spec/`: `PHASE-APP-1`, six draft JIRA-style `CORTEX-N` app tickets, backlog/roadmap links, and validation matrix rows. App tickets are grouped by epic: Epic 1 Base Platform, Epic 2 Finance App, Epic 3 Second Brain App, and Epic 4 Homelab App.
+- Added Epic 1 Finance services detail design under `docs/work/tickets/epic-1/`, linked CTX-101 through CTX-108 to the shared design, and added planned validation rows for the Finance service tickets.
+- Revised Epic 1 asset design to match the raw finance spec: added holdings, price history, valuation rules, cost-basis behavior, and asset-specific acceptance criteria.
+- Reconciled master design docs for Finance asset valuation: architecture, API contracts, ERD, product spec, and requirements now describe holdings, price history, current market valuation, and weighted-average cost basis.
+- Optimized Finance DB/design rules for asset valuation: deterministic price priority, rebuildable holdings, investment reporting exclusions, saving deposit classification, and v1 liability boundaries.
+- Added Finance debt/loan tracking design for both directions: money I owe and money owed to me, including linked cash movement and net-worth impact.
+- Added Finance query/reporting design rules: reports use business-effective dates such as `occurred_at`, tables include created/updated actor fields, and only correction-oriented tables use soft delete fields.
+- Hardened Epic 1 Finance implementation design with concrete DB type rules, paired transfer rows, soft-delete recalculation behavior, report DTO shape, indexes, and initial constraints.
+- Implemented initial Epic 1 Finance backend module with wallet, category, transaction, transfer, asset, report, net-worth, and debt/loan service logic, hard-coded single-user owner handling, schema migration, and focused unit tests.
 
 ## [1.1.1] - 2026-06-07
 

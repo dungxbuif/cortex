@@ -30,7 +30,7 @@ Cortex is a personal AI system acting as a unified gateway for an individual's d
 
 | Module | Responsibility | Key Data |
 | --- | --- | --- |
-| **Finance** | Manage personal finance, budgets, assets, and net worth. | PostgreSQL (Canonical) |
+| **Finance** | Manage personal finance, wallets, transactions, investment holdings, market price history, reports, and net worth. | PostgreSQL (Canonical) |
 | **Second Brain** | Knowledge management, capture inbox, and Obsidian RAG. | Obsidian Vault (Canonical) / PostgreSQL (Buffer) |
 | **Homelab** | Homelab service queries, docs, and validation. | GitHub Repo (Canonical) |
 | **Orchestrator** | Intent parsing, tool calling, and response synthesis. | Ephemeral Context |
@@ -41,11 +41,61 @@ Cortex is a personal AI system acting as a unified gateway for an individual's d
 ```text
 User Message -> Open WebUI -> Cortex OpenAI Proxy
   -> Orchestrator (Intent + Permission Check)
-  -> Tool Adapter 
+  -> Tool Adapter
   -> Domain API (e.g. Finance.CreateTransaction)
   -> Audit Event Log
   -> LLM Synthesis -> Markdown Response to User
 ```
+
+## Finance Service Boundary
+
+Finance is a deterministic domain module. It owns money movement, wallet balances, investment holdings, cost basis, market valuation, and reporting rules. It must not contain prompts, OpenAI tool schemas, chat history, or response synthesis.
+
+```text
++-----------------------------+
+| Orchestrator / Tool Adapter |
+| chat intent + tool mapping   |
++--------------+--------------+
+               |
+               v
++-----------------------------+
+| Finance Delivery API        |
+| command/query DTO mapping   |
++--------------+--------------+
+               |
+               v
++-----------------------------+
+| Finance Services            |
+| wallet/category/transaction |
+| asset/report/net-worth rules|
++--------------+--------------+
+               |
+               v
++-----------------------------+
+| Finance Repositories        |
+| persistence queries only    |
++--------------+--------------+
+               |
+               v
++-----------------------------+
+| PostgreSQL                  |
+| canonical finance store     |
++-----------------------------+
+```
+
+Finance investment modeling separates historical execution data from current market valuation:
+
+- `asset_transactions` record what happened at the time: buy/sell/dividend/split, quantity, unit price, fees, taxes, and linked cash movement.
+- `asset_holdings` hold current derived positions, weighted-average cost, current value, and gain/loss fields.
+- `asset_prices` store market price history and are not overwritten.
+- Net worth uses current asset values, not original purchase prices.
+
+Finance reporting and auditability follow separate time semantics:
+
+- Business reports use effective dates such as `transactions.occurred_at`, `asset_transactions.occurred_at`, `asset_prices.priced_at`, `debt_payments.paid_at`, and net-worth `as_of`.
+- Row audit fields such as `created_at`, `created_by`, `updated_at`, and `updated_by` record when and by whom data was entered or changed.
+- A transaction can be created today for a past or future business date; reports must place it in the period of `occurred_at`, not `created_at`.
+- Normal report reads use indexed aggregates and projections (`wallets.current_balance`, `asset_holdings`, latest `asset_prices`, active `debt_loans`) instead of replaying raw history.
 
 ## Runtime Flow
 

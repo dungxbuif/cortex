@@ -35,13 +35,13 @@ updated: TBD
 - Status: Initial SDLC agent framework scaffold plus Cortex app MVP ticket planning.
 - Active backlog: `docs/work/BACKLOG.md`
 - Current queue focus: `BL-APP-001` after `BL-001`, pending human priority choice.
-- Active phase: `docs/work/phases/PHASE-APP-1.md`
-- Active ticket: None.
+- Active phase: docs/work/phases/PHASE-1-finance.md
+- Active ticket: docs/work/tickets/epic-1/CTX-101.md
 - Active bug: None.
 
 ## Current Focus
 
-Establish the markdown framework that keeps human and AI agents aligned across planning, implementation, verification, release, and maintenance.
+Review Epic 1 Finance API implementation and add missing DB integration/per-ticket acceptance tests.
 
 ## Recently Touched Areas
 
@@ -49,8 +49,14 @@ Establish the markdown framework that keeps human and AI agents aligned across p
 - `docs/`
 - `docs/templates/`
 - `docs/standards/`
-- `docs/work/phases/PHASE-APP-1.md`
-- `docs/work/tickets/CORTEX-*.md`
+- `docs/work/phases/PHASE-1-finance.md`
+- `docs/work/tickets/epic-1/CTX-101.md`
+- `docs/work/tickets/epic-1/DETAIL_DESIGN.md`
+- `docs/architecture/ARCHITECTURE.md`
+- `docs/architecture/API.md`
+- `docs/architecture/ERD.md`
+- `docs/requirements/SPEC.md`
+- `docs/requirements/REQUIREMENTS.md`
 
 ## Recent Decisions
 
@@ -61,16 +67,20 @@ Establish the markdown framework that keeps human and AI agents aligned across p
 - Use pay-as-you-go documentation for brownfield projects.
 - Preserve existing harness `PHASE-2`; use `PHASE-APP-1` for Cortex app MVP planning from `docs/raw_spec/`.
 - Treat app implementation tickets as high-risk unless proven otherwise because they touch API, data, security, runtime, external sources, or multi-domain behavior.
-- Use JIRA-style ticket keys for app work: `CORTEX-1`, `CORTEX-2`, etc.
+- Use JIRA-style ticket keys for app work: `CORTEX-1`, `CORTEX-2`, etc. (mapped to `CTX-xxx`).
 - Group app work by epic: Epic 1 Base Platform, Epic 2 Finance App, Epic 3 Second Brain App, Epic 4 Homelab App.
-- Plan API/domain contracts before orchestrator integration; `CORTEX-6` stays inside Epic 1 but depends on the base API tickets.
+- Plan API/domain contracts before orchestrator integration.
+- Epic 1 Finance tickets are grouped under `docs/work/tickets/epic-1/`.
+- Epic 1 Finance services share one detail design because wallet, category, transaction, asset, reporting, and net-worth services depend on shared balance and persistence invariants.
+- Epic 1 asset design must model historical transactions, current holdings, market price history, and portfolio valuation separately so net worth uses current value while expense reports ignore investment buys.
+- Master architecture, API, ERD, and requirements docs have been reconciled with the Epic 1 Finance asset valuation model.
+- Epic 1 optimization rules: holdings are rebuildable projections, price selection is deterministic by asset class, investment cash movements are excluded from ordinary reports by default, saving deposits are assets only when term/interest behavior exists, debt/loan records distinguish `i_owe` liabilities from `owed_to_me` receivables, financial reports use business-effective dates such as `occurred_at`, finance tables carry `created_at/by` plus `updated_at/by`, money is stored as integer minor units, asset quantities use fixed precision decimals, and transfers are paired rows sharing `transfer_group_id`.
+- Epic 1 Finance implementation now has domain models, DTOs, GORM-backed service logic, migrations, hard-coded single-user `owner-single-user`, and focused unit tests. Tickets remain `in_review` until live PostgreSQL migration smoke test and per-ticket acceptance tests are added.
 
 ## Next Steps
 
-- Choose whether `BL-001` or `BL-APP-001` is the next active queue item.
-- If app work proceeds, start with Epic 1 Base Platform: `CORTEX-1` detail design before implementation.
-- Reconcile raw app spec into master requirements and architecture docs during implementation tickets.
-- Add project-specific human standards under `docs/standards/`.
+- Add live PostgreSQL migration smoke test for `src/backend/migrations/000001_init.up.sql`.
+- Add per-ticket acceptance tests for CTX-101 through CTX-109, especially transaction atomicity, asset holding rebuilds, report exclusions, and debt settlement.
 
 ## Open Questions
 

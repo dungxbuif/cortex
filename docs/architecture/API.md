@@ -25,12 +25,46 @@ The domain modules do not expose REST HTTP endpoints individually; they expose G
 
 ### Finance Module
 
-- `CreateTransaction(command)`: Record income, expense, or cash transfers.
-- `CreateTransfer(command)`: Move money between wallets.
-- `RecordAssetTransaction(command)`: Buy, sell, or receive dividends for investments.
-- `GetFinancialReport(query)`: Return aggregated cash flow and expense reporting.
-- `GetNetWorth(query)`: Calculate total asset values minus liabilities.
-- `CreateCategory(command)` / `CreateWallet(command)`: Master data management.
+Wallet and category APIs:
+
+- `CreateWallet(command)`: Create a wallet/account with type, currency, initial balance, include-in-total flag, and active status.
+- `UpdateWallet(wallet_id, patch)`: Update wallet metadata without corrupting current balance.
+- `ArchiveWallet(wallet_id)`: Archive an inactive wallet so future transactions cannot use it.
+- `ListWallets(query)`: List active/archived wallets.
+- `GetWalletBalance(wallet_id, as_of)`: Return wallet balance at a point in time.
+- `CreateCategory(command)`: Create an income/expense category with optional parent and aliases.
+- `UpdateCategory(category_id, patch)`: Update category metadata.
+- `ListCategories(query)`: List category hierarchy and visibility.
+- `ResolveCategory(input)`: Suggest a category from note, merchant, alias, or history.
+
+Transaction APIs:
+
+- `CreateTransaction(command)`: Record income or expense.
+- `CreateTransfer(command)`: Move money between wallets without changing net worth by creating paired `transfer_out` and `transfer_in` rows with one `transfer_group_id`.
+- `UpdateTransaction(transaction_id, patch)`: Update an existing transaction.
+- `SoftDeleteTransaction(transaction_id, reason)`: Soft-delete a transaction.
+- `ListTransactions(query)`: List/search transactions by business date (`occurred_at`) or audit entry date (`created_at`) depending on query mode.
+
+Investment asset APIs:
+
+- `CreateAsset(command)`: Create asset master data with asset type, symbol, name, currency, unit, price source, and active state.
+- `RecordAssetTransaction(command)`: Record buy, sell, transfer in/out, dividend, stock dividend, split, or manual adjustment.
+- `UpdateAssetPrice(command)`: Append a new market/manual price snapshot without overwriting historical prices.
+- `GetAssetHolding(query)`: Return current position, cost basis, current price, current value, realized gain, and unrealized gain for one asset.
+- `ListAssetHoldings(query)`: Return portfolio holdings by asset class.
+
+Report and valuation APIs:
+
+- `GetFinancialReport(query)`: Return aggregated cash flow and expense reporting by business-effective date with income, expense, net cashflow, transfer totals, excluded totals, investment cash movement, category/wallet/period breakdowns, and warnings.
+- `GetNetWorth(query)`: Calculate included cash wallets plus current market-valued assets and receivables minus debts/credit liabilities.
+
+Debt and loan APIs:
+
+- `CreateDebtOrLoan(command)`: Create a liability (`i_owe`) or receivable (`owed_to_me`) with counterparty, principal amount, currency, due date, note, and status.
+- `UpdateDebtOrLoan(id, patch)`: Update metadata, due date, note, or status.
+- `RecordDebtPayment(command)`: Record payment/collection and link it to wallet cash movement.
+- `GetDebtStatus(query)`: Return principal, paid/collected amount, remaining amount, due date, and status.
+- `ListDebts(query)`: List active, settled, forgiven, archived, payable, and receivable records.
 
 ### Second Brain Module
 
