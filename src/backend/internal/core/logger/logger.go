@@ -9,7 +9,7 @@ var log *logrus.Logger
 func Init(level string) {
 	log = logrus.New()
 	log.SetFormatter(&logrus.JSONFormatter{})
-	
+
 	lvl, err := logrus.ParseLevel(level)
 	if err != nil {
 		lvl = logrus.InfoLevel

@@ -29,6 +29,7 @@ All notable changes should be recorded here.
 - Added Finance query/reporting design rules: reports use business-effective dates such as `occurred_at`, tables include created/updated actor fields, and only correction-oriented tables use soft delete fields.
 - Hardened Epic 1 Finance implementation design with concrete DB type rules, paired transfer rows, soft-delete recalculation behavior, report DTO shape, indexes, and initial constraints.
 - Implemented initial Epic 1 Finance backend module with wallet, category, transaction, transfer, asset, report, net-worth, and debt/loan service logic, hard-coded single-user owner handling, schema migration, and focused unit tests.
+- Split Finance service implementation into focused files and moved tests into dedicated `domain/tests` and `service/tests` packages; added local PostgreSQL integration tests that execute the real migration.
 
 ## [1.1.1] - 2026-06-07
 

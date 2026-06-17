@@ -722,7 +722,10 @@ go test ./internal/modules/finance/... -run Report
 - Notes: focused unit tests cover shared owner default, audit helper behavior, money validation, signed report amounts, period grouping, and wallet type validation.
 - Command: `cd src/backend && go test ./...`
 - Result: pass
-- Notes: compile/vet pass across backend packages. Live PostgreSQL migration smoke test and full per-ticket acceptance tests are still pending.
+- Notes: compile/vet pass across backend packages.
+- Command: `cd src/backend && GOCACHE=/private/tmp/cortex-go-cache DATABASE_URL=postgres://dev:password@localhost:5432/cortex?sslmode=disable go test ./...`
+- Result: pass
+- Notes: local PostgreSQL integration tests execute the real migration in an isolated schema and cover the end-to-end finance service flow plus critical validation cases.
 
 ---
 

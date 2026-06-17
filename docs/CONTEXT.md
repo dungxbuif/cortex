@@ -41,7 +41,7 @@ updated: TBD
 
 ## Current Focus
 
-Review Epic 1 Finance API implementation and add missing DB integration/per-ticket acceptance tests.
+Review Epic 1 Finance API implementation and add remaining exhaustive per-ticket edge-case tests.
 
 ## Recently Touched Areas
 
@@ -75,12 +75,11 @@ Review Epic 1 Finance API implementation and add missing DB integration/per-tick
 - Epic 1 asset design must model historical transactions, current holdings, market price history, and portfolio valuation separately so net worth uses current value while expense reports ignore investment buys.
 - Master architecture, API, ERD, and requirements docs have been reconciled with the Epic 1 Finance asset valuation model.
 - Epic 1 optimization rules: holdings are rebuildable projections, price selection is deterministic by asset class, investment cash movements are excluded from ordinary reports by default, saving deposits are assets only when term/interest behavior exists, debt/loan records distinguish `i_owe` liabilities from `owed_to_me` receivables, financial reports use business-effective dates such as `occurred_at`, finance tables carry `created_at/by` plus `updated_at/by`, money is stored as integer minor units, asset quantities use fixed precision decimals, and transfers are paired rows sharing `transfer_group_id`.
-- Epic 1 Finance implementation now has domain models, DTOs, GORM-backed service logic, migrations, hard-coded single-user `owner-single-user`, and focused unit tests. Tickets remain `in_review` until live PostgreSQL migration smoke test and per-ticket acceptance tests are added.
+- Epic 1 Finance implementation now has split domain/service files, DTOs, GORM-backed service logic, migrations, hard-coded single-user `owner-single-user`, external test packages under `domain/tests` and `service/tests`, and local PostgreSQL integration proof. Tickets remain `in_review` until remaining exhaustive edge-case tests are added.
 
 ## Next Steps
 
-- Add live PostgreSQL migration smoke test for `src/backend/migrations/000001_init.up.sql`.
-- Add per-ticket acceptance tests for CTX-101 through CTX-109, especially transaction atomicity, asset holding rebuilds, report exclusions, and debt settlement.
+- Add remaining per-ticket edge-case tests for CTX-101 through CTX-109, especially asset quantity arithmetic, price priority, report include-investments behavior, and correction/reversal flows.
 
 ## Open Questions
 
