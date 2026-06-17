@@ -34,9 +34,17 @@ Thumbs.db
 # Local cache
 .gocache/
 .gopath/
+.venv/
+
+# Python compiled files
+__pycache__/
+*.py[cod]
+*$py.class
 
 # Cortex specific
 /references/
 _bmad-output/
 .agents/
 .agent/
+# Second Brain Real Vault Test Data
+/src/secondbrain/tests/testdata/

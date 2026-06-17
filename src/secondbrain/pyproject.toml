@@ -1,0 +1,18 @@
+[project]
+name = "cortex-secondbrain"
+version = "0.1.0"
+description = "Second Brain service for Cortex: capture buffer, vault sync metadata, and testable RAG retrieval."
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn>=0.30.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx2>=2.4.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

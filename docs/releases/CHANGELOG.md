@@ -20,6 +20,8 @@ All notable changes should be recorded here.
 ## [Unreleased]
 
 ### Added
+- Added initial Python Second Brain service under `src/secondbrain`, moved Second Brain notes and local testdata out of the Go backend tree, installed/enabled pgvector in local PostgreSQL `cortex`, added environment-based configuration and SQL migrations, and implemented deterministic capture, sync status, Markdown parsing/chunking, policy-safe retrieval, FastAPI adapter tests, local PostgreSQL pgvector integration tests, Google API smoke-test hooks, and 18-case real Vault ground-truth retrieval coverage.
+- Recorded architecture boundary that Python owns Orchestrator/LLM tool runtime and AI/RAG-heavy processing, Go owns API-heavy deterministic components, and Go↔Python communication should use internal gRPC with FastAPI only as a Python dev/debug adapter.
 - Added Cortex app MVP planning artifacts from `docs/raw_spec/`: `PHASE-APP-1`, six draft JIRA-style `CORTEX-N` app tickets, backlog/roadmap links, and validation matrix rows. App tickets are grouped by epic: Epic 1 Base Platform, Epic 2 Finance App, Epic 3 Second Brain App, and Epic 4 Homelab App.
 - Added Epic 1 Finance services detail design under `docs/work/tickets/epic-1/`, linked CTX-101 through CTX-108 to the shared design, and added planned validation rows for the Finance service tickets.
 - Revised Epic 1 asset design to match the raw finance spec: added holdings, price history, valuation rules, cost-basis behavior, and asset-specific acceptance criteria.

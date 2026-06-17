@@ -20,7 +20,7 @@ Xây dựng Cortex như một personal AI system hoạt động qua Chat UI, có
 - [Second-Brain Module](modules/second-brain.md): quản lý tri thức cá nhân dựa trên Obsidian Vault, capture inbox và RAG từ Markdown.
 - [Homelab Module](modules/homelab.md): hỏi đáp read-only trên repo Homelab đã pull/index, không chat-to-edit.
 
-Cortex dùng kiến trúc modular monolith bằng Go, expose OpenAI-compatible API cho Open WebUI, điều phối LLM/tool calls ở tầng runtime, và gọi vào các module thông qua domain APIs ổn định.
+Cortex dùng Python cho Orchestrator/LLM/tool runtime và các phần xử lý AI nặng; dùng Go cho các components nặng về public APIs, domain APIs ổn định, concurrency và xử lý nghiệp vụ deterministic. Các runtime giao tiếp qua gRPC nội bộ.
 
 ## 2. System Spec Index
 
@@ -65,7 +65,7 @@ Các module nghiệp vụ như Finance, Second-Brain và Homelab chỉ tập tru
 
 Các layer phía trên chịu trách nhiệm điều phối AI:
 
-- **Cortex Runtime / Orchestrator:** hiểu intent, trích xuất tham số, hỏi lại khi thiếu dữ liệu, điều phối nhiều bước.
+- **Cortex Runtime / Orchestrator (Python):** hiểu intent, trích xuất tham số, hỏi lại khi thiếu dữ liệu, điều phối nhiều bước.
 - **Tool Adapter / Tool Registry:** map tool-call schema sang domain API tương ứng.
 - **Presentation Adapter:** format kết quả domain API thành Markdown/chat response phù hợp với Open WebUI.
 - **Permission Policy:** kiểm tra quyền read/capture/write/sync/index trước khi gọi API.
@@ -97,12 +97,12 @@ Cortex không suy luận quyền theo tên module. Mỗi module khai báo capabi
 | `sync_from_external` | Bank/provider future | Vault mirror future | Git pull/webhook |
 | `execute_runtime_action` | No | No | No |
 
-## 6. Các thành phần Cốt lõi (Core Components - Go Backend)
+## 6. Các thành phần Cốt lõi (Core Components)
 
 ### 6.1. OpenAI API Proxy & Session Management
 
 - **Chức năng:** Lắng nghe request `/v1/chat/completions` từ Open WebUI.
-- **Session/Context:** Open WebUI gửi Messages History; Go Backend tiếp nhận, nạp policy, chọn context nội bộ/RAG khi cần, gắn tool definitions hợp lệ rồi gọi LLM provider.
+- **Session/Context:** Open WebUI gửi Messages History; API gateway/Orchestrator tiếp nhận, nạp policy, chọn context nội bộ/RAG khi cần, gắn tool definitions hợp lệ rồi gọi LLM provider. Orchestrator thuộc Python runtime.
 
 ### 6.2. Cortex Runtime, Orchestrator & Dynamic Tool Registry
 
@@ -176,7 +176,9 @@ N8n là external automation layer, không phải nơi chứa business logic chí
 ## 9. Technology Stack
 
 - **Interface/Client:** **Open WebUI** (chạy Docker local).
-- **Core Backend:** Go modular monolith, OpenAI-compatible API server.
+- **Orchestrator / AI Runtime:** Python, LLM/tool runtime, context planning, provider clients, RAG coordination.
+- **API-heavy Components:** Go services/gateway where useful for public APIs, deterministic domain APIs, concurrency, and strict contracts.
+- **Second Brain Backend:** Python AI service for RAG/document processing, exposed to Go through internal gRPC; optional FastAPI dev/debug adapter; Celery/RQ workers; SQLAlchemy/psql migration tooling.
 - **AI Model:** Gemini/OpenAI-compatible provider tùy cấu hình.
 - **Database:** PostgreSQL + pgvector.
 - **Storage/Mirror:** local disk mirror, Git mirror, optional MinIO for attachment/snapshot/backup.

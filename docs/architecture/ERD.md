@@ -270,3 +270,68 @@ erDiagram
         datetime created_at
     }
 ```
+
+## Second Brain Entities
+
+The Second Brain database acts as a read-only metadata mirror and RAG search index for the local Obsidian Vault, with a writeable Capture Buffer for temporary chat notes.
+
+- `secondbrain_captures` is the temporary buffer.
+- `secondbrain_documents` is the metadata index built from Obsidian Vault.
+- `secondbrain_document_chunks` holds the vector embeddings for RAG.
+
+```mermaid
+erDiagram
+    SECONDBRAIN_DOCUMENT ||--o{ SECONDBRAIN_DOCUMENT_CHUNK : "is split into"
+
+    SECONDBRAIN_CAPTURE {
+        string id PK
+        string owner_id
+        string status "captured, copied, exported, discarded"
+        string source "chat, manual, import"
+        string raw_type
+        text raw_text
+        text normalized_markdown
+        string suggested_title
+        text suggested_description
+        string_array suggested_tags
+        string vault_path
+        string checksum
+        string export_method
+        string created_from_thread_id
+        datetime created_at
+        string created_by
+        datetime updated_at
+        string updated_by
+    }
+
+    SECONDBRAIN_DOCUMENT {
+        string id PK
+        string owner_id
+        string vault_path "Unique Index"
+        string checksum
+        string title
+        string document_type
+        jsonb frontmatter
+        string sync_status
+        text validation_error
+        datetime last_synced_at
+        datetime created_at
+        string created_by
+        datetime updated_at
+        string updated_by
+    }
+
+    SECONDBRAIN_DOCUMENT_CHUNK {
+        string id PK
+        string document_id FK
+        int chunk_index
+        text content
+        vector embedding "VECTOR(1536)"
+    }
+```
+
+### Second Brain Query Rules
+
+- RAG Searches must strictly exclude `SECONDBRAIN_CAPTURE`.
+- `SECONDBRAIN_DOCUMENT.vault_path` must be unique per `owner_id`.
+- Embedding searches use Cosine Similarity on `SECONDBRAIN_DOCUMENT_CHUNK.embedding`.

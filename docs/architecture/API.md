@@ -21,7 +21,10 @@ The primary interface to Cortex is the OpenAI-compatible `/v1/chat/completions` 
 
 ## Domain APIs
 
-The domain modules do not expose REST HTTP endpoints individually; they expose Go function signatures (or internal RPCs) that the Orchestrator's Tool Adapter invokes. Below are the core Domain APIs defined for the modules.
+The domain modules (Finance, Homelab) do not expose REST HTTP endpoints individually; they expose Go function signatures (or internal RPCs) that the Orchestrator's Tool Adapter invokes.
+The **Orchestrator is Python-owned**. Go components expose API-heavy deterministic services through internal gRPC where Python needs them. The Second Brain module operates as a Python AI service and is called by the Python Orchestrator through internal Python/gRPC contracts. FastAPI endpoints may exist for local debugging and smoke tests, but they are not the authoritative integration boundary.
+
+Below are the core Domain APIs defined for the modules.
 
 ### Finance Module
 
@@ -66,11 +69,28 @@ Debt and loan APIs:
 - `GetDebtStatus(query)`: Return principal, paid/collected amount, remaining amount, due date, and status.
 - `ListDebts(query)`: List active, settled, forgiven, archived, payable, and receivable records.
 
-### Second Brain Module
+### Second Brain Module (Python gRPC Service)
 
-- `CaptureNote(command)`: Save an idea/note to the temporary capture buffer database.
-- `QueryVault(query)`: Search indexed Obsidian vault items via RAG.
-- `GetSyncStatus(query)`: Check the last time the Vault mirror was updated.
+Capture APIs:
+- `CreateCapture(command)`: Save an idea/note to the temporary capture buffer database.
+- `ListCaptures(query)`: List pending/exported captures.
+- `GetCapture(id)`: Retrieve a single capture.
+- `RenderCaptureMarkdown(id)`: Render a capture into a standard markdown template.
+- `MarkCaptureCopied(id)`: Update status to copied.
+- `MarkCaptureExported(command)`: Update status to exported when manually saved to Vault.
+- `DiscardCapture(command)`: Soft-delete/discard a temporary capture.
+
+Sync & Document APIs:
+- `GetSyncStatus(query)`: Check the last time the Vault mirror was updated, aggregate stale/failed files.
+- `RecordDocumentSync(command)`: Upsert parsed markdown metadata into the database mirror.
+
+RAG Query APIs:
+- `SearchKnowledge(query)`: Vector similarity search over `secondbrain_document_chunks` using `pgvector` (strictly excluding the capture buffer). Executed by Python retrieval pipeline.
+
+Internal transport:
+- Python Orchestrator -> Go domain/API services uses generated gRPC clients from protobuf service definitions.
+- Cross-service Python boundaries may also use gRPC where a separate process is useful; direct Python calls are allowed inside the same deployable service boundary.
+- REST/FastAPI is optional for local development, diagnostics, and smoke tests only.
 
 ### Homelab Module
 

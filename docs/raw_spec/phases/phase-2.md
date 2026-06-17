@@ -12,6 +12,6 @@ Nhằm nâng cấp Second-Brain từ chỗ chỉ lưu file Markdown thô sang m�
 **Kiến thức AI Apply:** Embeddings, Chunking strategies (cắt nhỏ text), Vector Database, Retrieval-Augmented Generation (RAG).
 
 **Thực thi:**
-* Cài thêm một Vector DB nhẹ (như Qdrant hoặc ChromaDB) trên Homelab.
-* Viết một service nhỏ (lúc này dùng Python sẽ rất nhàn vì hệ sinh thái LangChain/LlamaIndex mạnh) để định kỳ đọc file Markdown từ Go, chuyển thành Vector và lưu vào DB.
-* Khi bạn hỏi "Tháng trước tôi set up con router thế nào?", Go sẽ gọi service Python tìm kiếm các đoạn text liên quan, nhét vào prompt, và Gemini sẽ tổng hợp câu trả lời.
+* Dùng PostgreSQL + pgvector làm vector store mặc định để giữ vận hành local đơn giản.
+* Viết Python AI service để định kỳ đọc file Markdown từ Vault mirror/snapshot, chuyển thành vector và lưu vào DB.
+* Khi bạn hỏi "Tháng trước tôi set up con router thế nào?", Python Orchestrator sẽ gọi RAG service tìm kiếm các đoạn text liên quan, nhét vào prompt, và Gemini sẽ tổng hợp câu trả lời.

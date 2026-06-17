@@ -12,5 +12,5 @@ Khi số lượng "Plugin/Tools" lên tới hàng chục, một Agent sẽ bị 
 **Kiến thức AI Apply:** Multi-Agent Systems, Agentic Workflows, Semantic Routing.
 
 **Thực thi:**
-* Thay vì 1 Agent, bạn chia ra: Finance Agent, Homelab Agent, Research Agent. Go sẽ đóng vai trò Supervisor Agent, nhận tin nhắn và định tuyến (Routing) đến đúng Agent con xử lý.
-* Đây là lúc bạn apply MCP (Model Context Protocol). Các domain services (n8n, Python script) sẽ trở thành các MCP Servers, và Go BE là MCP Client. Mọi thứ tuân theo chuẩn giao tiếp quốc tế, cực kỳ dễ cắm rút.
+* Thay vì 1 Agent, bạn chia ra: Finance Agent, Homelab Agent, Research Agent. Python Orchestrator sẽ đóng vai trò Supervisor Agent, nhận tin nhắn và định tuyến (Routing) đến đúng Agent con xử lý.
+* Cross-runtime service calls dùng gRPC cho contract nội bộ. MCP có thể được áp dụng sau cho plugin/tool ecosystem khi cần chuẩn giao tiếp rộng hơn bên ngoài boundary Go/Python nội bộ.
