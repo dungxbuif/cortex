@@ -21,8 +21,21 @@ The primary interface to Cortex is the OpenAI-compatible `/v1/chat/completions` 
 
 ## Domain APIs
 
-The domain modules (Finance, Homelab) do not expose REST HTTP endpoints individually; they expose Go function signatures (or internal RPCs) that the Orchestrator's Tool Adapter invokes.
+The domain modules do not own public REST contracts individually; they expose Go function signatures, Python service methods, or internal RPCs that the Orchestrator's Tool Adapter invokes.
 The **Orchestrator is Python-owned**. Go components expose API-heavy deterministic services through internal gRPC where Python needs them. The Second Brain module operates as a Python AI service and is called by the Python Orchestrator through internal Python/gRPC contracts. FastAPI endpoints may exist for local debugging and smoke tests, but they are not the authoritative integration boundary.
+
+The Go Gateway also exposes thin internal/dev JSON proxy routes for AI services. These routes are transport adapters only: they inject the current single-user `owner_id` when omitted, call generated gRPC clients, and must not duplicate Python AI domain logic.
+
+AI gateway proxy routes:
+
+- `GET /api/ai/health`: Check Python Second Brain and Homelab gRPC health.
+- `POST /api/secondbrain/captures`: Create a temporary capture buffer record.
+- `GET /api/secondbrain/captures`: List capture buffer records.
+- `GET /api/secondbrain/status`: Return Second Brain indexed document/chunk counts.
+- `POST /api/secondbrain/search`: Search indexed Second Brain knowledge.
+- `POST /api/homelab/sync`: Sync/index Homelab markdown docs through the Python AI service.
+- `POST /api/homelab/search`: Search Homelab indexed docs.
+- `POST /api/homelab/validate-links`: Validate Homelab markdown relative links.
 
 Below are the core Domain APIs defined for the modules.
 
@@ -94,8 +107,9 @@ Internal transport:
 
 ### Homelab Module
 
-- `SearchDocs(query)`: RAG query over the Homelab documentation.
-- `GetServiceCatalog()`: List deployed Homelab services.
+- `SyncRepository(command)`: Read markdown from a local Homelab repo checkout, redact sensitive content, chunk, embed, and index docs.
+- `SearchDocs(query)`: RAG query over the Homelab documentation with source path and commit metadata.
+- `ValidateLinks(command)`: Validate relative markdown links and heading anchors.
 
 ## Error Handling
 

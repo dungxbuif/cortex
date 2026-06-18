@@ -8,15 +8,17 @@ import (
 )
 
 const (
-	EnvServerAddress = "SERVER_ADDRESS"
-	EnvDatabaseURL   = "DATABASE_URL"
-	EnvLogLevel      = "LOG_LEVEL"
+	EnvServerAddress    = "SERVER_ADDRESS"
+	EnvDatabaseURL      = "DATABASE_URL"
+	EnvLogLevel         = "LOG_LEVEL"
+	EnvAIServiceAddress = "AI_SERVICE_ADDRESS"
 )
 
 type Config struct {
-	ServerAddress string
-	DatabaseURL   string
-	LogLevel      string
+	ServerAddress    string
+	DatabaseURL      string
+	LogLevel         string
+	AIServiceAddress string
 }
 
 func Load() *Config {
@@ -31,9 +33,10 @@ func Load() *Config {
 	}
 
 	return &Config{
-		ServerAddress: getEnv(EnvServerAddress, ":8080"),
-		DatabaseURL:   dbUrl,
-		LogLevel:      getEnv(EnvLogLevel, "info"),
+		ServerAddress:    getEnv(EnvServerAddress, ":8080"),
+		DatabaseURL:      dbUrl,
+		LogLevel:         getEnv(EnvLogLevel, "info"),
+		AIServiceAddress: getEnv(EnvAIServiceAddress, "localhost:50051"),
 	}
 }
 

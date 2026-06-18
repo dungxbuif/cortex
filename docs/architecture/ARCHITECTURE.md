@@ -33,7 +33,7 @@ Cortex is a personal AI system acting as a unified gateway for an individual's d
 | --- | --- | --- |
 | **Finance (Go)** | Manage personal finance, wallets, transactions, investment holdings, market price history, reports, and net worth. | PostgreSQL (Canonical) |
 | **Second Brain (Python)** | Knowledge management, capture inbox, and Obsidian RAG pipeline with strict evaluations. | Obsidian Vault (Canonical) / PostgreSQL (Buffer & Vector Index) |
-| **Homelab (Go)** | Homelab service queries, docs, and validation. | GitHub Repo (Canonical) |
+| **Homelab (Python AI Service, Go Gateway Proxy)** | Homelab docs sync, redaction, RAG search, and link validation. Go exposes thin proxy routes to the Python gRPC service. | GitHub Repo (Canonical) / PostgreSQL (Vector Index) |
 | **Orchestrator (Python)** | Intent parsing, tool calling, context planning, provider calls, and response synthesis. | Ephemeral Context |
 | **System Services (Go)** | Permission, Audit, and Sync control. | PostgreSQL |
 
@@ -102,6 +102,18 @@ Finance reporting and auditability follow separate time semantics:
 
 - **Chat Flow**: Synchronous request/response loop via `/v1/chat/completions`.
 - **Sync/Index Flow**: Asynchronous jobs pulling from canonical sources (Git, Vault) -> Redaction -> Chunking -> Vector Index.
+- **AI Gateway Proxy Flow**: Go Echo routes under `/api/secondbrain/*` and `/api/homelab/*` map JSON to generated protobuf messages, call the Python AI service over internal gRPC, and return JSON without adding domain logic in Go.
+
+```text
+HTTP JSON request
+  -> Go Echo Gateway
+  -> internal/infrastructure/grpc AIServiceClient
+  -> generated protobuf client
+  -> Python grpc_server.py
+  -> grpc/handlers.py
+  -> SecondBrainService / HomelabService
+  -> PostgreSQL + pgvector / local Git or Vault mirror
+```
 
 ## Dependencies
 

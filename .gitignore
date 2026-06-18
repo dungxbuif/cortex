@@ -46,6 +46,4 @@ __pycache__/
 _bmad-output/
 .agents/
 .agent/
-# Second Brain Real Vault Test Data
-/src/secondbrain/tests/testdata/
-/exam/
+src/ai_service/tests/testdata

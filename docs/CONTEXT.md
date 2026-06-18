@@ -32,16 +32,16 @@ updated: TBD
 
 ## Current Status
 
-- Status: Epic 3 Homelab Readonly RAG & Link Validation completed and verified. Epic 4 Audit & Permissions is ready for planning.
+- Status: Epic 4 Restructuring & gRPC Integration complete and verified.
 - Active backlog: `docs/work/BACKLOG.md`
-- Current queue focus: `BL-006`
-- Active phase: docs/work/phases/PHASE-4-audit-policy.md
-- Active ticket: docs/work/tickets/CTX-401.md, docs/work/tickets/CTX-402.md
+- Current queue focus: None; next ready high-risk items are `BL-006` Audit & Permissions and `BL-007` Orchestrator.
+- Active phase: docs/work/phases/PHASE-4-restructuring.md
+- Active ticket: None.
 - Active bug: None.
 
 ## Current Focus
 
-Complete Epic 3 Homelab Readonly RAG & Link Validation, verifying it successfully runs over the real exam directory. Prepare detail design and implementation plan for Epic 4: Audit & Permissions.
+Epic 4 is complete. Next work should start from a new or existing ticket; likely candidates are Audit & Permissions (`BL-006`) or Orchestrator (`BL-007`).
 
 ## Recently Touched Areas
 
@@ -59,6 +59,46 @@ Complete Epic 3 Homelab Readonly RAG & Link Validation, verifying it successfull
 - `src/secondbrain/models.py`
 - `src/secondbrain/tests/test_homelab.py`
 - `src/secondbrain/tests/test_api_runtime.py`
+- `docs/work/tickets/epic-4/DETAIL_DESIGN.md`
+- `docs/work/tickets/epic-4/implementation_plan.md`
+- `docs/work/tickets/epic-4/CTX-403.md`
+- `src/ai_service/__init__.py`
+- `src/ai_service/api.py`
+- `src/ai_service/tests/test_api_runtime.py`
+- `src/ai_service/tests/test_google_ai_smoke.py`
+- `src/ai_service/tests/test_homelab.py`
+- `src/ai_service/tests/test_postgres_real_vault_integration.py`
+- `src/ai_service/tests/test_secondbrain_service.py`
+- `docs/work/tickets/epic-4/CTX-404.md`
+- `docs/work/tickets/epic-4/CTX-405.md`
+- `src/ai_service/core/config.py`
+- `src/ai_service/core/google_ai.py`
+- `src/ai_service/core/ports.py`
+- `src/ai_service/providers/`
+- `docs/work/tickets/epic-4/CTX-406.md`
+- `src/ai_service/secondbrain/models.py`
+- `src/ai_service/secondbrain/repository.py`
+- `src/ai_service/homelab/models.py`
+- `src/ai_service/homelab/repository.py`
+- `docs/work/tickets/epic-4/CTX-407.md`
+- `docs/work/tickets/epic-4/CTX-408.md`
+- `docs/work/tickets/epic-4/CTX-409.md`
+- `docs/work/tickets/epic-4/CTX-410.md`
+- `src/ai_service/homelab/redaction.py`
+- `src/ai_service/homelab/link_validator.py`
+- `src/ai_service/homelab/markdown.py`
+- `src/ai_service/tests/test_domain_helpers.py`
+- `src/ai_service/grpc/`
+- `src/ai_service/grpc_server.py`
+- `src/ai_service/tests/test_grpc_runtime.py`
+- `src/backend/internal/infrastructure/grpc/`
+- `src/backend/internal/modules/ai/`
+- `src/backend/internal/config/config.go`
+- `src/backend/cmd/server/main.go`
+- `src/proto/cortex.proto`
+- `scripts/run-ai-gateway-dev.sh`
+- `scripts/check-ai-gateway.sh`
+- `README.md`
 
 - `AGENTS.md`
 - `docs/`
@@ -92,21 +132,29 @@ Complete Epic 3 Homelab Readonly RAG & Link Validation, verifying it successfull
 - Master architecture, API, ERD, and requirements docs have been reconciled with the Epic 1 Finance asset valuation model.
 - Epic 1 optimization rules: holdings are rebuildable projections, price selection is deterministic by asset class, investment cash movements are excluded from ordinary reports by default, saving deposits are assets only when term/interest behavior exists, debt/loan records distinguish `i_owe` liabilities from `owed_to_me` receivables, financial reports use business-effective dates such as `occurred_at`, finance tables carry `created_at/by` plus `updated_at/by`, money is stored as integer minor units, asset quantities use fixed precision decimals, and transfers are paired rows sharing `transfer_group_id`.
 - Epic 1 Finance implementation has passed all exhaustive edge-case and E2E integration tests natively against PostgreSQL. All tickets verified and committed.
-- Second Brain has moved out of `src/backend/internal/modules/secondbrain` into standalone Python service path `src/secondbrain`.
+- Second Brain has moved out of `src/backend/internal/modules/secondbrain` into standalone Python AI service path `src/ai_service`.
 - Second Brain implementation starts with deterministic, testable core behavior before external LLM calls: capture lifecycle, Markdown/frontmatter parsing, heading-aware chunking, sync counts, policy-safe search, wiki/staging priority ranking, query expansion, and optional FastAPI adapter.
 - Second Brain DB naming is standardized around `secondbrain_captures`, `secondbrain_documents`, and `secondbrain_document_chunks`; Python service uses the shared PostgreSQL instance/database with prefixed table ownership.
 - Second Brain local PostgreSQL integration test uses `dev/password` against database `cortex`, indexes 91 real local Vault markdown files, and passes 18/18 ground-truth retrieval checks.
 - `pgvector` is installed in the local Docker `postgres` container and enabled in database `cortex` as extension `vector` version `0.8.2`; `secondbrain_document_chunks.embedding` is verified as DB type `vector`.
-- Python Second Brain reads DB/model settings from environment variables and has versioned SQL migrations under `src/secondbrain/migrations/`; migration `000001_secondbrain_pgvector` is applied in local DB `cortex` and sets embeddings to `VECTOR(768)`.
+- Python AI service reads DB/model settings from environment variables and has versioned SQL migrations under `src/ai_service/migrations/`; migration `000001_secondbrain_pgvector` is applied in local DB `cortex` and sets embeddings to `VECTOR(768)`.
 - Google model smoke tests are implemented and opt-in with `SECOND_BRAIN_RUN_GOOGLE_SMOKE=true`; local attempt successfully connects and validates API/model/key for Gemini generation and embedding models.
 - **Real Google AI Embeddings** are fully integrated: The original deterministic hashes have been replaced by real `gemini-embedding-2` calls using Python's standard `urllib.request` library with exponential backoff handling to bypass rate limits. All 91 ground truth local documents were successfully embedded and verified natively with Google API.
 - **Checksum Sync Optimization**: RAG Sync operations now bypass unmodified documents using checksum-matching against existing metadata in the database, protecting API limits and reducing sync time drastically.
 - Architecture decision update: Python owns Orchestrator/LLM tool runtime and AI/RAG-heavy processing; Go is preferred for API-heavy deterministic services; Go↔Python communication uses internal gRPC. FastAPI is retained only as a Python dev/debug adapter.
+- Epic 4 is approved for incremental implementation by ticket breakdown: CTX-403 baseline/import repair, CTX-404 ports/providers, CTX-405 repository split, CTX-406 domain cleanup, CTX-407 Python gRPC, CTX-408 Go gateway, CTX-409 runtime harness, CTX-410 E2E/docs reconciliation.
+- CTX-403 is verified: `ai_service.*` import root passes, all Python tests import the renamed package, non-smoke tests use deterministic fake embeddings, and the Python suite passes against local PostgreSQL/pgvector without requiring Google credentials outside the opt-in smoke test.
+- CTX-404 is verified: `Embedder` port exists, Google provider code lives under `src/ai_service/providers/`, Second Brain and Homelab services no longer import `GoogleAIClient` directly, full Python suite passes, and opt-in Google smoke passes with `.env.local`.
+- CTX-405 is verified: Second Brain and Homelab models/repositories are domain-owned, `core/repository.py` only contains shared SQL/psql helpers, repository contract tests pass against SQLite and local PostgreSQL/pgvector, and the full Python suite plus opt-in Google smoke pass.
+- CTX-406 is verified: Second Brain and Homelab chunking produces raw chunks before embedding, Homelab redaction/link validation/chunking helpers are split into focused modules, pure helper tests pass, full Python suite passes, and opt-in Google smoke passes.
+- CTX-407 is verified: Python protobuf stubs, gRPC handlers, and `grpc_server.py` expose Second Brain/Homelab service calls through generated clients; in-process gRPC tests pass, full Python suite passes, and opt-in Google smoke passes.
+- CTX-408 is verified: Go protobuf stubs, AI service gRPC client, Echo proxy routes, and `AI_SERVICE_ADDRESS` config compile and test. `go test ./...`, Python AI suite, and opt-in Google smoke all pass.
+- CTX-409 is verified: local harness starts Python AI gRPC and Go Gateway together, `/api/ai/health` passes through Go->Python gRPC, backend/Python tests pass, and opt-in Google smoke passes.
+- CTX-410 is verified: final local curl E2E through Go Gateway covers Python gRPC health, Second Brain capture create/list/status, Homelab link validation, Homelab sync, and Homelab search. Epic 4 phase is marked done.
 
 ## Next Steps
 
-- Prepare the DETAIL_DESIGN.md and implementation plan for Epic 4 Audit & Permissions.
-- Implement event logging and capability guard policy service in Go/Python.
+- Await user direction for next phase. Recommended next choices: `BL-006` Audit & Permissions before orchestrator writes, or `BL-007` Orchestrator if chat runtime is now the priority.
 
 ## Open Questions
 
