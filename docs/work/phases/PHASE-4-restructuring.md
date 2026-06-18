@@ -32,12 +32,13 @@ trace:
     - ../tickets/epic-4/CTX-408.md
     - ../tickets/epic-4/CTX-409.md
     - ../tickets/epic-4/CTX-410.md
+    - ../tickets/epic-4/CTX-411.md
 ---
 
 # PHASE-4-restructuring: AI Service Restructuring & gRPC Integration
 
 ## Goal
-Restructure the Python AI codebase into clean modular sub-packages under `ai_service` and implement gRPC communication between the Go Backend Gateway and the Python AI Service.
+Restructure the Python AI codebase into clean modular sub-packages under `ai_service`, implement internal gRPC contracts, and expose the Python-owned OpenAI-compatible gateway/orchestrator path.
 
 ## Scope
 - Renaming the Python codebase directory from `src/secondbrain` to `src/ai_service`.
@@ -46,17 +47,20 @@ Restructure the Python AI codebase into clean modular sub-packages under `ai_ser
 - Generating Python and Go stub classes from protobuf files.
 - Implementing the Python gRPC server mapping service calls.
 - Implementing the Go gRPC client and proxying HTTP traffic via Echo handlers.
+- Implementing the Python gateway route `/v1/chat/completions` that routes chat into existing Second Brain and Homelab services.
 - Upgrading Go and Python test suites.
 
 ## Out of Scope
-- Implementing the full Chat Orchestrator LLM loop (since it is part of the next Phase/Epic).
+- Implementing the full Chat Orchestrator LLM/ReAct loop (since it is part of the next Phase/Epic).
 - Implementing audit logging database tables and capability guards (which are part of Phase 4/Epic 4 security checks).
+- Removing existing Go gateway code.
 
 ## Priority
 High
 
 ## Success Criteria
-- Echo backend runs HTTP REST handlers that proxy commands to the Python gRPC server.
+- Python gateway exposes an OpenAI-compatible chat route that delegates into the existing module services.
+- Echo backend REST proxy remains regression-tested but is not the primary orchestrator gateway.
 - All RAG search and link checker tests pass under the new restructured codebase.
 - Protobuf contracts are clean, version-independent, and generated code compiles successfully.
 
@@ -65,7 +69,7 @@ High
 - Python AI service unit/integration suite.
 - Go backend full suite, including Finance regression tests and AI gateway tests.
 - Opt-in real Google model smoke with local credentials.
-- Local curl E2E through Go Gateway to Python gRPC.
+- Python gateway and Python gRPC orchestrator runtime tests.
 
 ## Completion Summary
 
@@ -79,10 +83,12 @@ Epic 4 is complete and verified.
 - CTX-408 implemented Go protobuf stubs, gRPC client, and Echo proxy routes.
 - CTX-409 added local runtime harness scripts.
 - CTX-410 verified real local Go Gateway -> Python gRPC E2E for Second Brain and Homelab paths.
+- CTX-411 added the Python-owned OpenAI-compatible gateway/orchestrator full flow for chat capture and Homelab search over the existing module services.
 
 Final evidence:
 
 - `go test ./...` passes.
-- `PYTHONPATH=src src/ai_service/.venv/bin/python -m unittest discover -s src/ai_service/tests -v` passes, 24 tests OK.
+- `PYTHONPATH=src src/ai_service/.venv/bin/python -m unittest discover -s src/ai_service/tests -v` passes, 25 tests OK.
 - Opt-in Google smoke passes, 2 tests OK.
 - Curl E2E through `scripts/run-ai-gateway-dev.sh` passes for health, capture create/list/status, Homelab link validation, sync, and search.
+- Python gateway `/v1/chat/completions` and Python gRPC `OrchestratorService.ChatCompletions` tests pass against the same module services.

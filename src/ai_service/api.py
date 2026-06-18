@@ -6,6 +6,7 @@ from typing import Any
 from ai_service.secondbrain.repository import SqliteSecondBrainRepository
 from ai_service.secondbrain.service import SecondBrainService
 from ai_service.homelab.service import HomelabService
+from ai_service.orchestrator.service import ChatMessage, OrchestratorService
 
 
 def create_app(
@@ -22,13 +23,45 @@ def create_app(
     """
 
     try:
-        from fastapi import FastAPI
+        from fastapi import FastAPI, HTTPException
     except ModuleNotFoundError as exc:
         raise RuntimeError("FastAPI is not installed. Install project dependencies first.") from exc
 
     app = FastAPI(title="Cortex Second Brain API")
     service = SecondBrainService(repository=secondbrain_repository or repository, embedder=embedder, ai_client=ai_client)
     homelab_service = HomelabService(repository=homelab_repository or repository, embedder=embedder, ai_client=ai_client)
+    orchestrator_service = OrchestratorService(service, homelab_service)
+
+    @app.get("/api/ai/health")
+    def ai_health() -> dict[str, str]:
+        return {
+            "status": "ok",
+            "gateway": "python",
+            "second_brain": "ok",
+            "homelab": "ok",
+            "orchestrator": "ok",
+        }
+
+    @app.post("/v1/chat/completions")
+    def chat_completions(payload: dict[str, Any]) -> dict[str, Any]:
+        try:
+            messages = [
+                ChatMessage(
+                    role=str(message.get("role", "")),
+                    content=str(message.get("content", "")),
+                    name=str(message.get("name", "")),
+                )
+                for message in payload.get("messages", [])
+            ]
+            completion = orchestrator_service.chat_completions(
+                messages=messages,
+                owner_id=str(payload.get("owner_id", "owner")),
+                conversation_id=str(payload.get("conversation_id", "")),
+                request_id=str(payload.get("request_id", "")),
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        return _serialize(asdict(completion))
 
     @app.post("/api/v1/capture")
     def create_capture(payload: dict[str, Any]) -> dict[str, Any]:

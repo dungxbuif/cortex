@@ -17,14 +17,14 @@ shared_fields: [status, linked_decisions]
 
 ## Overview
 
-Cortex is a personal AI system acting as a unified gateway for an individual's data domains. It is structured around a **Python Orchestrator / AI runtime** plus **Go API-heavy deterministic services**. Python owns LLM orchestration, tool routing, context planning, RAG coordination, provider integration, response synthesis, and AI evaluations. Go is preferred for public API gateway surfaces and deterministic domain/API components such as Finance. Go and Python communicate through internal gRPC contracts.
+Cortex is a personal AI system acting as a unified gateway for an individual's data domains. It is structured around a **Python Gateway / Orchestrator / AI runtime** plus **Go API-heavy deterministic services**. Python owns the OpenAI-compatible chat gateway, LLM orchestration, tool routing, context planning, RAG coordination, provider integration, response synthesis, and AI evaluations. Go is preferred for deterministic domain/API components such as Finance and compatibility proxy surfaces when useful. Go and Python communicate through internal gRPC contracts where they are separate processes.
 
 ## System Boundaries
 
 - **Open WebUI (Client)**: The sole chat interface.
-- **Orchestrator & LLM Runtime (Python)**: Maps chat intents to strict domain API tool calls, manages context, calls LLM providers, and synthesizes responses.
-- **Go Domain/API Services**: Pure business logic and API-heavy components (Finance, Homelab integration, public gateway surfaces when needed) exposed to Python through gRPC.
-- **Python AI Services**: Specialized AI/RAG/vector/document-understanding tasks (Second Brain) exposed through internal gRPC, with optional FastAPI dev/debug adapters.
+- **Python Gateway, Orchestrator & LLM Runtime**: Exposes `/v1/chat/completions`, maps chat intents to strict domain API tool calls, manages context, calls LLM providers, and synthesizes responses.
+- **Go Domain/API Services**: Pure business logic and API-heavy components such as Finance, exposed to Python through gRPC where needed.
+- **Python AI Services**: Specialized AI/RAG/vector/document-understanding tasks for Second Brain and Homelab, available through direct Python calls inside the service boundary and internal gRPC where a process boundary is useful.
 - **N8n (External Automation)**: Handles crons, external integrations, and pushes data back to Cortex via webhooks.
 
 ## Modules
@@ -33,14 +33,14 @@ Cortex is a personal AI system acting as a unified gateway for an individual's d
 | --- | --- | --- |
 | **Finance (Go)** | Manage personal finance, wallets, transactions, investment holdings, market price history, reports, and net worth. | PostgreSQL (Canonical) |
 | **Second Brain (Python)** | Knowledge management, capture inbox, and Obsidian RAG pipeline with strict evaluations. | Obsidian Vault (Canonical) / PostgreSQL (Buffer & Vector Index) |
-| **Homelab (Python AI Service, Go Gateway Proxy)** | Homelab docs sync, redaction, RAG search, and link validation. Go exposes thin proxy routes to the Python gRPC service. | GitHub Repo (Canonical) / PostgreSQL (Vector Index) |
+| **Homelab (Python AI Service)** | Homelab docs sync, redaction, RAG search, and link validation. Python gateway/orchestrator calls the service directly inside the AI runtime; internal gRPC remains available as a service contract. | GitHub Repo (Canonical) / PostgreSQL (Vector Index) |
 | **Orchestrator (Python)** | Intent parsing, tool calling, context planning, provider calls, and response synthesis. | Ephemeral Context |
 | **System Services (Go)** | Permission, Audit, and Sync control. | PostgreSQL |
 
 ## Data Flow
 
 ```text
-User Message -> Open WebUI -> Cortex OpenAI Proxy
+User Message -> Open WebUI -> Python /v1/chat/completions Gateway
   -> Python Orchestrator (Intent + Permission Check)
   -> Tool Adapter
   -> Domain/API Service (gRPC to Go service OR Python AI service)
@@ -100,17 +100,14 @@ Finance reporting and auditability follow separate time semantics:
 
 ## Runtime Flow
 
-- **Chat Flow**: Synchronous request/response loop via `/v1/chat/completions`.
+- **Chat Flow**: Synchronous request/response loop via Python `/v1/chat/completions`.
 - **Sync/Index Flow**: Asynchronous jobs pulling from canonical sources (Git, Vault) -> Redaction -> Chunking -> Vector Index.
-- **AI Gateway Proxy Flow**: Go Echo routes under `/api/secondbrain/*` and `/api/homelab/*` map JSON to generated protobuf messages, call the Python AI service over internal gRPC, and return JSON without adding domain logic in Go.
+- **AI Compatibility Proxy Flow**: Go Echo routes under `/api/secondbrain/*` and `/api/homelab/*` remain thin internal/dev adapters. They map JSON to generated protobuf messages, call the Python AI service over internal gRPC, and return JSON without adding domain logic in Go.
 
 ```text
-HTTP JSON request
-  -> Go Echo Gateway
-  -> internal/infrastructure/grpc AIServiceClient
-  -> generated protobuf client
-  -> Python grpc_server.py
-  -> grpc/handlers.py
+OpenAI-compatible chat request
+  -> Python FastAPI /v1/chat/completions
+  -> OrchestratorService
   -> SecondBrainService / HomelabService
   -> PostgreSQL + pgvector / local Git or Vault mirror
 ```
@@ -118,10 +115,10 @@ HTTP JSON request
 ## Dependencies
 
 - **PostgreSQL + pgvector**: Core database for finance data, capture buffers, and vector embeddings.
-- **Go**: Public API gateway surfaces and deterministic domain/API services.
-- **Python / gRPC services**: Ecosystem for advanced RAG, text chunking, embeddings, reranking, and LLM evaluations (Second Brain).
-- **Python Orchestrator**: LLM/tool runtime, context planning, provider integrations, and response synthesis.
-- **FastAPI**: Optional dev/debug adapter for Python services, not the primary Go/Python contract.
+- **Go**: Deterministic domain/API services and compatibility proxy surfaces.
+- **Python / gRPC services**: Ecosystem for advanced RAG, text chunking, embeddings, reranking, and LLM evaluations.
+- **Python Gateway/Orchestrator**: OpenAI-compatible chat gateway, LLM/tool runtime, context planning, provider integrations, and response synthesis.
+- **FastAPI**: Primary Python chat gateway surface and optional dev/debug adapter for module diagnostics.
 - **Open WebUI**: Frontend chat client.
 - **LLM Provider**: Gemini / OpenAI for intelligence.
 - **N8n**: External webhook worker.

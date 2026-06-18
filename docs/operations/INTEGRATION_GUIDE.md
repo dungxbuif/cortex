@@ -54,4 +54,4 @@ To keep the Homelab read-only vector search up-to-date, a GitHub push webhook tr
      ```bash
      GITHUB_WEBHOOK_SECRET=your_generated_secret_here
      ```
-   - The webhook verification logic `verify_signature` in [homelab.py](file:///Users/dungxbuif/workspace/cortex/src/secondbrain/homelab.py) validates the signature header `X-Hub-Signature-256` to prevent unauthorized sync trigger requests.
+   - The webhook verification logic `verify_signature` in [homelab.py](../../src/secondbrain/homelab.py) validates the signature header `X-Hub-Signature-256` to prevent unauthorized sync trigger requests.

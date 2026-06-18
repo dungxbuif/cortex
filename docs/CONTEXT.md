@@ -32,19 +32,28 @@ updated: TBD
 
 ## Current Status
 
-- Status: Epic 4 Restructuring & gRPC Integration complete and verified.
+- Status: Epic 4 Restructuring, Python Gateway & gRPC Integration complete and verified.
 - Active backlog: `docs/work/BACKLOG.md`
-- Current queue focus: None; next ready high-risk items are `BL-006` Audit & Permissions and `BL-007` Orchestrator.
+- Current queue focus: None; next ready high-risk items are `BL-006` Audit & Permissions, `BL-007` Orchestrator stubs, and `BL-009` Full LLM/ReAct Orchestrator Completion after remaining tasks.
 - Active phase: docs/work/phases/PHASE-4-restructuring.md
 - Active ticket: None.
 - Active bug: None.
 
 ## Current Focus
 
-Epic 4 is complete. Next work should start from a new or existing ticket; likely candidates are Audit & Permissions (`BL-006`) or Orchestrator (`BL-007`).
+Epic 4 is complete with Python-owned `/v1/chat/completions` gateway routing into existing Second Brain and Homelab services. Epic 7 has been added after the current epics/remaining tasks to capture full LLM/ReAct orchestration, prompt contracts, tool-call adapters, module connectors, sync/completion gaps, and eval/E2E proof.
 
 ## Recently Touched Areas
 
+- `docs/work/BACKLOG.md`
+- `docs/work/phases/PHASE-5-audit-policy.md`
+- `docs/work/phases/PHASE-6-orchestrator.md`
+- `docs/work/tickets/CTX-501.md`
+- `docs/work/tickets/CTX-502.md`
+- `docs/work/tickets/CTX-601.md`
+- `docs/work/tickets/CTX-602.md`
+- `docs/work/tickets/CTX-603.md`
+- `docs/work/tickets/CTX-604.md`
 - `AGENTS.md`
 - `docs/CONTEXT.md`
 - `docs/work/VALIDATION_MATRIX.md`
@@ -84,6 +93,14 @@ Epic 4 is complete. Next work should start from a new or existing ticket; likely
 - `docs/work/tickets/epic-4/CTX-408.md`
 - `docs/work/tickets/epic-4/CTX-409.md`
 - `docs/work/tickets/epic-4/CTX-410.md`
+- `docs/work/phases/PHASE-7-orchestrator-completion.md`
+- `docs/work/tickets/epic-7/DETAIL_DESIGN.md`
+- `docs/work/tickets/epic-7/CTX-701.md`
+- `docs/work/tickets/epic-7/CTX-702.md`
+- `docs/work/tickets/epic-7/CTX-703.md`
+- `docs/work/tickets/epic-7/CTX-704.md`
+- `docs/work/tickets/epic-7/CTX-705.md`
+- `docs/work/tickets/epic-7/CTX-706.md`
 - `src/ai_service/homelab/redaction.py`
 - `src/ai_service/homelab/link_validator.py`
 - `src/ai_service/homelab/markdown.py`
@@ -151,10 +168,12 @@ Epic 4 is complete. Next work should start from a new or existing ticket; likely
 - CTX-408 is verified: Go protobuf stubs, AI service gRPC client, Echo proxy routes, and `AI_SERVICE_ADDRESS` config compile and test. `go test ./...`, Python AI suite, and opt-in Google smoke all pass.
 - CTX-409 is verified: local harness starts Python AI gRPC and Go Gateway together, `/api/ai/health` passes through Go->Python gRPC, backend/Python tests pass, and opt-in Google smoke passes.
 - CTX-410 is verified: final local curl E2E through Go Gateway covers Python gRPC health, Second Brain capture create/list/status, Homelab link validation, Homelab sync, and Homelab search. Epic 4 phase is marked done.
+- CTX-411 is verified: Python gateway `/v1/chat/completions` routes chat capture and Homelab search intents into existing module services, uses the same PostgreSQL database with module-separated tables, and exposes the same deterministic router through Python gRPC `OrchestratorService.ChatCompletions`.
+- BL-009 / Epic 7 is planned and ready after existing epics/remaining tasks: CTX-701 through CTX-706 cover full LLM/ReAct runtime, tool registry, tool adapter execution, module connectors, sync/completion gaps, and eval/E2E proof.
 
 ## Next Steps
 
-- Await user direction for next phase. Recommended next choices: `BL-006` Audit & Permissions before orchestrator writes, or `BL-007` Orchestrator if chat runtime is now the priority.
+- Await user direction for next phase. Recommended next choices: `BL-006` Audit & Permissions before orchestrator writes, continue `BL-007` stubs if needed, then `BL-009` Epic 7 for full LLM/ReAct completion.
 
 ## Open Questions
 

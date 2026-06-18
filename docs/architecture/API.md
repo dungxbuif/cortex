@@ -17,14 +17,19 @@ shared_fields: [status]
 
 ## Public Contracts
 
-The primary interface to Cortex is the OpenAI-compatible `/v1/chat/completions` API. All UI interactions happen through this single proxy layer.
+The primary interface to Cortex is the Python-owned OpenAI-compatible `/v1/chat/completions` API. All UI interactions happen through this single gateway layer.
 
 ## Domain APIs
 
 The domain modules do not own public REST contracts individually; they expose Go function signatures, Python service methods, or internal RPCs that the Orchestrator's Tool Adapter invokes.
-The **Orchestrator is Python-owned**. Go components expose API-heavy deterministic services through internal gRPC where Python needs them. The Second Brain module operates as a Python AI service and is called by the Python Orchestrator through internal Python/gRPC contracts. FastAPI endpoints may exist for local debugging and smoke tests, but they are not the authoritative integration boundary.
+The **Gateway and Orchestrator are Python-owned**. Go components expose API-heavy deterministic services through internal gRPC where Python needs them. Second Brain and Homelab operate as Python AI services and are called by the Python Gateway/Orchestrator through direct Python service calls inside the same service boundary, with internal gRPC available where a process boundary is useful.
 
-The Go Gateway also exposes thin internal/dev JSON proxy routes for AI services. These routes are transport adapters only: they inject the current single-user `owner_id` when omitted, call generated gRPC clients, and must not duplicate Python AI domain logic.
+The Go Gateway also exposes thin internal/dev JSON proxy routes for AI services. These routes are compatibility transport adapters only: they inject the current single-user `owner_id` when omitted, call generated gRPC clients, and must not duplicate Python AI domain logic.
+
+Python gateway routes:
+
+- `GET /api/ai/health`: Check the Python gateway and connected module services.
+- `POST /v1/chat/completions`: OpenAI-compatible chat endpoint. Current Epic 4 behavior uses a deterministic router: capture intents write to the Second Brain capture inbox; Homelab-oriented questions search indexed Homelab chunks; other knowledge questions search Second Brain first and Homelab second. Full LLM/ReAct planning is deferred to the Orchestrator epic.
 
 AI gateway proxy routes:
 
@@ -103,7 +108,7 @@ RAG Query APIs:
 Internal transport:
 - Python Orchestrator -> Go domain/API services uses generated gRPC clients from protobuf service definitions.
 - Cross-service Python boundaries may also use gRPC where a separate process is useful; direct Python calls are allowed inside the same deployable service boundary.
-- REST/FastAPI is optional for local development, diagnostics, and smoke tests only.
+- FastAPI is the Python gateway surface for `/v1/chat/completions` and also hosts local diagnostics/smoke routes for module services.
 
 ### Homelab Module
 

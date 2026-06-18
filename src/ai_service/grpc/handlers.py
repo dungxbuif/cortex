@@ -6,6 +6,7 @@ import grpc
 
 from ai_service.grpc import cortex_pb2, cortex_pb2_grpc
 from ai_service.homelab.service import HomelabService
+from ai_service.orchestrator.service import ChatMessage, OrchestratorService
 from ai_service.secondbrain.service import SecondBrainService
 
 T = TypeVar("T")
@@ -116,9 +117,42 @@ class HomelabServicer(cortex_pb2_grpc.HomelabServiceServicer):
         )
 
 
-def register_services(server: grpc.Server, secondbrain_service: SecondBrainService, homelab_service: HomelabService) -> None:
+class OrchestratorServicer(cortex_pb2_grpc.OrchestratorServiceServicer):
+    def __init__(self, service: OrchestratorService) -> None:
+        self.service = service
+
+    def HealthCheck(self, request, context):
+        return cortex_pb2.HealthCheckResponse(status="ok")
+
+    def ChatCompletions(self, request, context):
+        return _grpc_guard(
+            context,
+            lambda: _chat_completion_response(
+                self.service.chat_completions(
+                    messages=[
+                        ChatMessage(role=message.role, content=message.content, name=message.name)
+                        for message in request.messages
+                    ],
+                    owner_id=request.owner_id or "owner",
+                    conversation_id=request.conversation_id,
+                    request_id=request.request_id,
+                )
+            ),
+        )
+
+
+def register_services(
+    server: grpc.Server,
+    secondbrain_service: SecondBrainService,
+    homelab_service: HomelabService,
+    orchestrator_service: OrchestratorService | None = None,
+) -> None:
     cortex_pb2_grpc.add_SecondBrainServiceServicer_to_server(SecondBrainServicer(secondbrain_service), server)
     cortex_pb2_grpc.add_HomelabServiceServicer_to_server(HomelabServicer(homelab_service), server)
+    cortex_pb2_grpc.add_OrchestratorServiceServicer_to_server(
+        OrchestratorServicer(orchestrator_service or OrchestratorService(secondbrain_service, homelab_service)),
+        server,
+    )
 
 
 def _grpc_guard(context, fn: Callable[[], T]) -> T:
@@ -144,6 +178,27 @@ def _capture_record(capture) -> cortex_pb2.CaptureRecord:
         normalized_markdown=capture.normalized_markdown,
         vault_path=capture.vault_path or "",
         created_at=capture.created_at.isoformat(),
+    )
+
+
+def _chat_completion_response(completion) -> cortex_pb2.ChatCompletionsResponse:
+    return cortex_pb2.ChatCompletionsResponse(
+        id=completion.id,
+        object=completion.object,
+        created=completion.created,
+        model=completion.model,
+        choices=[
+            cortex_pb2.ChatCompletionsResponse.Choice(
+                index=choice.index,
+                message=cortex_pb2.ChatMessage(
+                    role=choice.message.role,
+                    content=choice.message.content,
+                    name=choice.message.name,
+                ),
+                finish_reason=choice.finish_reason,
+            )
+            for choice in completion.choices
+        ],
     )
 
 

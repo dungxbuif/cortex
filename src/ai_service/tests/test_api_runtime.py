@@ -52,9 +52,15 @@ class FastAPIRuntimeTest(unittest.TestCase):
         self.assertIn("/api/v1/homelab/sync", paths)
         self.assertIn("/api/v1/homelab/search", paths)
         self.assertIn("/api/v1/homelab/validate-links", paths)
+        self.assertIn("/api/ai/health", paths)
+        self.assertIn("/v1/chat/completions", paths)
         self.assertEqual(self.repository.embedding_column_type(), "vector")
 
         client = TestClient(app)
+
+        health_response = client.get("/api/ai/health")
+        self.assertEqual(health_response.status_code, 200)
+        self.assertEqual(health_response.json()["gateway"], "python")
         
         import tempfile
         from pathlib import Path
@@ -70,6 +76,19 @@ class FastAPIRuntimeTest(unittest.TestCase):
             self.assertEqual(validate_res.status_code, 200)
             self.assertIn("broken_links", validate_res.json())
             self.assertEqual(len(validate_res.json()["broken_links"]), 1)
+
+            sync_res = client.post(
+                "/api/v1/homelab/sync",
+                json={
+                    "owner_id": OWNER_ID,
+                    "repo_path": temp_dir,
+                    "repo_url": "repo",
+                    "branch": "main",
+                    "commit_sha": "sha",
+                },
+            )
+            self.assertEqual(sync_res.status_code, 200)
+            self.assertEqual(sync_res.json()["processed_files"], 1)
 
         create_response = client.post(
             "/api/v1/capture",
@@ -95,6 +114,28 @@ class FastAPIRuntimeTest(unittest.TestCase):
         )
         self.assertEqual(search_response.status_code, 200)
         self.assertEqual(search_response.json(), [])
+
+        chat_capture = client.post(
+            "/v1/chat/completions",
+            json={
+                "owner_id": OWNER_ID,
+                "request_id": "chatcmpl-api-test",
+                "messages": [{"role": "user", "content": "Ghi lai y tuong gateway python"}],
+            },
+        )
+        self.assertEqual(chat_capture.status_code, 200)
+        self.assertEqual(chat_capture.json()["id"], "chatcmpl-api-test")
+        self.assertIn("capture inbox", chat_capture.json()["choices"][0]["message"]["content"])
+
+        chat_search = client.post(
+            "/v1/chat/completions",
+            json={
+                "owner_id": OWNER_ID,
+                "messages": [{"role": "user", "content": "homelab README link"}],
+            },
+        )
+        self.assertEqual(chat_search.status_code, 200)
+        self.assertIn("Ket qua tu Homelab", chat_search.json()["choices"][0]["message"]["content"])
 
 
 if __name__ == "__main__":

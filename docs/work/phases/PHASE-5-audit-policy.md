@@ -23,13 +23,13 @@ trace:
   roadmap: ROADMAP
   requirements: []
   tickets:
-    - ../tickets/CTX-501.md\n    - ../tickets/CTX-502.md\n    - ../tickets/CTX-503.md\n    - ../tickets/CTX-504.md
+    - ../tickets/CTX-501.md\n    - ../tickets/CTX-502.md
 ---
 
-# PHASE-5: Runtime Orchestrator & Tool Adapter
+# PHASE-5: Audit & Permission Guards
 
 ## Goal
-Runtime Orchestrator & Tool Adapter
+Audit & Permission Guards
 
 ## Scope
 Implementation of associated tickets.

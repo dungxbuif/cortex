@@ -6,13 +6,13 @@ This design describes the architecture, database schema, algorithms, and integra
 
 ## 1. Context Loaded & Reference Links
 
-- **Backlog Item**: [BL-005](file:///Users/dungxbuif/workspace/cortex/docs/work/BACKLOG.md)
-- **Active Phase**: [PHASE-3-homelab.md](file:///Users/dungxbuif/workspace/cortex/docs/work/phases/PHASE-3-homelab.md)
+- **Backlog Item**: [BL-005](../../BACKLOG.md)
+- **Active Phase**: [PHASE-3-homelab.md](../../phases/PHASE-3-homelab.md)
 - **Active Tickets**:
-  - [CTX-301: Homelab RAG Query API](file:///Users/dungxbuif/workspace/cortex/docs/work/tickets/epic-3/CTX-301.md)
-  - [CTX-302: Markdown Link Verification API](file:///Users/dungxbuif/workspace/cortex/docs/work/tickets/epic-3/CTX-302.md)
-- **Spec Source**: [docs/raw_spec/modules/homelab.md](file:///Users/dungxbuif/workspace/cortex/docs/raw_spec/modules/homelab.md)
-- **Architecture Base**: [docs/decisions/ADR-003-second-brain-python-migration.md](file:///Users/dungxbuif/workspace/cortex/docs/decisions/ADR-003-second-brain-python-migration.md)
+  - [CTX-301: Homelab RAG Query API](CTX-301.md)
+  - [CTX-302: Markdown Link Verification API](CTX-302.md)
+- **Spec Source**: [docs/raw_spec/modules/homelab.md](../../../raw_spec/modules/homelab.md)
+- **Architecture Base**: [docs/decisions/ADR-003-second-brain-python-migration.md](../../../decisions/ADR-003-second-brain-python-migration.md)
 
 ---
 

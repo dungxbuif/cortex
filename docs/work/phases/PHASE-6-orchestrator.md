@@ -1,6 +1,6 @@
 ---
 artifact_type: phase
-id: PHASE-4
+id: PHASE-6
 status: ready
 owner: human
 human_fields:
@@ -23,13 +23,13 @@ trace:
   roadmap: ROADMAP
   requirements: []
   tickets:
-    - ../tickets/CTX-401.md\n    - ../tickets/CTX-402.md
+    - ../tickets/CTX-601.md\n    - ../tickets/CTX-602.md\n    - ../tickets/CTX-603.md\n    - ../tickets/CTX-604.md
 ---
 
-# PHASE-4: Audit & Permission Guards
+# PHASE-6: Runtime Orchestrator & Tool Adapter
 
 ## Goal
-Audit & Permission Guards
+Runtime Orchestrator & Tool Adapter
 
 ## Scope
 Implementation of associated tickets.

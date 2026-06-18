@@ -37,6 +37,7 @@ class GrpcRuntimeTest(unittest.TestCase):
         self.channel = grpc.insecure_channel(f"127.0.0.1:{port}")
         self.sb = cortex_pb2_grpc.SecondBrainServiceStub(self.channel)
         self.hl = cortex_pb2_grpc.HomelabServiceStub(self.channel)
+        self.orch = cortex_pb2_grpc.OrchestratorServiceStub(self.channel)
 
     def tearDown(self) -> None:
         self.channel.close()
@@ -96,6 +97,40 @@ class GrpcRuntimeTest(unittest.TestCase):
         with self.assertRaises(grpc.RpcError) as raised:
             self.sb.CreateCapture(cortex_pb2.CreateCaptureRequest(owner_id="grpc-owner", raw_text=" "))
         self.assertEqual(raised.exception.code(), grpc.StatusCode.INVALID_ARGUMENT)
+
+    def test_orchestrator_chat_routes_to_existing_services(self) -> None:
+        capture = self.orch.ChatCompletions(
+            cortex_pb2.ChatCompletionsRequest(
+                owner_id="grpc-orchestrator",
+                request_id="chatcmpl-test",
+                messages=[cortex_pb2.ChatMessage(role="user", content="Ghi lai y tuong routing module cu")],
+            )
+        )
+        self.assertEqual(capture.id, "chatcmpl-test")
+        self.assertIn("capture inbox", capture.choices[0].message.content)
+        listed = self.sb.ListCaptures(cortex_pb2.ListCapturesRequest(owner_id="grpc-orchestrator"))
+        self.assertEqual(len(listed.captures), 1)
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "README.md").write_text("# Homelab\nRathole tunnel forwarding\n")
+            self.hl.SyncHomelab(
+                cortex_pb2.SyncHomelabRequest(
+                    owner_id="grpc-orchestrator",
+                    repo_path=temp_dir,
+                    repo_url="repo",
+                    branch="main",
+                    commit_sha="sha",
+                )
+            )
+            search = self.orch.ChatCompletions(
+                cortex_pb2.ChatCompletionsRequest(
+                    owner_id="grpc-orchestrator",
+                    messages=[cortex_pb2.ChatMessage(role="user", content="homelab rathole tunnel")],
+                )
+            )
+            self.assertIn("Ket qua tu Homelab", search.choices[0].message.content)
+            self.assertIn("README.md", search.choices[0].message.content)
 
 
 if __name__ == "__main__":

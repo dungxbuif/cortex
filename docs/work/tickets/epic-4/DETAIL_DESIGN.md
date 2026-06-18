@@ -2,12 +2,12 @@
 
 ## 1. Context & Reference Links
 
-- **Backlog Item**: [BL-008](file:///Users/dungxbuif/workspace/cortex/docs/work/BACKLOG.md)
-- **Phase**: [PHASE-4-restructuring.md](file:///Users/dungxbuif/workspace/cortex/docs/work/phases/PHASE-4-restructuring.md)
-- **Ticket**: [CTX-403](file:///Users/dungxbuif/workspace/cortex/docs/work/tickets/epic-4/CTX-403.md)
-- **Architecture**: [ARCHITECTURE.md](file:///Users/dungxbuif/workspace/cortex/docs/architecture/ARCHITECTURE.md)
-- **Spec**: [spec.md](file:///Users/dungxbuif/workspace/cortex/docs/raw_spec/spec.md)
-- **ADR-003**: [ADR-003](file:///Users/dungxbuif/workspace/cortex/docs/decisions/ADR-003-second-brain-python-migration.md)
+- **Backlog Item**: [BL-008](../../BACKLOG.md)
+- **Phase**: [PHASE-4-restructuring.md](../../phases/PHASE-4-restructuring.md)
+- **Ticket**: [CTX-403](CTX-403.md)
+- **Architecture**: [ARCHITECTURE.md](../../../architecture/ARCHITECTURE.md)
+- **Spec**: [spec.md](../../../raw_spec/spec.md)
+- **ADR-003**: [ADR-003](../../../decisions/ADR-003-second-brain-python-migration.md)
 
 ---
 
@@ -54,21 +54,21 @@ src/
 
 | # | File | Vấn đề | Nguyên tắc bị vi phạm |
 |---|------|--------|----------------------|
-| V1 | [google_ai.py](file:///Users/dungxbuif/workspace/cortex/src/ai_service/core/google_ai.py) | Nằm trong `core/` — là shared utility. Nhưng đây là **AI provider client** (embed text, generate text) — nên thuộc về AI/Orchestrator layer, không phải core business utility. | Module Boundary: domain modules không nên phụ thuộc trực tiếp vào LLM/AI provider |
-| V2 | [secondbrain/markdown.py:98-120](file:///Users/dungxbuif/workspace/cortex/src/ai_service/secondbrain/markdown.py#L98-L120) | `chunk_markdown()` nhận `GoogleAIClient` trực tiếp và gọi `ai_client.embed_text()` bên trong loop. Domain module gọi thẳng AI API. | Module Boundary: chunking là domain logic, embedding là AI infrastructure |
-| V3 | [homelab/service.py:342-365](file:///Users/dungxbuif/workspace/cortex/src/ai_service/homelab/service.py#L342-L365) | `_chunk_homelab_document()` gọi `self.ai_client.embed_text()` trong loop. Giống V2. | Module Boundary: domain gọi thẳng AI provider |
-| V4 | [homelab/service.py:163](file:///Users/dungxbuif/workspace/cortex/src/ai_service/homelab/service.py#L163) | `search_knowledge()` gọi `self.ai_client.embed_text(query)` trực tiếp. Domain module tự embed query để search. | Module Boundary: domain module không nên embed query trực tiếp |
-| V5 | [secondbrain/service.py:176](file:///Users/dungxbuif/workspace/cortex/src/ai_service/secondbrain/service.py#L176) | `search_knowledge()` gọi `self.ai_client.embed_text(joined_query)` trực tiếp. | Module Boundary: domain module không nên embed query trực tiếp |
-| V6 | [repository.py](file:///Users/dungxbuif/workspace/cortex/src/ai_service/core/repository.py) | **God class**: `SqliteSecondBrainRepository` (474 dòng) và `PostgresPsqlSecondBrainRepository` (500+ dòng) đều chứa methods cho **cả** Second Brain **và** Homelab. Đặt tên cũng gây nhầm lẫn (tên "SecondBrain" nhưng chứa cả homelab). | Single Responsibility: mỗi module nên có repository riêng |
+| V1 | [google_ai.py](../../../../src/ai_service/core/google_ai.py) | Nằm trong `core/` — là shared utility. Nhưng đây là **AI provider client** (embed text, generate text) — nên thuộc về AI/Orchestrator layer, không phải core business utility. | Module Boundary: domain modules không nên phụ thuộc trực tiếp vào LLM/AI provider |
+| V2 | [secondbrain/markdown.py:98-120](../../../../src/ai_service/secondbrain/markdown.py#L98-L120) | `chunk_markdown()` nhận `GoogleAIClient` trực tiếp và gọi `ai_client.embed_text()` bên trong loop. Domain module gọi thẳng AI API. | Module Boundary: chunking là domain logic, embedding là AI infrastructure |
+| V3 | [homelab/service.py:342-365](../../../../src/ai_service/homelab/service.py#L342-L365) | `_chunk_homelab_document()` gọi `self.ai_client.embed_text()` trong loop. Giống V2. | Module Boundary: domain gọi thẳng AI provider |
+| V4 | [homelab/service.py:163](../../../../src/ai_service/homelab/service.py#L163) | `search_knowledge()` gọi `self.ai_client.embed_text(query)` trực tiếp. Domain module tự embed query để search. | Module Boundary: domain module không nên embed query trực tiếp |
+| V5 | [secondbrain/service.py:176](../../../../src/ai_service/secondbrain/service.py#L176) | `search_knowledge()` gọi `self.ai_client.embed_text(joined_query)` trực tiếp. | Module Boundary: domain module không nên embed query trực tiếp |
+| V6 | [repository.py](../../../../src/ai_service/core/repository.py) | **God class**: `SqliteSecondBrainRepository` (474 dòng) và `PostgresPsqlSecondBrainRepository` (500+ dòng) đều chứa methods cho **cả** Second Brain **và** Homelab. Đặt tên cũng gây nhầm lẫn (tên "SecondBrain" nhưng chứa cả homelab). | Single Responsibility: mỗi module nên có repository riêng |
 
 #### 🟡 Cải thiện cần thiết
 
 | # | File | Vấn đề |
 |---|------|--------|
-| I1 | [config.py](file:///Users/dungxbuif/workspace/cortex/src/ai_service/core/config.py) | `SecondBrainSettings` nên đổi tên thành `AIServiceSettings` vì nó cấu hình cho toàn bộ AI service (cả Homelab, cả Orchestrator), không chỉ Second Brain. |
-| I2 | [models.py](file:///Users/dungxbuif/workspace/cortex/src/ai_service/core/models.py) | Chứa entities của cả 2 domain (`Capture`, `VaultDocument`, `VaultChunk` + `HomelabDocument`, `HomelabChunk`). Nên tách mỗi domain giữ models riêng. |
-| I3 | [api.py](file:///Users/dungxbuif/workspace/cortex/src/ai_service/api.py) | FastAPI app tên `"Cortex Second Brain API"` nhưng serve cả Homelab routes. Nên đổi tên. Sau Epic 4, file này sẽ chỉ dùng cho dev/debug, gRPC là contract chính. |
-| I4 | [main.go](file:///Users/dungxbuif/workspace/cortex/src/backend/cmd/server/main.go) | Chỉ có 1 endpoint `/health`. Chưa kết nối Finance service handlers. Chưa có gRPC client. |
+| I1 | [config.py](../../../../src/ai_service/core/config.py) | `SecondBrainSettings` nên đổi tên thành `AIServiceSettings` vì nó cấu hình cho toàn bộ AI service (cả Homelab, cả Orchestrator), không chỉ Second Brain. |
+| I2 | [models.py](../../../../src/ai_service/core/models.py) | Chứa entities của cả 2 domain (`Capture`, `VaultDocument`, `VaultChunk` + `HomelabDocument`, `HomelabChunk`). Nên tách mỗi domain giữ models riêng. |
+| I3 | [api.py](../../../../src/ai_service/api.py) | FastAPI app tên `"Cortex Second Brain API"` nhưng serve cả Homelab routes. Nên đổi tên. Sau Epic 4, file này sẽ chỉ dùng cho dev/debug, gRPC là contract chính. |
+| I4 | [main.go](../../../../src/backend/cmd/server/main.go) | Chỉ có 1 endpoint `/health`. Chưa kết nối Finance service handlers. Chưa có gRPC client. |
 
 ---
 
@@ -591,3 +591,58 @@ curl -X POST http://localhost:8080/api/v1/homelab/validate-links \
 - **Trạng thái:** Approved for incremental implementation by ticket breakdown.
 - **Người duyệt:** dungxbuif
 - **Ghi chú:** Implementation must proceed ticket-by-ticket from `CTX-403` through the continuity gates in `implementation_plan.md`.
+
+---
+
+## 10. Addendum: Minimal Orchestrator Full-Flow Connection
+
+### Problem
+
+Epic 4 originally stopped at direct Second Brain/Homelab service calls plus gRPC contracts, while `cortex.proto` already defined `OrchestratorService.ChatCompletions`. That leaves the OpenAI-compatible chat entrypoint disconnected from the existing module services, so Open WebUI cannot exercise the full module routing path.
+
+### Decision
+
+Add a minimal deterministic Orchestrator layer inside the Python AI service and expose it through Python `/v1/chat/completions` plus the existing gRPC contract. This is not the full LLM/ReAct loop. It is a testable routing/composition layer that:
+
+- accepts OpenAI-compatible chat messages through Python gateway `/v1/chat/completions`;
+- routes capture requests to `SecondBrainService.create_capture`;
+- routes Homelab-oriented questions to `HomelabService.search_knowledge`;
+- routes Second Brain knowledge questions to `SecondBrainService.search_knowledge`;
+- returns a structured Markdown answer with source snippets/citations when search results exist.
+
+The gateway continues to use one shared PostgreSQL database (`cortex` in local dev). Module isolation is by table/repository boundary only: `secondbrain_*` tables for Second Brain and `homelab_*` tables for Homelab.
+
+### Component Interaction
+
+```text
++----------------+      +------------------------+
+| Open WebUI/curl | ---> | Python AI Gateway      |
+| /v1/chat/...    |      | FastAPI + Orchestrator |
++----------------+      +-----------+------------+
+                                    |
+                   +----------------+----------------+
+                   |                                 |
+                   v                                 v
+          +--------------------+              +----------------+
+          | SecondBrainService |              | HomelabService |
+          | capture/search     |              | search/sync    |
+          +----------+---------+              +-------+--------+
+                     |                                |
+                     v                                v
+              +-------------+                  +-------------+
+              | PostgreSQL  |                  | PostgreSQL  |
+              | + pgvector  |                  | + pgvector  |
+              +-------------+                  +-------------+
+```
+
+### Out of Scope Still Deferred
+
+- LLM reasoning loop, tool-call schema generation, and multi-step ReAct planning.
+- Permission/audit persistence and capability guards.
+- Finance tool adapter wiring into orchestrator chat.
+
+### Verification
+
+- Python gateway test must prove `/v1/chat/completions` routes capture and Homelab search through existing services.
+- Python gRPC runtime test must prove `ChatCompletions` routes capture and Homelab search through the same orchestrator service.
+- Existing Second Brain/Homelab/Finance regression tests must continue to pass.

@@ -10,6 +10,7 @@ import grpc
 from ai_service.grpc.handlers import register_services
 from ai_service.homelab.repository import PostgresPsqlHomelabRepository
 from ai_service.homelab.service import HomelabService
+from ai_service.orchestrator.service import OrchestratorService
 from ai_service.providers.embedding import default_embedder
 from ai_service.secondbrain.repository import PostgresPsqlSecondBrainRepository
 from ai_service.secondbrain.service import SecondBrainService
@@ -18,6 +19,7 @@ from ai_service.secondbrain.service import SecondBrainService
 def create_server(
     secondbrain_service: SecondBrainService | None = None,
     homelab_service: HomelabService | None = None,
+    orchestrator_service: OrchestratorService | None = None,
     max_workers: int = 10,
 ) -> grpc.Server:
     embedder = None if secondbrain_service and homelab_service else default_embedder()
@@ -29,8 +31,9 @@ def create_server(
         repository=PostgresPsqlHomelabRepository.from_env(),
         embedder=embedder,
     )
+    orch_service = orchestrator_service or OrchestratorService(sb_service, hl_service)
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
-    register_services(server, sb_service, hl_service)
+    register_services(server, sb_service, hl_service, orch_service)
     return server
 
 
