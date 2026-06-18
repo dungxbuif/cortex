@@ -103,6 +103,7 @@ Finance reporting and auditability follow separate time semantics:
 - **Chat Flow**: Synchronous request/response loop via Python `/v1/chat/completions`.
 - **Sync/Index Flow**: Asynchronous jobs pulling from canonical sources (Git, Vault) -> Redaction -> Chunking -> Vector Index.
 - **AI Compatibility Proxy Flow**: Go Echo routes under `/api/secondbrain/*` and `/api/homelab/*` remain thin internal/dev adapters. They map JSON to generated protobuf messages, call the Python AI service over internal gRPC, and return JSON without adding domain logic in Go.
+- **Second Brain Obsidian Sync Flow**: n8n or another MinIO event source posts an authenticated object event to the Go Gateway. The Gateway validates `X-Cortex-N8n-Token` and forwards bucket/key metadata to Python over gRPC. Python fetches the configured local MinIO/S3 mirror object, accepts only `second-brain/**/*.md`, and indexes through the existing checksum-aware Second Brain pipeline. MinIO remains a mirror/snapshot, not the canonical authoring source.
 
 ```text
 OpenAI-compatible chat request
@@ -122,6 +123,7 @@ OpenAI-compatible chat request
 - **Open WebUI**: Frontend chat client.
 - **LLM Provider**: Gemini / OpenAI for intelligence.
 - **N8n**: External webhook worker.
+- **MinIO-compatible object storage**: Optional Second Brain mirror/snapshot source for Obsidian sync. Local development uses `SECOND_BRAIN_MINIO_LOCAL_ROOT` as a filesystem-backed S3 bucket simulation.
 
 ## Risks And Tradeoffs
 

@@ -19,11 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	SecondBrainService_HealthCheck_FullMethodName       = "/cortex.SecondBrainService/HealthCheck"
-	SecondBrainService_CreateCapture_FullMethodName     = "/cortex.SecondBrainService/CreateCapture"
-	SecondBrainService_ListCaptures_FullMethodName      = "/cortex.SecondBrainService/ListCaptures"
-	SecondBrainService_GetSyncStatus_FullMethodName     = "/cortex.SecondBrainService/GetSyncStatus"
-	SecondBrainService_SearchSecondBrain_FullMethodName = "/cortex.SecondBrainService/SearchSecondBrain"
+	SecondBrainService_HealthCheck_FullMethodName           = "/cortex.SecondBrainService/HealthCheck"
+	SecondBrainService_CreateCapture_FullMethodName         = "/cortex.SecondBrainService/CreateCapture"
+	SecondBrainService_ListCaptures_FullMethodName          = "/cortex.SecondBrainService/ListCaptures"
+	SecondBrainService_GetSyncStatus_FullMethodName         = "/cortex.SecondBrainService/GetSyncStatus"
+	SecondBrainService_SearchSecondBrain_FullMethodName     = "/cortex.SecondBrainService/SearchSecondBrain"
+	SecondBrainService_SyncSecondBrainObject_FullMethodName = "/cortex.SecondBrainService/SyncSecondBrainObject"
 )
 
 // SecondBrainServiceClient is the client API for SecondBrainService service.
@@ -35,6 +36,7 @@ type SecondBrainServiceClient interface {
 	ListCaptures(ctx context.Context, in *ListCapturesRequest, opts ...grpc.CallOption) (*ListCapturesResponse, error)
 	GetSyncStatus(ctx context.Context, in *GetSyncStatusRequest, opts ...grpc.CallOption) (*GetSyncStatusResponse, error)
 	SearchSecondBrain(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*SearchResponse, error)
+	SyncSecondBrainObject(ctx context.Context, in *SyncSecondBrainObjectRequest, opts ...grpc.CallOption) (*SyncSecondBrainObjectResponse, error)
 }
 
 type secondBrainServiceClient struct {
@@ -95,6 +97,16 @@ func (c *secondBrainServiceClient) SearchSecondBrain(ctx context.Context, in *Se
 	return out, nil
 }
 
+func (c *secondBrainServiceClient) SyncSecondBrainObject(ctx context.Context, in *SyncSecondBrainObjectRequest, opts ...grpc.CallOption) (*SyncSecondBrainObjectResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SyncSecondBrainObjectResponse)
+	err := c.cc.Invoke(ctx, SecondBrainService_SyncSecondBrainObject_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SecondBrainServiceServer is the server API for SecondBrainService service.
 // All implementations must embed UnimplementedSecondBrainServiceServer
 // for forward compatibility.
@@ -104,6 +116,7 @@ type SecondBrainServiceServer interface {
 	ListCaptures(context.Context, *ListCapturesRequest) (*ListCapturesResponse, error)
 	GetSyncStatus(context.Context, *GetSyncStatusRequest) (*GetSyncStatusResponse, error)
 	SearchSecondBrain(context.Context, *SearchRequest) (*SearchResponse, error)
+	SyncSecondBrainObject(context.Context, *SyncSecondBrainObjectRequest) (*SyncSecondBrainObjectResponse, error)
 	mustEmbedUnimplementedSecondBrainServiceServer()
 }
 
@@ -128,6 +141,9 @@ func (UnimplementedSecondBrainServiceServer) GetSyncStatus(context.Context, *Get
 }
 func (UnimplementedSecondBrainServiceServer) SearchSecondBrain(context.Context, *SearchRequest) (*SearchResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SearchSecondBrain not implemented")
+}
+func (UnimplementedSecondBrainServiceServer) SyncSecondBrainObject(context.Context, *SyncSecondBrainObjectRequest) (*SyncSecondBrainObjectResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SyncSecondBrainObject not implemented")
 }
 func (UnimplementedSecondBrainServiceServer) mustEmbedUnimplementedSecondBrainServiceServer() {}
 func (UnimplementedSecondBrainServiceServer) testEmbeddedByValue()                            {}
@@ -240,6 +256,24 @@ func _SecondBrainService_SearchSecondBrain_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SecondBrainService_SyncSecondBrainObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncSecondBrainObjectRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SecondBrainServiceServer).SyncSecondBrainObject(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SecondBrainService_SyncSecondBrainObject_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SecondBrainServiceServer).SyncSecondBrainObject(ctx, req.(*SyncSecondBrainObjectRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SecondBrainService_ServiceDesc is the grpc.ServiceDesc for SecondBrainService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -266,6 +300,10 @@ var SecondBrainService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchSecondBrain",
 			Handler:    _SecondBrainService_SearchSecondBrain_Handler,
+		},
+		{
+			MethodName: "SyncSecondBrainObject",
+			Handler:    _SecondBrainService_SyncSecondBrainObject_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

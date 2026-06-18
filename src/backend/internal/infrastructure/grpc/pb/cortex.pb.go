@@ -853,6 +853,158 @@ func (x *GetSyncStatusResponse) GetTotalChunks() int32 {
 	return 0
 }
 
+type SyncSecondBrainObjectRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Bucket        string                 `protobuf:"bytes,1,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	ObjectKey     string                 `protobuf:"bytes,2,opt,name=object_key,json=objectKey,proto3" json:"object_key,omitempty"`
+	EventId       string                 `protobuf:"bytes,3,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"`
+	OwnerId       string                 `protobuf:"bytes,4,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SyncSecondBrainObjectRequest) Reset() {
+	*x = SyncSecondBrainObjectRequest{}
+	mi := &file_cortex_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SyncSecondBrainObjectRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SyncSecondBrainObjectRequest) ProtoMessage() {}
+
+func (x *SyncSecondBrainObjectRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cortex_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SyncSecondBrainObjectRequest.ProtoReflect.Descriptor instead.
+func (*SyncSecondBrainObjectRequest) Descriptor() ([]byte, []int) {
+	return file_cortex_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *SyncSecondBrainObjectRequest) GetBucket() string {
+	if x != nil {
+		return x.Bucket
+	}
+	return ""
+}
+
+func (x *SyncSecondBrainObjectRequest) GetObjectKey() string {
+	if x != nil {
+		return x.ObjectKey
+	}
+	return ""
+}
+
+func (x *SyncSecondBrainObjectRequest) GetEventId() string {
+	if x != nil {
+		return x.EventId
+	}
+	return ""
+}
+
+func (x *SyncSecondBrainObjectRequest) GetOwnerId() string {
+	if x != nil {
+		return x.OwnerId
+	}
+	return ""
+}
+
+type SyncSecondBrainObjectResponse struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Status         string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	ProcessedFiles int32                  `protobuf:"varint,2,opt,name=processed_files,json=processedFiles,proto3" json:"processed_files,omitempty"`
+	SkippedFiles   int32                  `protobuf:"varint,3,opt,name=skipped_files,json=skippedFiles,proto3" json:"skipped_files,omitempty"`
+	FailedFiles    int32                  `protobuf:"varint,4,opt,name=failed_files,json=failedFiles,proto3" json:"failed_files,omitempty"`
+	ObjectKey      string                 `protobuf:"bytes,5,opt,name=object_key,json=objectKey,proto3" json:"object_key,omitempty"`
+	Message        string                 `protobuf:"bytes,6,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *SyncSecondBrainObjectResponse) Reset() {
+	*x = SyncSecondBrainObjectResponse{}
+	mi := &file_cortex_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SyncSecondBrainObjectResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SyncSecondBrainObjectResponse) ProtoMessage() {}
+
+func (x *SyncSecondBrainObjectResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cortex_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SyncSecondBrainObjectResponse.ProtoReflect.Descriptor instead.
+func (*SyncSecondBrainObjectResponse) Descriptor() ([]byte, []int) {
+	return file_cortex_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *SyncSecondBrainObjectResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *SyncSecondBrainObjectResponse) GetProcessedFiles() int32 {
+	if x != nil {
+		return x.ProcessedFiles
+	}
+	return 0
+}
+
+func (x *SyncSecondBrainObjectResponse) GetSkippedFiles() int32 {
+	if x != nil {
+		return x.SkippedFiles
+	}
+	return 0
+}
+
+func (x *SyncSecondBrainObjectResponse) GetFailedFiles() int32 {
+	if x != nil {
+		return x.FailedFiles
+	}
+	return 0
+}
+
+func (x *SyncSecondBrainObjectResponse) GetObjectKey() string {
+	if x != nil {
+		return x.ObjectKey
+	}
+	return ""
+}
+
+func (x *SyncSecondBrainObjectResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 type SyncHomelabRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RepoPath      string                 `protobuf:"bytes,1,opt,name=repo_path,json=repoPath,proto3" json:"repo_path,omitempty"`
@@ -866,7 +1018,7 @@ type SyncHomelabRequest struct {
 
 func (x *SyncHomelabRequest) Reset() {
 	*x = SyncHomelabRequest{}
-	mi := &file_cortex_proto_msgTypes[14]
+	mi := &file_cortex_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -878,7 +1030,7 @@ func (x *SyncHomelabRequest) String() string {
 func (*SyncHomelabRequest) ProtoMessage() {}
 
 func (x *SyncHomelabRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cortex_proto_msgTypes[14]
+	mi := &file_cortex_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -891,7 +1043,7 @@ func (x *SyncHomelabRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncHomelabRequest.ProtoReflect.Descriptor instead.
 func (*SyncHomelabRequest) Descriptor() ([]byte, []int) {
-	return file_cortex_proto_rawDescGZIP(), []int{14}
+	return file_cortex_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *SyncHomelabRequest) GetRepoPath() string {
@@ -941,7 +1093,7 @@ type SyncHomelabResponse struct {
 
 func (x *SyncHomelabResponse) Reset() {
 	*x = SyncHomelabResponse{}
-	mi := &file_cortex_proto_msgTypes[15]
+	mi := &file_cortex_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -953,7 +1105,7 @@ func (x *SyncHomelabResponse) String() string {
 func (*SyncHomelabResponse) ProtoMessage() {}
 
 func (x *SyncHomelabResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cortex_proto_msgTypes[15]
+	mi := &file_cortex_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -966,7 +1118,7 @@ func (x *SyncHomelabResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncHomelabResponse.ProtoReflect.Descriptor instead.
 func (*SyncHomelabResponse) Descriptor() ([]byte, []int) {
-	return file_cortex_proto_rawDescGZIP(), []int{15}
+	return file_cortex_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *SyncHomelabResponse) GetStatus() string {
@@ -1006,7 +1158,7 @@ type ValidateLinksRequest struct {
 
 func (x *ValidateLinksRequest) Reset() {
 	*x = ValidateLinksRequest{}
-	mi := &file_cortex_proto_msgTypes[16]
+	mi := &file_cortex_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1018,7 +1170,7 @@ func (x *ValidateLinksRequest) String() string {
 func (*ValidateLinksRequest) ProtoMessage() {}
 
 func (x *ValidateLinksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cortex_proto_msgTypes[16]
+	mi := &file_cortex_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1031,7 +1183,7 @@ func (x *ValidateLinksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidateLinksRequest.ProtoReflect.Descriptor instead.
 func (*ValidateLinksRequest) Descriptor() ([]byte, []int) {
-	return file_cortex_proto_rawDescGZIP(), []int{16}
+	return file_cortex_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ValidateLinksRequest) GetRepoPath() string {
@@ -1053,7 +1205,7 @@ type BrokenLink struct {
 
 func (x *BrokenLink) Reset() {
 	*x = BrokenLink{}
-	mi := &file_cortex_proto_msgTypes[17]
+	mi := &file_cortex_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1065,7 +1217,7 @@ func (x *BrokenLink) String() string {
 func (*BrokenLink) ProtoMessage() {}
 
 func (x *BrokenLink) ProtoReflect() protoreflect.Message {
-	mi := &file_cortex_proto_msgTypes[17]
+	mi := &file_cortex_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1078,7 +1230,7 @@ func (x *BrokenLink) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BrokenLink.ProtoReflect.Descriptor instead.
 func (*BrokenLink) Descriptor() ([]byte, []int) {
-	return file_cortex_proto_rawDescGZIP(), []int{17}
+	return file_cortex_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *BrokenLink) GetSourceFile() string {
@@ -1119,7 +1271,7 @@ type ValidateLinksResponse struct {
 
 func (x *ValidateLinksResponse) Reset() {
 	*x = ValidateLinksResponse{}
-	mi := &file_cortex_proto_msgTypes[18]
+	mi := &file_cortex_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1131,7 +1283,7 @@ func (x *ValidateLinksResponse) String() string {
 func (*ValidateLinksResponse) ProtoMessage() {}
 
 func (x *ValidateLinksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cortex_proto_msgTypes[18]
+	mi := &file_cortex_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1144,7 +1296,7 @@ func (x *ValidateLinksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidateLinksResponse.ProtoReflect.Descriptor instead.
 func (*ValidateLinksResponse) Descriptor() ([]byte, []int) {
-	return file_cortex_proto_rawDescGZIP(), []int{18}
+	return file_cortex_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ValidateLinksResponse) GetStatus() string {
@@ -1172,7 +1324,7 @@ type ChatMessage struct {
 
 func (x *ChatMessage) Reset() {
 	*x = ChatMessage{}
-	mi := &file_cortex_proto_msgTypes[19]
+	mi := &file_cortex_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1184,7 +1336,7 @@ func (x *ChatMessage) String() string {
 func (*ChatMessage) ProtoMessage() {}
 
 func (x *ChatMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_cortex_proto_msgTypes[19]
+	mi := &file_cortex_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1197,7 +1349,7 @@ func (x *ChatMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatMessage.ProtoReflect.Descriptor instead.
 func (*ChatMessage) Descriptor() ([]byte, []int) {
-	return file_cortex_proto_rawDescGZIP(), []int{19}
+	return file_cortex_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ChatMessage) GetRole() string {
@@ -1233,7 +1385,7 @@ type ChatCompletionsRequest struct {
 
 func (x *ChatCompletionsRequest) Reset() {
 	*x = ChatCompletionsRequest{}
-	mi := &file_cortex_proto_msgTypes[20]
+	mi := &file_cortex_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1245,7 +1397,7 @@ func (x *ChatCompletionsRequest) String() string {
 func (*ChatCompletionsRequest) ProtoMessage() {}
 
 func (x *ChatCompletionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cortex_proto_msgTypes[20]
+	mi := &file_cortex_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1258,7 +1410,7 @@ func (x *ChatCompletionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatCompletionsRequest.ProtoReflect.Descriptor instead.
 func (*ChatCompletionsRequest) Descriptor() ([]byte, []int) {
-	return file_cortex_proto_rawDescGZIP(), []int{20}
+	return file_cortex_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ChatCompletionsRequest) GetMessages() []*ChatMessage {
@@ -1302,7 +1454,7 @@ type ChatCompletionsResponse struct {
 
 func (x *ChatCompletionsResponse) Reset() {
 	*x = ChatCompletionsResponse{}
-	mi := &file_cortex_proto_msgTypes[21]
+	mi := &file_cortex_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1314,7 +1466,7 @@ func (x *ChatCompletionsResponse) String() string {
 func (*ChatCompletionsResponse) ProtoMessage() {}
 
 func (x *ChatCompletionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cortex_proto_msgTypes[21]
+	mi := &file_cortex_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1327,7 +1479,7 @@ func (x *ChatCompletionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatCompletionsResponse.ProtoReflect.Descriptor instead.
 func (*ChatCompletionsResponse) Descriptor() ([]byte, []int) {
-	return file_cortex_proto_rawDescGZIP(), []int{21}
+	return file_cortex_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ChatCompletionsResponse) GetId() string {
@@ -1376,7 +1528,7 @@ type ChatCompletionsResponse_Choice struct {
 
 func (x *ChatCompletionsResponse_Choice) Reset() {
 	*x = ChatCompletionsResponse_Choice{}
-	mi := &file_cortex_proto_msgTypes[22]
+	mi := &file_cortex_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1388,7 +1540,7 @@ func (x *ChatCompletionsResponse_Choice) String() string {
 func (*ChatCompletionsResponse_Choice) ProtoMessage() {}
 
 func (x *ChatCompletionsResponse_Choice) ProtoReflect() protoreflect.Message {
-	mi := &file_cortex_proto_msgTypes[22]
+	mi := &file_cortex_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1401,7 +1553,7 @@ func (x *ChatCompletionsResponse_Choice) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatCompletionsResponse_Choice.ProtoReflect.Descriptor instead.
 func (*ChatCompletionsResponse_Choice) Descriptor() ([]byte, []int) {
-	return file_cortex_proto_rawDescGZIP(), []int{21, 0}
+	return file_cortex_proto_rawDescGZIP(), []int{23, 0}
 }
 
 func (x *ChatCompletionsResponse_Choice) GetIndex() int32 {
@@ -1491,7 +1643,21 @@ const file_cortex_proto_rawDesc = "" +
 	"\x15GetSyncStatusResponse\x12'\n" +
 	"\x0ftotal_documents\x18\x01 \x01(\x05R\x0etotalDocuments\x12+\n" +
 	"\x11indexed_documents\x18\x02 \x01(\x05R\x10indexedDocuments\x12!\n" +
-	"\ftotal_chunks\x18\x03 \x01(\x05R\vtotalChunks\"\x9e\x01\n" +
+	"\ftotal_chunks\x18\x03 \x01(\x05R\vtotalChunks\"\x8b\x01\n" +
+	"\x1cSyncSecondBrainObjectRequest\x12\x16\n" +
+	"\x06bucket\x18\x01 \x01(\tR\x06bucket\x12\x1d\n" +
+	"\n" +
+	"object_key\x18\x02 \x01(\tR\tobjectKey\x12\x19\n" +
+	"\bevent_id\x18\x03 \x01(\tR\aeventId\x12\x19\n" +
+	"\bowner_id\x18\x04 \x01(\tR\aownerId\"\xe1\x01\n" +
+	"\x1dSyncSecondBrainObjectResponse\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\x12'\n" +
+	"\x0fprocessed_files\x18\x02 \x01(\x05R\x0eprocessedFiles\x12#\n" +
+	"\rskipped_files\x18\x03 \x01(\x05R\fskippedFiles\x12!\n" +
+	"\ffailed_files\x18\x04 \x01(\x05R\vfailedFiles\x12\x1d\n" +
+	"\n" +
+	"object_key\x18\x05 \x01(\tR\tobjectKey\x12\x18\n" +
+	"\amessage\x18\x06 \x01(\tR\amessage\"\x9e\x01\n" +
 	"\x12SyncHomelabRequest\x12\x1b\n" +
 	"\trepo_path\x18\x01 \x01(\tR\brepoPath\x12\x19\n" +
 	"\brepo_url\x18\x02 \x01(\tR\arepoUrl\x12\x16\n" +
@@ -1536,13 +1702,14 @@ const file_cortex_proto_rawDesc = "" +
 	"\x06Choice\x12\x14\n" +
 	"\x05index\x18\x01 \x01(\x05R\x05index\x12-\n" +
 	"\amessage\x18\x02 \x01(\v2\x13.cortex.ChatMessageR\amessage\x12#\n" +
-	"\rfinish_reason\x18\x03 \x01(\tR\ffinishReason2\x87\x03\n" +
+	"\rfinish_reason\x18\x03 \x01(\tR\ffinishReason2\xed\x03\n" +
 	"\x12SecondBrainService\x12F\n" +
 	"\vHealthCheck\x12\x1a.cortex.HealthCheckRequest\x1a\x1b.cortex.HealthCheckResponse\x12L\n" +
 	"\rCreateCapture\x12\x1c.cortex.CreateCaptureRequest\x1a\x1d.cortex.CreateCaptureResponse\x12I\n" +
 	"\fListCaptures\x12\x1b.cortex.ListCapturesRequest\x1a\x1c.cortex.ListCapturesResponse\x12L\n" +
 	"\rGetSyncStatus\x12\x1c.cortex.GetSyncStatusRequest\x1a\x1d.cortex.GetSyncStatusResponse\x12B\n" +
-	"\x11SearchSecondBrain\x12\x15.cortex.SearchRequest\x1a\x16.cortex.SearchResponse2\xae\x02\n" +
+	"\x11SearchSecondBrain\x12\x15.cortex.SearchRequest\x1a\x16.cortex.SearchResponse\x12d\n" +
+	"\x15SyncSecondBrainObject\x12$.cortex.SyncSecondBrainObjectRequest\x1a%.cortex.SyncSecondBrainObjectResponse2\xae\x02\n" +
 	"\x0eHomelabService\x12F\n" +
 	"\vHealthCheck\x12\x1a.cortex.HealthCheckRequest\x1a\x1b.cortex.HealthCheckResponse\x12F\n" +
 	"\vSyncHomelab\x12\x1a.cortex.SyncHomelabRequest\x1a\x1b.cortex.SyncHomelabResponse\x12>\n" +
@@ -1564,7 +1731,7 @@ func file_cortex_proto_rawDescGZIP() []byte {
 	return file_cortex_proto_rawDescData
 }
 
-var file_cortex_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
+var file_cortex_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_cortex_proto_goTypes = []any{
 	(*HealthCheckRequest)(nil),             // 0: cortex.HealthCheckRequest
 	(*HealthCheckResponse)(nil),            // 1: cortex.HealthCheckResponse
@@ -1580,15 +1747,17 @@ var file_cortex_proto_goTypes = []any{
 	(*ListCapturesResponse)(nil),           // 11: cortex.ListCapturesResponse
 	(*GetSyncStatusRequest)(nil),           // 12: cortex.GetSyncStatusRequest
 	(*GetSyncStatusResponse)(nil),          // 13: cortex.GetSyncStatusResponse
-	(*SyncHomelabRequest)(nil),             // 14: cortex.SyncHomelabRequest
-	(*SyncHomelabResponse)(nil),            // 15: cortex.SyncHomelabResponse
-	(*ValidateLinksRequest)(nil),           // 16: cortex.ValidateLinksRequest
-	(*BrokenLink)(nil),                     // 17: cortex.BrokenLink
-	(*ValidateLinksResponse)(nil),          // 18: cortex.ValidateLinksResponse
-	(*ChatMessage)(nil),                    // 19: cortex.ChatMessage
-	(*ChatCompletionsRequest)(nil),         // 20: cortex.ChatCompletionsRequest
-	(*ChatCompletionsResponse)(nil),        // 21: cortex.ChatCompletionsResponse
-	(*ChatCompletionsResponse_Choice)(nil), // 22: cortex.ChatCompletionsResponse.Choice
+	(*SyncSecondBrainObjectRequest)(nil),   // 14: cortex.SyncSecondBrainObjectRequest
+	(*SyncSecondBrainObjectResponse)(nil),  // 15: cortex.SyncSecondBrainObjectResponse
+	(*SyncHomelabRequest)(nil),             // 16: cortex.SyncHomelabRequest
+	(*SyncHomelabResponse)(nil),            // 17: cortex.SyncHomelabResponse
+	(*ValidateLinksRequest)(nil),           // 18: cortex.ValidateLinksRequest
+	(*BrokenLink)(nil),                     // 19: cortex.BrokenLink
+	(*ValidateLinksResponse)(nil),          // 20: cortex.ValidateLinksResponse
+	(*ChatMessage)(nil),                    // 21: cortex.ChatMessage
+	(*ChatCompletionsRequest)(nil),         // 22: cortex.ChatCompletionsRequest
+	(*ChatCompletionsResponse)(nil),        // 23: cortex.ChatCompletionsResponse
+	(*ChatCompletionsResponse_Choice)(nil), // 24: cortex.ChatCompletionsResponse.Choice
 }
 var file_cortex_proto_depIdxs = []int32{
 	4,  // 0: cortex.SearchResult.chunk:type_name -> cortex.ChunkMetadata
@@ -1596,34 +1765,36 @@ var file_cortex_proto_depIdxs = []int32{
 	5,  // 2: cortex.SearchResponse.results:type_name -> cortex.SearchResult
 	8,  // 3: cortex.CreateCaptureResponse.capture:type_name -> cortex.CaptureRecord
 	8,  // 4: cortex.ListCapturesResponse.captures:type_name -> cortex.CaptureRecord
-	17, // 5: cortex.ValidateLinksResponse.broken_links:type_name -> cortex.BrokenLink
-	19, // 6: cortex.ChatCompletionsRequest.messages:type_name -> cortex.ChatMessage
-	22, // 7: cortex.ChatCompletionsResponse.choices:type_name -> cortex.ChatCompletionsResponse.Choice
-	19, // 8: cortex.ChatCompletionsResponse.Choice.message:type_name -> cortex.ChatMessage
+	19, // 5: cortex.ValidateLinksResponse.broken_links:type_name -> cortex.BrokenLink
+	21, // 6: cortex.ChatCompletionsRequest.messages:type_name -> cortex.ChatMessage
+	24, // 7: cortex.ChatCompletionsResponse.choices:type_name -> cortex.ChatCompletionsResponse.Choice
+	21, // 8: cortex.ChatCompletionsResponse.Choice.message:type_name -> cortex.ChatMessage
 	0,  // 9: cortex.SecondBrainService.HealthCheck:input_type -> cortex.HealthCheckRequest
 	7,  // 10: cortex.SecondBrainService.CreateCapture:input_type -> cortex.CreateCaptureRequest
 	10, // 11: cortex.SecondBrainService.ListCaptures:input_type -> cortex.ListCapturesRequest
 	12, // 12: cortex.SecondBrainService.GetSyncStatus:input_type -> cortex.GetSyncStatusRequest
 	2,  // 13: cortex.SecondBrainService.SearchSecondBrain:input_type -> cortex.SearchRequest
-	0,  // 14: cortex.HomelabService.HealthCheck:input_type -> cortex.HealthCheckRequest
-	14, // 15: cortex.HomelabService.SyncHomelab:input_type -> cortex.SyncHomelabRequest
-	2,  // 16: cortex.HomelabService.SearchHomelab:input_type -> cortex.SearchRequest
-	16, // 17: cortex.HomelabService.ValidateLinks:input_type -> cortex.ValidateLinksRequest
-	0,  // 18: cortex.OrchestratorService.HealthCheck:input_type -> cortex.HealthCheckRequest
-	20, // 19: cortex.OrchestratorService.ChatCompletions:input_type -> cortex.ChatCompletionsRequest
-	1,  // 20: cortex.SecondBrainService.HealthCheck:output_type -> cortex.HealthCheckResponse
-	9,  // 21: cortex.SecondBrainService.CreateCapture:output_type -> cortex.CreateCaptureResponse
-	11, // 22: cortex.SecondBrainService.ListCaptures:output_type -> cortex.ListCapturesResponse
-	13, // 23: cortex.SecondBrainService.GetSyncStatus:output_type -> cortex.GetSyncStatusResponse
-	6,  // 24: cortex.SecondBrainService.SearchSecondBrain:output_type -> cortex.SearchResponse
-	1,  // 25: cortex.HomelabService.HealthCheck:output_type -> cortex.HealthCheckResponse
-	15, // 26: cortex.HomelabService.SyncHomelab:output_type -> cortex.SyncHomelabResponse
-	6,  // 27: cortex.HomelabService.SearchHomelab:output_type -> cortex.SearchResponse
-	18, // 28: cortex.HomelabService.ValidateLinks:output_type -> cortex.ValidateLinksResponse
-	1,  // 29: cortex.OrchestratorService.HealthCheck:output_type -> cortex.HealthCheckResponse
-	21, // 30: cortex.OrchestratorService.ChatCompletions:output_type -> cortex.ChatCompletionsResponse
-	20, // [20:31] is the sub-list for method output_type
-	9,  // [9:20] is the sub-list for method input_type
+	14, // 14: cortex.SecondBrainService.SyncSecondBrainObject:input_type -> cortex.SyncSecondBrainObjectRequest
+	0,  // 15: cortex.HomelabService.HealthCheck:input_type -> cortex.HealthCheckRequest
+	16, // 16: cortex.HomelabService.SyncHomelab:input_type -> cortex.SyncHomelabRequest
+	2,  // 17: cortex.HomelabService.SearchHomelab:input_type -> cortex.SearchRequest
+	18, // 18: cortex.HomelabService.ValidateLinks:input_type -> cortex.ValidateLinksRequest
+	0,  // 19: cortex.OrchestratorService.HealthCheck:input_type -> cortex.HealthCheckRequest
+	22, // 20: cortex.OrchestratorService.ChatCompletions:input_type -> cortex.ChatCompletionsRequest
+	1,  // 21: cortex.SecondBrainService.HealthCheck:output_type -> cortex.HealthCheckResponse
+	9,  // 22: cortex.SecondBrainService.CreateCapture:output_type -> cortex.CreateCaptureResponse
+	11, // 23: cortex.SecondBrainService.ListCaptures:output_type -> cortex.ListCapturesResponse
+	13, // 24: cortex.SecondBrainService.GetSyncStatus:output_type -> cortex.GetSyncStatusResponse
+	6,  // 25: cortex.SecondBrainService.SearchSecondBrain:output_type -> cortex.SearchResponse
+	15, // 26: cortex.SecondBrainService.SyncSecondBrainObject:output_type -> cortex.SyncSecondBrainObjectResponse
+	1,  // 27: cortex.HomelabService.HealthCheck:output_type -> cortex.HealthCheckResponse
+	17, // 28: cortex.HomelabService.SyncHomelab:output_type -> cortex.SyncHomelabResponse
+	6,  // 29: cortex.HomelabService.SearchHomelab:output_type -> cortex.SearchResponse
+	20, // 30: cortex.HomelabService.ValidateLinks:output_type -> cortex.ValidateLinksResponse
+	1,  // 31: cortex.OrchestratorService.HealthCheck:output_type -> cortex.HealthCheckResponse
+	23, // 32: cortex.OrchestratorService.ChatCompletions:output_type -> cortex.ChatCompletionsResponse
+	21, // [21:33] is the sub-list for method output_type
+	9,  // [9:21] is the sub-list for method input_type
 	9,  // [9:9] is the sub-list for extension type_name
 	9,  // [9:9] is the sub-list for extension extendee
 	0,  // [0:9] is the sub-list for field type_name
@@ -1640,7 +1811,7 @@ func file_cortex_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cortex_proto_rawDesc), len(file_cortex_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   23,
+			NumMessages:   25,
 			NumExtensions: 0,
 			NumServices:   3,
 		},

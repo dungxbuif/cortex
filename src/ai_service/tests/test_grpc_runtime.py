@@ -10,6 +10,7 @@ from ai_service.grpc import cortex_pb2, cortex_pb2_grpc
 from ai_service.grpc_server import create_server
 from ai_service.homelab.repository import SqliteHomelabRepository
 from ai_service.homelab.service import HomelabService
+from ai_service.secondbrain.object_store import LocalS3ObjectStore
 from ai_service.secondbrain.repository import SqliteSecondBrainRepository
 from ai_service.secondbrain.service import SecondBrainService
 
@@ -63,6 +64,53 @@ class GrpcRuntimeTest(unittest.TestCase):
 
         search = self.sb.SearchSecondBrain(cortex_pb2.SearchRequest(owner_id="grpc-owner", query="Capture grpc", top_k=5))
         self.assertEqual(len(search.results), 0)
+
+    def test_secondbrain_sync_minio_object_indexes_local_s3_markdown(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            object_path = root / "obsidian" / "second-brain" / "wiki" / "grpc-minio.md"
+            object_path.parent.mkdir(parents=True)
+            object_path.write_text(
+                "---\ntype: wiki\ntitle: gRPC MinIO\n---\n# gRPC MinIO\nObsidian sync over local S3 action.",
+                encoding="utf-8",
+            )
+            service = SecondBrainService(
+                repository=self.sb_repo,
+                embedder=FakeEmbedder(),
+                object_store=LocalS3ObjectStore(root),
+                allowed_bucket="obsidian",
+            )
+            self.server.stop(0)
+            self.channel.close()
+            self.server = create_server(
+                secondbrain_service=service,
+                homelab_service=HomelabService(self.hl_repo, embedder=FakeEmbedder()),
+                max_workers=2,
+            )
+            port = self.server.add_insecure_port("127.0.0.1:0")
+            self.server.start()
+            self.channel = grpc.insecure_channel(f"127.0.0.1:{port}")
+            self.sb = cortex_pb2_grpc.SecondBrainServiceStub(self.channel)
+
+            sync = self.sb.SyncSecondBrainObject(
+                cortex_pb2.SyncSecondBrainObjectRequest(
+                    bucket="obsidian",
+                    object_key="second-brain/wiki/grpc-minio.md",
+                    owner_id="grpc-minio",
+                )
+            )
+            self.assertEqual(sync.status, "indexed")
+            self.assertEqual(sync.processed_files, 1)
+
+            replay = self.sb.SyncSecondBrainObject(
+                cortex_pb2.SyncSecondBrainObjectRequest(
+                    bucket="obsidian",
+                    object_key="second-brain/wiki/grpc-minio.md",
+                    owner_id="grpc-minio",
+                )
+            )
+            self.assertEqual(replay.status, "skipped")
+            self.assertEqual(replay.message, "unchanged content")
 
     def test_homelab_sync_search_and_validate_links(self) -> None:
         health = self.hl.HealthCheck(cortex_pb2.HealthCheckRequest())

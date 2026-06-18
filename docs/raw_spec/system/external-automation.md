@@ -93,6 +93,7 @@ The integration of n8n is divided into four distinct phases:
    * Define JSON webhook handlers for each module:
      * `POST /api/webhooks/n8n/finance/prices`
      * `POST /api/webhooks/n8n/secondbrain/capture`
+     * `POST /api/webhooks/n8n/secondbrain/obsidian-sync`
      * `POST /api/webhooks/n8n/homelab/sync`
 2. **Implement Security Middleware:**
    * Verify the `X-Cortex-N8n-Token`.
@@ -113,6 +114,10 @@ The integration of n8n is divided into four distinct phases:
 2. **Second Brain Capture Workflow:**
    * **Trigger:** Telegram Bot trigger or RSS Reader.
    * **Action:** Format note content as temporary Markdown and post it to `/api/webhooks/n8n/secondbrain/capture`.
+3. **Second Brain Obsidian Sync Workflow:**
+   * **Trigger:** MinIO/S3 object-created event for the Obsidian sync mirror.
+   * **Action:** Send bucket and object key to `/api/webhooks/n8n/secondbrain/obsidian-sync`.
+   * **Constraint:** Cortex indexes only Markdown object keys under `second-brain/`; MinIO is a mirror/snapshot and does not replace the local Obsidian Vault as canonical source.
 
 ### Phase 4: Verification & UAT
 1. **Mock Testing:** Send HTTP requests using curl with/without valid headers to ensure middleware filters requests correctly.

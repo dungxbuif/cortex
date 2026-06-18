@@ -3,6 +3,7 @@ from __future__ import annotations
 import uuid
 
 from .markdown import build_document, chunk_markdown, normalize_capture_markdown, suggest_tags
+from .object_store import ObjectStore, normalize_object_key
 from ai_service.core.models import CaptureStatus, DEFAULT_OWNER_ID, utc_now
 from ai_service.core.ports import Embedder, SecondBrainRepository
 from ai_service.core.vector import cosine_similarity, tokenize
@@ -85,9 +86,15 @@ class SecondBrainService:
         repository: SecondBrainRepository | None = None,
         embedder: Embedder | None = None,
         ai_client: Embedder | None = None,
+        object_store: ObjectStore | None = None,
+        allowed_bucket: str | None = None,
+        object_prefix: str = "second-brain/",
     ) -> None:
         self.repository = repository or SqliteSecondBrainRepository()
         self.embedder = embedder or ai_client or _default_embedder()
+        self.object_store = object_store
+        self.allowed_bucket = allowed_bucket
+        self.object_prefix = object_prefix
 
     def create_capture(
         self,
@@ -158,6 +165,31 @@ class SecondBrainService:
         chunks = _attach_embeddings(chunk_markdown(owner_id, document, markdown), self.embedder)
         self.repository.upsert_document_with_chunks(document, chunks)
         return len(chunks)
+
+    def sync_minio_object(
+        self,
+        bucket: str,
+        object_key: str,
+        owner_id: str = DEFAULT_OWNER_ID,
+    ) -> dict[str, int | str]:
+        key = normalize_object_key(object_key)
+        if self.allowed_bucket and bucket != self.allowed_bucket:
+            raise ValueError("bucket is not allowed")
+        if not key.startswith(self.object_prefix):
+            return _sync_result("skipped", key, "object outside second-brain prefix", skipped=1)
+        if not key.endswith(".md"):
+            return _sync_result("skipped", key, "object is not markdown", skipped=1)
+        if self.object_store is None:
+            raise RuntimeError("object store is not configured")
+
+        markdown = self.object_store.get_text_object(bucket, key)
+        vault_path = key[len(self.object_prefix) :]
+        if not vault_path:
+            return _sync_result("skipped", key, "object key has no vault path", skipped=1)
+        chunks = self.index_vault_document(vault_path, markdown, owner_id=owner_id)
+        if chunks == 0:
+            return _sync_result("skipped", key, "unchanged content", skipped=1)
+        return _sync_result("indexed", key, f"indexed {chunks} chunks", processed=1)
 
     def get_sync_status(self, owner_id: str = DEFAULT_OWNER_ID) -> SyncStatus:
         return self.repository.sync_status(owner_id)
@@ -364,3 +396,21 @@ def _attach_embeddings(raw_chunks: list[RawChunk], embedder: Embedder) -> list[V
         )
         for chunk, vector in zip(raw_chunks, vectors, strict=True)
     ]
+
+
+def _sync_result(
+    status: str,
+    object_key: str,
+    message: str,
+    processed: int = 0,
+    skipped: int = 0,
+    failed: int = 0,
+) -> dict[str, int | str]:
+    return {
+        "status": status,
+        "processed_files": processed,
+        "skipped_files": skipped,
+        "failed_files": failed,
+        "object_key": object_key,
+        "message": message,
+    }

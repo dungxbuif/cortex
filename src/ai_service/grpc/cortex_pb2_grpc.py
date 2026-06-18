@@ -61,6 +61,11 @@ class SecondBrainServiceStub:
                 request_serializer=cortex__pb2.SearchRequest.SerializeToString,
                 response_deserializer=cortex__pb2.SearchResponse.FromString,
                 _registered_method=True)
+        self.SyncSecondBrainObject = channel.unary_unary(
+                '/cortex.SecondBrainService/SyncSecondBrainObject',
+                request_serializer=cortex__pb2.SyncSecondBrainObjectRequest.SerializeToString,
+                response_deserializer=cortex__pb2.SyncSecondBrainObjectResponse.FromString,
+                _registered_method=True)
 
 
 class SecondBrainServiceServicer:
@@ -98,6 +103,12 @@ class SecondBrainServiceServicer:
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SyncSecondBrainObject(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_SecondBrainServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -125,6 +136,11 @@ def add_SecondBrainServiceServicer_to_server(servicer, server):
                     servicer.SearchSecondBrain,
                     request_deserializer=cortex__pb2.SearchRequest.FromString,
                     response_serializer=cortex__pb2.SearchResponse.SerializeToString,
+            ),
+            'SyncSecondBrainObject': grpc.unary_unary_rpc_method_handler(
+                    servicer.SyncSecondBrainObject,
+                    request_deserializer=cortex__pb2.SyncSecondBrainObjectRequest.FromString,
+                    response_serializer=cortex__pb2.SyncSecondBrainObjectResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -264,6 +280,33 @@ class SecondBrainService:
             '/cortex.SecondBrainService/SearchSecondBrain',
             cortex__pb2.SearchRequest.SerializeToString,
             cortex__pb2.SearchResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SyncSecondBrainObject(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/cortex.SecondBrainService/SyncSecondBrainObject',
+            cortex__pb2.SyncSecondBrainObjectRequest.SerializeToString,
+            cortex__pb2.SyncSecondBrainObjectResponse.FromString,
             options,
             channel_credentials,
             insecure,

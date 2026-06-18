@@ -69,7 +69,7 @@ write_policy:
   direct_vault_write: denied_current_scope
   external_write: denied_current_scope
 sync_policy:
-  vault_to_app: future_mechanism
+  vault_to_app: minio_mirror_webhook_or_future_mechanism
   app_to_vault: manual_export_by_user
 ```
 

@@ -62,6 +62,18 @@ class SecondBrainServicer(cortex_pb2_grpc.SecondBrainServiceServicer):
             ),
         )
 
+    def SyncSecondBrainObject(self, request, context):
+        return _grpc_guard(
+            context,
+            lambda: _secondbrain_sync_response(
+                self.service.sync_minio_object(
+                    bucket=request.bucket,
+                    object_key=request.object_key,
+                    owner_id=request.owner_id or "owner",
+                )
+            ),
+        )
+
 
 class HomelabServicer(cortex_pb2_grpc.HomelabServiceServicer):
     def __init__(self, service: HomelabService) -> None:
@@ -216,6 +228,17 @@ def _homelab_sync_response(result: dict) -> cortex_pb2.SyncHomelabResponse:
         processed_files=int(result.get("processed_files", 0)),
         skipped_files=int(result.get("skipped_files", 0)),
         failed_files=int(result.get("failed_files", 0)),
+    )
+
+
+def _secondbrain_sync_response(result: dict) -> cortex_pb2.SyncSecondBrainObjectResponse:
+    return cortex_pb2.SyncSecondBrainObjectResponse(
+        status=str(result.get("status", "")),
+        processed_files=int(result.get("processed_files", 0)),
+        skipped_files=int(result.get("skipped_files", 0)),
+        failed_files=int(result.get("failed_files", 0)),
+        object_key=str(result.get("object_key", "")),
+        message=str(result.get("message", "")),
     )
 
 

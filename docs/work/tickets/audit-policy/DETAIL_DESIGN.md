@@ -19,10 +19,10 @@ shared_fields:
   - trace
 trace:
   backlog_item: BL-006
-  phase: docs/work/phases/PHASE-4-audit-policy.md
+  phase: docs/work/phases/PHASE-5-audit-policy.md
   tickets:
-    - docs/work/tickets/CTX-401.md
-    - docs/work/tickets/CTX-402.md
+    - docs/work/tickets/CTX-501.md
+    - docs/work/tickets/CTX-502.md
   raw_specs:
     - docs/raw_spec/system/audit-events.md
     - docs/raw_spec/system/permission-policy.md
@@ -126,7 +126,7 @@ Title: Audit And Permission System Components
 +-----------------------------+
 ```
 
-### CTX-401: Audit Logging API
+### CTX-501: Audit Logging API
 
 Add a Go system module `internal/modules/system/audit`:
 
@@ -185,7 +185,7 @@ Append-only enforcement:
 - DB migration grants no trigger yet because role-level hardening is outside current local setup.
 - Tests prove repository has append/get/list only and no normal deletion path.
 
-### CTX-402: Capability Guard
+### CTX-502: Capability Guard
 
 Add a Go system module `internal/modules/system/policy`:
 
@@ -307,7 +307,7 @@ After implementation:
 - `docs/architecture/ARCHITECTURE.md`: add system services implementation details if behavior changes from master doc.
 - `docs/architecture/API.md`: add internal Audit/Policy service API signatures.
 - `docs/architecture/ERD.md`: add `audit_events`.
-- `docs/work/VALIDATION_MATRIX.md`: add CTX-401 and CTX-402 proof rows.
+- `docs/work/VALIDATION_MATRIX.md`: add CTX-501 and CTX-502 proof rows.
 - `docs/releases/CHANGELOG.md`: add audit/policy entry.
 - `docs/CONTEXT.md` and `docs/work/BACKLOG.md`: update active status.
 - ADR: not required if implementation follows existing raw spec and ADR-002 module boundary; create one only if the policy model changes materially.

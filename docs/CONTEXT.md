@@ -34,7 +34,7 @@ updated: TBD
 
 - Status: Epic 4 Restructuring, Python Gateway & gRPC Integration complete and verified.
 - Active backlog: `docs/work/BACKLOG.md`
-- Current queue focus: None; next ready high-risk items are `BL-006` Audit & Permissions, `BL-007` Orchestrator stubs, and `BL-009` Full LLM/ReAct Orchestrator Completion after remaining tasks.
+- Current queue focus: `BL-010` Second Brain Obsidian MinIO webhook sync on branch `feat/obsidian-sync` at commit `79c501e4c67a12a1dfdf9d7af351edf7a549e6cc`; implementation is complete and verified locally.
 - Active phase: docs/work/phases/PHASE-4-restructuring.md
 - Active ticket: None.
 - Active bug: None.
@@ -116,6 +116,15 @@ Epic 4 is complete with Python-owned `/v1/chat/completions` gateway routing into
 - `scripts/run-ai-gateway-dev.sh`
 - `scripts/check-ai-gateway.sh`
 - `README.md`
+- `docs/work/tickets/epic-2/CTX-204.md`
+- `docs/work/tickets/epic-2/DETAIL_DESIGN_MINIO_WEBHOOK.md`
+- `docs/raw_spec/system/external-automation.md`
+- `src/ai_service/secondbrain/object_store.py`
+- `src/ai_service/secondbrain/service.py`
+- `src/ai_service/grpc/`
+- `src/backend/internal/modules/ai/`
+- `src/proto/cortex.proto`
+- `scripts/simulate-secondbrain-s3-action.sh`
 
 - `AGENTS.md`
 - `docs/`
@@ -171,10 +180,12 @@ Epic 4 is complete with Python-owned `/v1/chat/completions` gateway routing into
 - CTX-411 is verified: Python gateway `/v1/chat/completions` routes chat capture and Homelab search intents into existing module services, uses the same PostgreSQL database with module-separated tables, and exposes the same deterministic router through Python gRPC `OrchestratorService.ChatCompletions`.
 - BL-009 / Epic 7 is planned and ready after existing epics/remaining tasks: CTX-701 through CTX-706 cover full LLM/ReAct runtime, tool registry, tool adapter execution, module connectors, sync/completion gaps, and eval/E2E proof.
 - **Python Direct Public Gateway**: Retired the thin Go gRPC HTTP proxy routes completely. Python's FastAPI app now directly serves as the Public API Gateway & Service for all REST endpoints (`/api/secondbrain/*`, `/api/homelab/*`) and `/v1/chat/completions`.
+- Current sprint branch is `feat/obsidian-sync` at commit `79c501e4c67a12a1dfdf9d7af351edf7a549e6cc`.
+- CTX-204 is done: Second Brain Obsidian MinIO webhook sync uses local filesystem-backed S3 simulation, an authenticated webhook route directly in Python FastAPI, a new Python gRPC sync RPC, and existing checksum-aware indexing. MinIO remains a mirror/snapshot of canonical Obsidian `second-brain/`, not a writable canonical source.
 
 ## Next Steps
 
-- Await user direction for next phase. Recommended next choices: `BL-006` Audit & Permissions before orchestrator writes, continue `BL-007` stubs if needed, then `BL-009` Epic 7 for full LLM/ReAct completion.
+- Await next priority. Recommended next choices: continue `BL-006` Audit & Permissions, then `BL-007` Orchestrator stubs or `BL-009` Full LLM/ReAct completion.
 
 ## Open Questions
 

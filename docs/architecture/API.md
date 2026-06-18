@@ -38,6 +38,7 @@ AI gateway proxy routes:
 - `GET /api/secondbrain/captures`: List capture buffer records.
 - `GET /api/secondbrain/status`: Return Second Brain indexed document/chunk counts.
 - `POST /api/secondbrain/search`: Search indexed Second Brain knowledge.
+- `POST /api/webhooks/n8n/secondbrain/obsidian-sync`: Authenticated n8n/MinIO-style webhook that asks Python Second Brain to fetch and index one object from the configured MinIO-compatible mirror. The object key must be under `second-brain/`; out-of-prefix and non-Markdown objects are skipped.
 - `POST /api/homelab/sync`: Sync/index Homelab markdown docs through the Python AI service.
 - `POST /api/homelab/search`: Search Homelab indexed docs.
 - `POST /api/homelab/validate-links`: Validate Homelab markdown relative links.
@@ -101,6 +102,42 @@ Capture APIs:
 Sync & Document APIs:
 - `GetSyncStatus(query)`: Check the last time the Vault mirror was updated, aggregate stale/failed files.
 - `RecordDocumentSync(command)`: Upsert parsed markdown metadata into the database mirror.
+- `SyncSecondBrainObject(command)`: Fetch a Markdown object from the configured MinIO-compatible mirror, require the `second-brain/` prefix, and index it through the existing checksum-aware Second Brain document pipeline.
+
+Second Brain Obsidian sync webhook:
+
+- Endpoint: `POST /api/webhooks/n8n/secondbrain/obsidian-sync`
+- Auth header: `X-Cortex-N8n-Token: <CORTEX_N8N_API_KEY>`
+- Request JSON:
+
+```json
+{
+  "bucket": "obsidian",
+  "object_key": "second-brain/wiki/example.md",
+  "event_id": "optional-source-event-id",
+  "owner_id": "owner"
+}
+```
+
+- Response JSON:
+
+```json
+{
+  "status": "indexed|skipped|failed",
+  "processed_files": 1,
+  "skipped_files": 0,
+  "failed_files": 0,
+  "object_key": "second-brain/wiki/example.md",
+  "message": "indexed 2 chunks"
+}
+```
+
+Runtime variables:
+
+- `CORTEX_N8N_API_KEY`: Go gateway webhook token.
+- `SECOND_BRAIN_MINIO_LOCAL_ROOT`: local filesystem root used to simulate a MinIO/S3 bucket in development and tests.
+- `SECOND_BRAIN_MINIO_BUCKET`: allowed bucket name.
+- `SECOND_BRAIN_MINIO_PREFIX`: allowed object prefix, defaults to `second-brain/`.
 
 RAG Query APIs:
 - `SearchKnowledge(query)`: Vector similarity search over `secondbrain_document_chunks` using `pgvector` (strictly excluding the capture buffer). Executed by Python retrieval pipeline.

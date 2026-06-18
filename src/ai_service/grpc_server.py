@@ -12,6 +12,7 @@ from ai_service.homelab.repository import PostgresPsqlHomelabRepository
 from ai_service.homelab.service import HomelabService
 from ai_service.orchestrator.service import OrchestratorService
 from ai_service.providers.embedding import default_embedder
+from ai_service.secondbrain.object_store import LocalS3ObjectStore
 from ai_service.secondbrain.repository import PostgresPsqlSecondBrainRepository
 from ai_service.secondbrain.service import SecondBrainService
 
@@ -26,6 +27,9 @@ def create_server(
     sb_service = secondbrain_service or SecondBrainService(
         repository=PostgresPsqlSecondBrainRepository.from_env(),
         embedder=embedder,
+        object_store=LocalS3ObjectStore.from_env(),
+        allowed_bucket=os.getenv("SECOND_BRAIN_MINIO_BUCKET") or None,
+        object_prefix=os.getenv("SECOND_BRAIN_MINIO_PREFIX", "second-brain/"),
     )
     hl_service = homelab_service or HomelabService(
         repository=PostgresPsqlHomelabRepository.from_env(),
