@@ -54,6 +54,15 @@ class FastAPIRuntimeTest(unittest.TestCase):
         self.assertIn("/api/v1/homelab/validate-links", paths)
         self.assertIn("/api/ai/health", paths)
         self.assertIn("/v1/chat/completions", paths)
+
+        # Public routes
+        self.assertIn("/api/secondbrain/captures", paths)
+        self.assertIn("/api/secondbrain/status", paths)
+        self.assertIn("/api/secondbrain/search", paths)
+        self.assertIn("/api/homelab/sync", paths)
+        self.assertIn("/api/homelab/search", paths)
+        self.assertIn("/api/homelab/validate-links", paths)
+
         self.assertEqual(self.repository.embedding_column_type(), "vector")
 
         client = TestClient(app)
@@ -77,6 +86,15 @@ class FastAPIRuntimeTest(unittest.TestCase):
             self.assertIn("broken_links", validate_res.json())
             self.assertEqual(len(validate_res.json()["broken_links"]), 1)
 
+            # Test public link validation
+            pub_validate_res = client.post(
+                "/api/homelab/validate-links",
+                json={"repo_path": temp_dir}
+            )
+            self.assertEqual(pub_validate_res.status_code, 200)
+            self.assertEqual(pub_validate_res.json()["status"], "completed")
+            self.assertEqual(len(pub_validate_res.json()["broken_links"]), 1)
+
             sync_res = client.post(
                 "/api/v1/homelab/sync",
                 json={
@@ -90,6 +108,24 @@ class FastAPIRuntimeTest(unittest.TestCase):
             self.assertEqual(sync_res.status_code, 200)
             self.assertEqual(sync_res.json()["processed_files"], 1)
 
+            # Modify the file content to force reprocessing on the public sync endpoint
+            with open(temp_path / "README.md", "w") as f:
+                f.write("# README\nLink to [other](./other.md)\nSome change\n")
+
+            # Test public homelab sync
+            pub_sync_res = client.post(
+                "/api/homelab/sync",
+                json={
+                    "owner_id": OWNER_ID,
+                    "repo_path": temp_dir,
+                    "repo_url": "repo-pub",
+                    "branch": "main",
+                    "commit_sha": "sha-pub",
+                },
+            )
+            self.assertEqual(pub_sync_res.status_code, 200)
+            self.assertEqual(pub_sync_res.json()["processed_files"], 1)
+
         create_response = client.post(
             "/api/v1/capture",
             json={
@@ -100,13 +136,36 @@ class FastAPIRuntimeTest(unittest.TestCase):
         self.assertEqual(create_response.status_code, 200)
         self.assertIn("rag: false", create_response.json()["normalized_markdown"])
 
+        # Test public captures POST
+        pub_create_response = client.post(
+            "/api/secondbrain/captures",
+            json={
+                "owner_id": OWNER_ID,
+                "raw_text": "Public route capture text here.",
+            },
+        )
+        self.assertEqual(pub_create_response.status_code, 201)
+        self.assertIn("capture", pub_create_response.json())
+        self.assertEqual(pub_create_response.json()["capture"]["raw_text"], "Public route capture text here.")
+
         list_response = client.get("/api/v1/capture", params={"owner_id": OWNER_ID})
         self.assertEqual(list_response.status_code, 200)
-        self.assertEqual(len(list_response.json()), 1)
+        # Should contain legacy creation + public creation
+        self.assertEqual(len(list_response.json()), 2)
+
+        # Test public captures GET
+        pub_list_response = client.get("/api/secondbrain/captures", params={"owner_id": OWNER_ID})
+        self.assertEqual(pub_list_response.status_code, 200)
+        self.assertEqual(len(pub_list_response.json()["captures"]), 2)
 
         sync_response = client.get("/api/v1/sync/status", params={"owner_id": OWNER_ID})
         self.assertEqual(sync_response.status_code, 200)
         self.assertEqual(sync_response.json()["total_documents"], 0)
+
+        # Test public status GET
+        pub_sync_response = client.get("/api/secondbrain/status", params={"owner_id": OWNER_ID})
+        self.assertEqual(pub_sync_response.status_code, 200)
+        self.assertEqual(pub_sync_response.json()["total_documents"], 0)
 
         search_response = client.post(
             "/api/v1/search",
@@ -114,6 +173,22 @@ class FastAPIRuntimeTest(unittest.TestCase):
         )
         self.assertEqual(search_response.status_code, 200)
         self.assertEqual(search_response.json(), [])
+
+        # Test public search POST
+        pub_search_response = client.post(
+            "/api/secondbrain/search",
+            json={"owner_id": OWNER_ID, "query": "API capture RAG", "top_k": 5},
+        )
+        self.assertEqual(pub_search_response.status_code, 200)
+        self.assertEqual(pub_search_response.json()["results"], [])
+
+        # Test public homelab search POST
+        pub_hl_search_response = client.post(
+            "/api/homelab/search",
+            json={"owner_id": OWNER_ID, "query": "homelab info", "top_k": 5},
+        )
+        self.assertEqual(pub_hl_search_response.status_code, 200)
+        self.assertIn("results", pub_hl_search_response.json())
 
         chat_capture = client.post(
             "/v1/chat/completions",
