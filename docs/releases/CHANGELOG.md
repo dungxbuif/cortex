@@ -20,7 +20,7 @@ All notable changes should be recorded here.
 ## [Unreleased]
 
 ### Added
-- Implemented CTX-204 Second Brain Obsidian MinIO webhook sync on `feat/obsidian-sync`: added local filesystem-backed S3 simulation, `SyncSecondBrainObject` gRPC contract, authenticated Go webhook route, checksum-aware indexing for `second-brain/` Markdown objects, docs, and full Second Brain/backend test coverage.
+- Implemented CTX-204 Second Brain Obsidian MinIO webhook sync on `feat/obsidian-sync`: migrated the authenticated webhook route directly into Python FastAPI, added a standard-library AWS Signature V4 network client for real S3/MinIO connection, retained the filesystem-based simulation for local tests, and verified E2E against a real secure S3 bucket.
 - Added Epic 4 AI service restructuring plan and CTX-403 baseline repair: the renamed Python service now imports and tests through `ai_service.*`, FastAPI dev tests can inject deterministic fake embeddings, and the Python test suite passes against local PostgreSQL/pgvector without requiring Google credentials outside the opt-in smoke test.
 - Added CTX-404 AI provider boundary: introduced an `Embedder` port, moved Google provider code under `src/ai_service/providers/`, added `GoogleEmbedder`, added `AI_SERVICE_*` env fallback support, and updated Second Brain/Homelab services to use injected embedders instead of importing `GoogleAIClient` directly.
 - Added CTX-405 domain persistence split: moved Second Brain and Homelab models/repositories into domain-owned modules, reduced `core/repository.py` to shared SQL/psql helpers, and added repository contract tests covering SQLite and local PostgreSQL/pgvector adapters.

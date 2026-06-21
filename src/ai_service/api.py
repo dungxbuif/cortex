@@ -15,6 +15,9 @@ def create_app(
     homelab_repository: Any | None = None,
     embedder: Any | None = None,
     ai_client: Any | None = None,
+    object_store: Any | None = None,
+    allowed_bucket: str | None = None,
+    object_prefix: str | None = None,
 ) -> Any:
     """Create the optional FastAPI transport adapter.
 
@@ -49,10 +52,31 @@ def create_app(
             except Exception:
                 homelab_repository = SqliteHomelabRepository()
 
+    import os
+    from ai_service.secondbrain.object_store import LocalS3ObjectStore
+
+    if object_store is None:
+        object_store = LocalS3ObjectStore.from_env()
+    if allowed_bucket is None:
+        allowed_bucket = os.getenv("SECOND_BRAIN_MINIO_BUCKET") or None
+    if object_prefix is None:
+        object_prefix = os.getenv("SECOND_BRAIN_MINIO_PREFIX", "second-brain/")
+
     app = FastAPI(title="Cortex Second Brain API")
-    service = SecondBrainService(repository=secondbrain_repository, embedder=embedder, ai_client=ai_client)
+    service = SecondBrainService(
+        repository=secondbrain_repository,
+        embedder=embedder,
+        ai_client=ai_client,
+        object_store=object_store,
+        allowed_bucket=allowed_bucket,
+        object_prefix=object_prefix,
+    )
     homelab_service = HomelabService(repository=homelab_repository, embedder=embedder, ai_client=ai_client)
     orchestrator_service = OrchestratorService(service, homelab_service)
+
+    @app.get("/health")
+    def health() -> dict[str, str]:
+        return {"status": "ok"}
 
     @app.get("/api/ai/health")
     def ai_health() -> dict[str, str]:
@@ -215,6 +239,38 @@ def create_app(
             "status": "completed",
             "broken_links": _serialize(broken),
         }
+
+    from fastapi import Header
+
+    @app.post("/api/webhooks/n8n/secondbrain/obsidian-sync")
+    def webhook_obsidian_sync(
+        payload: dict[str, Any],
+        x_cortex_n8n_token: str | None = Header(None, alias="X-Cortex-N8n-Token"),
+    ) -> dict[str, Any]:
+        expected_token = os.getenv("CORTEX_N8N_API_KEY", "local-dev-token")
+        if not x_cortex_n8n_token or x_cortex_n8n_token != expected_token:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+
+        bucket = payload.get("bucket")
+        object_key = payload.get("object_key")
+        owner_id = payload.get("owner_id") or "owner"
+
+        if not bucket or not object_key:
+            raise HTTPException(status_code=400, detail="bucket and object_key are required")
+
+        try:
+            res = service.sync_minio_object(
+                bucket=str(bucket),
+                object_key=str(object_key),
+                owner_id=str(owner_id),
+            )
+            return _serialize(res)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     return app
 

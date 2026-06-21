@@ -53,6 +53,7 @@ class FastAPIRuntimeTest(unittest.TestCase):
         self.assertIn("/api/v1/homelab/search", paths)
         self.assertIn("/api/v1/homelab/validate-links", paths)
         self.assertIn("/api/ai/health", paths)
+        self.assertIn("/health", paths)
         self.assertIn("/v1/chat/completions", paths)
 
         # Public routes
@@ -62,14 +63,19 @@ class FastAPIRuntimeTest(unittest.TestCase):
         self.assertIn("/api/homelab/sync", paths)
         self.assertIn("/api/homelab/search", paths)
         self.assertIn("/api/homelab/validate-links", paths)
+        self.assertIn("/api/webhooks/n8n/secondbrain/obsidian-sync", paths)
 
         self.assertEqual(self.repository.embedding_column_type(), "vector")
 
         client = TestClient(app)
 
-        health_response = client.get("/api/ai/health")
+        health_response = client.get("/health")
         self.assertEqual(health_response.status_code, 200)
-        self.assertEqual(health_response.json()["gateway"], "python")
+        self.assertEqual(health_response.json()["status"], "ok")
+
+        ai_health_response = client.get("/api/ai/health")
+        self.assertEqual(ai_health_response.status_code, 200)
+        self.assertEqual(ai_health_response.json()["gateway"], "python")
         
         import tempfile
         from pathlib import Path
@@ -211,6 +217,56 @@ class FastAPIRuntimeTest(unittest.TestCase):
         )
         self.assertEqual(chat_search.status_code, 200)
         self.assertIn("Ket qua tu Homelab", chat_search.json()["choices"][0]["message"]["content"])
+
+        # Test webhook auth missing
+        wh_auth_missing = client.post(
+            "/api/webhooks/n8n/secondbrain/obsidian-sync",
+            json={"bucket": "obsidian", "object_key": "second-brain/wiki/ok.md"},
+        )
+        self.assertEqual(wh_auth_missing.status_code, 401)
+
+        # Test webhook auth wrong
+        wh_auth_wrong = client.post(
+            "/api/webhooks/n8n/secondbrain/obsidian-sync",
+            headers={"X-Cortex-N8n-Token": "bad-token"},
+            json={"bucket": "obsidian", "object_key": "second-brain/wiki/ok.md"},
+        )
+        self.assertEqual(wh_auth_wrong.status_code, 401)
+
+        # Test webhook success
+        import tempfile
+        from pathlib import Path
+        from ai_service.secondbrain.object_store import LocalS3ObjectStore
+        
+        with tempfile.TemporaryDirectory() as temp_s3_dir:
+            temp_s3_path = Path(temp_s3_dir)
+            bucket_dir = temp_s3_path / "obsidian"
+            bucket_dir.mkdir()
+            doc_path = bucket_dir / "second-brain" / "wiki" / "webhook-test.md"
+            doc_path.parent.mkdir(parents=True, exist_ok=True)
+            doc_path.write_text("# Webhook Success\nSync from MinIO worked.", encoding="utf-8")
+            
+            app_with_s3 = create_app(
+                secondbrain_repository=self.repository,
+                homelab_repository=self.homelab_repository,
+                embedder=FakeEmbedder(),
+                object_store=LocalS3ObjectStore(temp_s3_path),
+                allowed_bucket="obsidian",
+            )
+            client_s3 = TestClient(app_with_s3)
+            
+            wh_res = client_s3.post(
+                "/api/webhooks/n8n/secondbrain/obsidian-sync",
+                headers={"X-Cortex-N8n-Token": "local-dev-token"},
+                json={
+                    "bucket": "obsidian",
+                    "object_key": "second-brain/wiki/webhook-test.md",
+                    "owner_id": OWNER_ID,
+                },
+            )
+            self.assertEqual(wh_res.status_code, 200)
+            self.assertEqual(wh_res.json()["status"], "indexed")
+            self.assertEqual(wh_res.json()["processed_files"], 1)
 
 
 if __name__ == "__main__":

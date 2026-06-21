@@ -36,6 +36,8 @@ class AIServiceSettings:
 
     @classmethod
     def from_env(cls) -> "AIServiceSettings":
+        root_env = Path(__file__).resolve().parents[3] / ".env"
+        load_env_file(root_env)
         env_file = Path(__file__).resolve().parents[1] / ".env.local"
         load_env_file(env_file)
         default_migrations = Path(__file__).resolve().parents[1] / "migrations"
