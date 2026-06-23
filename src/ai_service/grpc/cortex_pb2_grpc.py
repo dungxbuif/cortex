@@ -644,3 +644,239 @@ class OrchestratorService:
             timeout,
             metadata,
             _registered_method=True)
+
+
+class PolicyServiceStub:
+    """4. System Policy And Audit Services
+
+    """
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.HealthCheck = channel.unary_unary(
+                '/cortex.PolicyService/HealthCheck',
+                request_serializer=cortex__pb2.HealthCheckRequest.SerializeToString,
+                response_deserializer=cortex__pb2.HealthCheckResponse.FromString,
+                _registered_method=True)
+        self.EvaluatePolicy = channel.unary_unary(
+                '/cortex.PolicyService/EvaluatePolicy',
+                request_serializer=cortex__pb2.EvaluatePolicyRequest.SerializeToString,
+                response_deserializer=cortex__pb2.EvaluatePolicyResponse.FromString,
+                _registered_method=True)
+
+
+class PolicyServiceServicer:
+    """4. System Policy And Audit Services
+
+    """
+
+    def HealthCheck(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def EvaluatePolicy(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_PolicyServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'HealthCheck': grpc.unary_unary_rpc_method_handler(
+                    servicer.HealthCheck,
+                    request_deserializer=cortex__pb2.HealthCheckRequest.FromString,
+                    response_serializer=cortex__pb2.HealthCheckResponse.SerializeToString,
+            ),
+            'EvaluatePolicy': grpc.unary_unary_rpc_method_handler(
+                    servicer.EvaluatePolicy,
+                    request_deserializer=cortex__pb2.EvaluatePolicyRequest.FromString,
+                    response_serializer=cortex__pb2.EvaluatePolicyResponse.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'cortex.PolicyService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('cortex.PolicyService', rpc_method_handlers)
+
+
+ # This class is part of an EXPERIMENTAL API.
+class PolicyService:
+    """4. System Policy And Audit Services
+
+    """
+
+    @staticmethod
+    def HealthCheck(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/cortex.PolicyService/HealthCheck',
+            cortex__pb2.HealthCheckRequest.SerializeToString,
+            cortex__pb2.HealthCheckResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def EvaluatePolicy(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/cortex.PolicyService/EvaluatePolicy',
+            cortex__pb2.EvaluatePolicyRequest.SerializeToString,
+            cortex__pb2.EvaluatePolicyResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+
+class AuditServiceStub:
+    """Missing associated documentation comment in .proto file."""
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.HealthCheck = channel.unary_unary(
+                '/cortex.AuditService/HealthCheck',
+                request_serializer=cortex__pb2.HealthCheckRequest.SerializeToString,
+                response_deserializer=cortex__pb2.HealthCheckResponse.FromString,
+                _registered_method=True)
+        self.AppendAuditEvent = channel.unary_unary(
+                '/cortex.AuditService/AppendAuditEvent',
+                request_serializer=cortex__pb2.AppendAuditEventRequest.SerializeToString,
+                response_deserializer=cortex__pb2.AppendAuditEventResponse.FromString,
+                _registered_method=True)
+
+
+class AuditServiceServicer:
+    """Missing associated documentation comment in .proto file."""
+
+    def HealthCheck(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def AppendAuditEvent(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_AuditServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'HealthCheck': grpc.unary_unary_rpc_method_handler(
+                    servicer.HealthCheck,
+                    request_deserializer=cortex__pb2.HealthCheckRequest.FromString,
+                    response_serializer=cortex__pb2.HealthCheckResponse.SerializeToString,
+            ),
+            'AppendAuditEvent': grpc.unary_unary_rpc_method_handler(
+                    servicer.AppendAuditEvent,
+                    request_deserializer=cortex__pb2.AppendAuditEventRequest.FromString,
+                    response_serializer=cortex__pb2.AppendAuditEventResponse.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'cortex.AuditService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('cortex.AuditService', rpc_method_handlers)
+
+
+ # This class is part of an EXPERIMENTAL API.
+class AuditService:
+    """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def HealthCheck(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/cortex.AuditService/HealthCheck',
+            cortex__pb2.HealthCheckRequest.SerializeToString,
+            cortex__pb2.HealthCheckResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def AppendAuditEvent(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/cortex.AuditService/AppendAuditEvent',
+            cortex__pb2.AppendAuditEventRequest.SerializeToString,
+            cortex__pb2.AppendAuditEventResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)

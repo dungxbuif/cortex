@@ -117,20 +117,24 @@ MinIO/S3 event
 
 ## System Audit And Policy
 
-Epic 5 adds internal Go system services for audit and capability decisions:
+Epic 5 added internal Go system services for audit and capability decisions, and Epic 7 exposes them to the Python Orchestrator through internal gRPC:
 
 - `system/audit` persists append-only `audit_events` records with generated IDs, timestamps, JSONB source/target refs, and recursive secret-key rejection.
 - `system/policy` evaluates the static v1 capability matrix for Finance, Second Brain, and Homelab.
 - The policy service hard-denies Homelab external writes/runtime actions and Second Brain direct Vault writes, requires confirmation for high-impact Finance writes, and supports webhook/system actor checks such as `second_brain.index_external_source`.
+- `PolicyService.EvaluatePolicy` and `AuditService.AppendAuditEvent` run on the Go backend's internal `SYSTEM_GRPC_ADDRESS`.
+- Python uses `GrpcPolicyEnforcer` before connector execution and `GrpcAuditSink` after policy/tool outcomes.
 
-These services are internal primitives for future Orchestrator/tool adapter wiring; no public audit or policy management API is exposed in this slice.
+No public audit or policy management API is exposed. The bridge is an internal control plane for tool execution only.
 
 ```text
 OpenAI-compatible chat request
   -> Python FastAPI /v1/chat/completions
   -> OrchestratorService
-  -> SecondBrainService / HomelabService
-  -> PostgreSQL + pgvector / local Git or Vault mirror
+  -> ToolAdapterExecutor
+  -> GrpcPolicyEnforcer -> Go PolicyService -> system/policy
+  -> ModuleConnector -> SecondBrainService / HomelabService / Go domain API
+  -> GrpcAuditSink -> Go AuditService -> system/audit -> audit_events
 ```
 
 ## Dependencies

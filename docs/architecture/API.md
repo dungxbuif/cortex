@@ -170,6 +170,7 @@ RAG Query APIs:
 
 Internal transport:
 - Python Orchestrator -> Go domain/API services uses generated gRPC clients from protobuf service definitions.
+- Python Orchestrator -> Go system services uses generated gRPC clients for `PolicyService.EvaluatePolicy` and `AuditService.AppendAuditEvent` on the internal `SYSTEM_GRPC_ADDRESS`. These calls are not public APIs; they gate tool execution and persist audit outcomes.
 - Cross-service Python boundaries may also use gRPC where a separate process is useful; direct Python calls are allowed inside the same deployable service boundary.
 - FastAPI is the Python gateway surface for `/v1/chat/completions` and also hosts local diagnostics/smoke routes for module services.
 

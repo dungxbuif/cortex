@@ -1,7 +1,7 @@
 ---
 artifact_type: ticket
 id: CTX-706A
-status: ready
+status: verified
 owner: shared
 priority: High
 lane: high-risk
@@ -46,12 +46,12 @@ This is a critical prerequisite for Finance writes/operations, as write-capable 
 
 ## Acceptance Criteria
 
-- [ ] Protobuf definitions compile successfully for both Go and Python.
-- [ ] Go backend starts the gRPC server exposing `PolicyService` and `AuditService`.
-- [ ] Python orchestrator calls `PolicyGrpcClient` to evaluate tool permissions.
-- [ ] Python orchestrator emits audit events to `AuditGrpcClient` post-execution.
-- [ ] Tool execution loop correctly routes to `Deny` (returns denial message) and `Require Confirmation` (halts loop and persists confirmation).
-- [ ] Integration tests verify the end-to-end policy check, confirmation suspension, denial logic, and audit database persistence.
+- [x] Protobuf definitions compile successfully for both Go and Python.
+- [x] Go backend starts the gRPC server exposing `PolicyService` and `AuditService`.
+- [x] Python orchestrator calls `PolicyGrpcClient` to evaluate tool permissions.
+- [x] Python orchestrator emits audit events to `AuditGrpcClient` post-execution.
+- [x] Tool execution loop correctly routes to `Deny` (returns denial message) and `Require Confirmation` (halts loop and persists confirmation).
+- [x] Integration tests verify the end-to-end policy check, confirmation suspension, denial logic, and audit database persistence.
 
 ## Small Task Exemption
 
@@ -70,3 +70,13 @@ This is a critical prerequisite for Finance writes/operations, as write-capable 
 - ERD/Data: no schema changes.
 - ADR: none required.
 - Release notes: update `docs/releases/CHANGELOG.md`.
+
+## Verification Evidence
+
+- `rtk env PATH=/Users/dungxbuif/go/bin:$PATH protoc -I src/proto --go_out=src/backend/internal/infrastructure/grpc/pb --go_opt=paths=source_relative --go-grpc_out=src/backend/internal/infrastructure/grpc/pb --go-grpc_opt=paths=source_relative src/proto/cortex.proto` passed.
+- `rtk env PYTHONPATH=src src/ai_service/.venv/bin/python -m grpc_tools.protoc -I src/proto --python_out=src/ai_service/grpc --grpc_python_out=src/ai_service/grpc src/proto/cortex.proto` passed.
+- `rtk env GOCACHE=/private/tmp/cortex-go-cache go test ./internal/infrastructure/grpc/system ./internal/modules/system/...` passed.
+- `rtk env GOCACHE=/private/tmp/cortex-go-cache go test ./...` passed.
+- `rtk env PYTHONPATH=src src/ai_service/.venv/bin/python -m unittest src.ai_service.tests.test_orchestrator_policy src.ai_service.tests.test_orchestrator_executor src.ai_service.tests.test_orchestrator_react -v` passed, 17 tests OK.
+- `rtk env PYTHONPATH=src src/ai_service/.venv/bin/python -m unittest discover -s src/ai_service/tests -v` passed, 85 tests OK, 1 Google smoke skipped by opt-in.
+- `rtk env PYTHONPATH=src src/ai_service/.venv/bin/python -m compileall -q src/ai_service` passed.

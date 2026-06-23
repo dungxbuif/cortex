@@ -15,6 +15,14 @@ class ObservationStatus(StrEnum):
     SYSTEM_ERROR = "system_error"
 
 
+class PolicyDecisionType(StrEnum):
+    ALLOW = "allow"
+    DENY = "deny"
+    REQUIRE_CONFIRMATION = "require_confirmation"
+    REQUIRE_CLARIFICATION = "require_clarification"
+    MANUAL_ACTION_REQUIRED = "manual_action_required"
+
+
 @dataclass(frozen=True)
 class ConversationInput:
     owner_id: str
@@ -58,6 +66,37 @@ class ToolObservation:
     citations: tuple[Citation, ...] = ()
     warnings: tuple[str, ...] = ()
     audit_event_id: str | None = None
+
+
+@dataclass(frozen=True)
+class PolicyDecision:
+    decision: PolicyDecisionType
+    reason: str = ""
+    audit_event_id: str | None = None
+
+    @property
+    def allowed(self) -> bool:
+        return self.decision == PolicyDecisionType.ALLOW
+
+    @property
+    def requires_confirmation(self) -> bool:
+        return self.decision == PolicyDecisionType.REQUIRE_CONFIRMATION
+
+
+@dataclass(frozen=True)
+class AuditEvent:
+    event_type: str
+    module: str
+    actor_type: str
+    actor_id: str
+    conversation_id: str
+    request_id: str
+    tool_name: str
+    capability: str
+    status: str
+    source_ref: dict[str, Any] = field(default_factory=dict)
+    target_ref: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -156,7 +195,20 @@ class StaticToolRegistry:
         ]
 
 class PolicyEnforcer(Protocol):
+    async def evaluate(
+        self,
+        tool: ToolDefinition,
+        context: ToolExecutionContext,
+        arguments: dict[str, Any],
+    ) -> PolicyDecision:
+        ...
+
     async def authorize(
         self, actor_id: str, capabilities: tuple[str, ...], context: ToolExecutionContext
     ) -> bool:
+        ...
+
+
+class AuditSink(Protocol):
+    async def append_event(self, event: AuditEvent) -> str:
         ...

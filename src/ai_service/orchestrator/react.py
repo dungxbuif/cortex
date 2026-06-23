@@ -248,7 +248,11 @@ class ReActOrchestrator:
                 
                 if result.pop("suspend", False):
                     requires_confirmation = True
-                    confirmation_data = (result["tool_def"], result["arguments"])
+                    confirmation_data = (
+                        result["tool_def"],
+                        result["arguments"],
+                        result.get("policy_decision", {"decision": "require_confirmation"}),
+                    )
                     break
                     
                 result["id"] = tcall.id
@@ -256,7 +260,7 @@ class ReActOrchestrator:
 
             # 4. Handle State Branching (Suspend or Loop)
             if requires_confirmation:
-                tool_def, args = confirmation_data  # type: ignore
+                tool_def, args, policy_decision = confirmation_data  # type: ignore
                 prompt_shown = SystemMessage.MSG_CONFIRM_ACTION.value.format(tool_name=tool_def.name, args=args)
                 self.conversation_manager.create_pending_confirmation(
                     conversation_id=canonical_conversation_id,
@@ -266,7 +270,7 @@ class ReActOrchestrator:
                     channel_user_id=user_input.channel_user_id,
                     tool_name=tool_def.name,
                     tool_args=args,
-                    policy_decision={"decision": "require_confirmation"},
+                    policy_decision=policy_decision,
                     prompt_shown=prompt_shown,
                 )
                 self.conversation_manager.save_message(

@@ -50,6 +50,11 @@ message SearchResponse {
   repeated SearchResult results = 1;
 }
 
+message StringMapEntry {
+  string key = 1;
+  string value = 2;
+}
+
 // 1. Second Brain Service Definition
 
 service SecondBrainService {
@@ -185,4 +190,59 @@ message ChatCompletionsResponse {
     string finish_reason = 3;
   }
   repeated Choice choices = 5;
+}
+
+// 4. System Policy And Audit Services
+
+service PolicyService {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+  rpc EvaluatePolicy(EvaluatePolicyRequest) returns (EvaluatePolicyResponse);
+}
+
+message EvaluatePolicyRequest {
+  string module = 1;
+  string capability = 2;
+  string actor_type = 3;
+  string actor_id = 4;
+  string conversation_id = 5;
+  string request_id = 6;
+  string tool_name = 7;
+  bool high_impact = 8;
+  bool ambiguous = 9;
+  bool low_confidence = 10;
+  bool money_movement = 11;
+  bool audit_read = 12;
+  repeated StringMapEntry source_ref = 13;
+  repeated StringMapEntry target_ref = 14;
+  repeated StringMapEntry metadata = 15;
+}
+
+message EvaluatePolicyResponse {
+  string decision = 1;
+  string reason = 2;
+  string audit_event_id = 3;
+}
+
+service AuditService {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+  rpc AppendAuditEvent(AppendAuditEventRequest) returns (AppendAuditEventResponse);
+}
+
+message AppendAuditEventRequest {
+  string event_type = 1;
+  string module = 2;
+  string actor_type = 3;
+  string actor_id = 4;
+  string conversation_id = 5;
+  string request_id = 6;
+  string tool_name = 7;
+  string capability = 8;
+  string status = 9;
+  repeated StringMapEntry source_ref = 10;
+  repeated StringMapEntry target_ref = 11;
+  repeated StringMapEntry metadata = 12;
+}
+
+message AppendAuditEventResponse {
+  string audit_event_id = 1;
 }

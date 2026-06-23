@@ -34,7 +34,7 @@ updated: TBD
 
 - Status: Epic 5 Audit & Permissions, Epic 8 Async Ingestion/Delete Sync, Phase 9 React/Tailwind Client Console, and Epic 7 CTX-700 through CTX-704 orchestration foundations are implemented and verified; remaining module connector/eval work stays human-supervised.
 - Active backlog: `docs/work/BACKLOG.md`
-- Current queue focus: Epic 7 foundation work has advanced through `CTX-705`; next Epic 7 slice is Finance connector plus Policy/Audit bridge scoping before write-capable Finance chat.
+- Current queue focus: Epic 7 foundation work has advanced through `CTX-706A` and `CTX-706`; next Epic 7 slice is Finance connector scoping before write-capable Finance chat, followed by eval/E2E proof.
 - Active phase: None.
 - Active ticket: None.
 - Active bug: None.
@@ -209,7 +209,7 @@ Epic 4 is complete with Python-owned chat gateway routing into existing Second B
 - CTX-409 is verified: local harness starts Python AI gRPC and Go Gateway together, `/api/ai/health` passes through Go->Python gRPC, backend/Python tests pass, and opt-in Google smoke passes.
 - CTX-410 is verified: final local curl E2E through Go Gateway covers Python gRPC health, Second Brain capture create/list/status, Homelab link validation, Homelab sync, and Homelab search. Epic 4 phase is marked done.
 - CTX-411 is verified: Python gateway `/v1/chat/completions` routes chat capture and Homelab search intents into existing module services, uses the same PostgreSQL database with module-separated tables, and exposes the same deterministic router through Python gRPC `OrchestratorService.ChatCompletions`.
-- BL-009 / Epic 7 is active and ready for incremental human-supervised implementation: CTX-701A prompt-contract design is done, CTX-700 through CTX-704 are verified, and CTX-705 Second Brain/Homelab module connectors are in progress.
+- BL-009 / Epic 7 is active and ready for incremental human-supervised implementation: CTX-701A prompt-contract design is done, CTX-700 through CTX-706A/CTX-706 are verified, and Finance connector/eval work remains.
 - BL-011 / Epic 8 is planned and ready for review after go-live-critical Epic 5/Epic 7 work: CTX-801 covers async ingestion queue/worker semantics for Second Brain object webhooks, and CTX-802 covers S3 delete synchronization to remove stale documents/chunks from RAG.
 - BL-006 / Epic 5 is verified: Go `system/audit` persists append-only `audit_events`, Go `system/policy` evaluates static v1 capability decisions, source-of-truth denials, Finance confirmation, webhook actor authorization, and audit-backed decisions.
 - BL-011 / Epic 8 is verified: Second Brain webhook persists ingestion jobs and returns `202 Accepted`; worker processing handles upsert/delete events; delete sync removes stale `secondbrain_documents` and `secondbrain_document_chunks` from active RAG results.
@@ -221,10 +221,12 @@ Epic 4 is complete with Python-owned chat gateway routing into existing Second B
 - CTX-701 is verified: Python AI service migration `000004_orchestrator_conversations.sql` adds `conversations`, `conversation_messages`, and `pending_confirmations`; `ConversationManager` persists context windows, resets stale conversations after inactivity, hashes tool args, enforces pending-confirmation TTL, and binds confirmations to channel/user actors.
 - CTX-704 is verified: Telegram transport adapter normalizes text updates into `ConversationInput`, enforces explicit chat/user allowlist authorization, sends typing actions, renders Markdown-lite into Telegram-safe HTML for short messages, sends long responses as plaintext chunks, retries plain text fallback, loads env settings, and exposes optional `python-telegram-bot` wiring.
 - CTX-705 is verified: `SecondBrainConnector` and `HomelabConnector` map ReAct tool calls into existing Python services, return normalized `ToolObservation` data and citations, preserve capture tags, preserve capture-inbox/no-Vault-write and Homelab redaction boundaries, reject unallowlisted Homelab local paths, and pass focused/full Python AI test suites.
+- CTX-706A is verified: `PolicyService` and `AuditService` are defined in protobuf, Go and Python stubs are regenerated, Go backend starts internal system gRPC services via `SYSTEM_GRPC_ADDRESS`, and Python `GrpcPolicyEnforcer`/`GrpcAuditSink` clients map decisions and audit events.
+- CTX-706 is verified: `ToolAdapterExecutor` validates schemas, evaluates policy decisions, handles deny/confirmation branches, dispatches connectors, maps connector failures, and emits audit events.
 
 ## Next Steps
 
-- Next Epic 7 implementation step is a follow-up Finance connector plus Policy/Audit gRPC bridge decision before write-capable Finance chat.
+- Next Epic 7 implementation step is Finance connector scoping and implementation before write-capable Finance chat.
 - Remaining human-supervised items include Finance connector completion, graceful degradation gaps, evals, and go-live readiness.
 
 ## Open Questions

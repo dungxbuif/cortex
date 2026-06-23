@@ -12,6 +12,7 @@ const (
 	EnvDatabaseURL      = "DATABASE_URL"
 	EnvLogLevel         = "LOG_LEVEL"
 	EnvAIServiceAddress = "AI_SERVICE_ADDRESS"
+	EnvSystemGRPCAddr   = "SYSTEM_GRPC_ADDRESS"
 )
 
 type Config struct {
@@ -19,6 +20,7 @@ type Config struct {
 	DatabaseURL      string
 	LogLevel         string
 	AIServiceAddress string
+	SystemGRPCAddr   string
 }
 
 func Load() *Config {
@@ -37,6 +39,7 @@ func Load() *Config {
 		DatabaseURL:      dbUrl,
 		LogLevel:         getEnv(EnvLogLevel, "info"),
 		AIServiceAddress: getEnv(EnvAIServiceAddress, "localhost:50051"),
+		SystemGRPCAddr:   getEnv(EnvSystemGRPCAddr, ":50052"),
 	}
 }
 
