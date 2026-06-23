@@ -32,16 +32,16 @@ updated: TBD
 
 ## Current Status
 
-- Status: Epic 5 Audit & Permissions, Epic 8 Async Ingestion/Delete Sync, and Phase 9 React/Tailwind Client Console are implemented and verified; go-live and LLM prompt/ReAct work remain excluded for human supervision.
+- Status: Epic 5 Audit & Permissions, Epic 8 Async Ingestion/Delete Sync, Phase 9 React/Tailwind Client Console, and Epic 7 CTX-700/CTX-701 orchestration foundations are implemented and verified; remaining LLM/ReAct/provider/tool execution work stays human-supervised.
 - Active backlog: `docs/work/BACKLOG.md`
-- Current queue focus: non-go-live, non-prompt/LLM tasks completed through `BL-006`, `BL-011`, and `BL-012`.
+- Current queue focus: Epic 7 foundation work has advanced through `CTX-700` and `CTX-701`; next Epic 7 implementation slice is `CTX-702` Telegram bot transport adapter.
 - Active phase: None.
 - Active ticket: None.
 - Active bug: None.
 
 ## Current Focus
 
-Epic 4 is complete with Python-owned `/v1/chat/completions` gateway routing into existing Second Brain and Homelab services. Epic 5 Audit & Permissions is verified. Epic 8 Async Ingestion/Delete Sync is verified. Phase 9 Client Console is verified with React/Tailwind, single-user JWT, and SSE. Epic 7 prompt/LLM/ReAct and go-live readiness remain intentionally out of autonomous implementation scope for human supervision.
+Epic 4 is complete with Python-owned chat gateway routing into existing Second Brain and Homelab services. Epic 5 Audit & Permissions is verified. Epic 8 Async Ingestion/Delete Sync is verified. Phase 9 Client Console is verified with React/Tailwind, single-user JWT, and SSE. Epic 7 CTX-700 shared orchestration contracts and CTX-701 conversation/confirmation persistence are verified. Remaining Epic 7 Telegram transport, LLM/ReAct, provider, registry, policy/audit bridge, connectors, and eval work remains queued for human-supervised implementation.
 
 ## Recently Touched Areas
 
@@ -149,6 +149,11 @@ Epic 4 is complete with Python-owned `/v1/chat/completions` gateway routing into
 - `src/client/`
 - `src/ai_service/api.py`
 - `src/ai_service/tests/test_api_runtime.py`
+- `src/ai_service/orchestrator/contracts.py`
+- `src/ai_service/orchestrator/conversation.py`
+- `src/ai_service/migrations/000004_orchestrator_conversations.sql`
+- `src/ai_service/tests/test_orchestrator_contracts.py`
+- `src/ai_service/tests/test_orchestrator_conversation.py`
 
 - `AGENTS.md`
 - `docs/`
@@ -202,8 +207,7 @@ Epic 4 is complete with Python-owned `/v1/chat/completions` gateway routing into
 - CTX-409 is verified: local harness starts Python AI gRPC and Go Gateway together, `/api/ai/health` passes through Go->Python gRPC, backend/Python tests pass, and opt-in Google smoke passes.
 - CTX-410 is verified: final local curl E2E through Go Gateway covers Python gRPC health, Second Brain capture create/list/status, Homelab link validation, Homelab sync, and Homelab search. Epic 4 phase is marked done.
 - CTX-411 is verified: Python gateway `/v1/chat/completions` routes chat capture and Homelab search intents into existing module services, uses the same PostgreSQL database with module-separated tables, and exposes the same deterministic router through Python gRPC `OrchestratorService.ChatCompletions`.
-- BL-009 / Epic 7 is planned and ready after existing epics/remaining tasks: CTX-701 through CTX-706 cover full LLM/ReAct runtime, tool registry, tool adapter execution, module connectors, sync/completion gaps, and eval/E2E proof.
-- CTX-701A is added as the first Epic 7 design step so prompt contracts, orchestration state flow, tool-selection rules, and eval examples can be Q&A reviewed before implementing CTX-701 runtime code.
+- BL-009 / Epic 7 is active and ready for incremental human-supervised implementation: CTX-701A prompt-contract design is done, CTX-700 shared contracts and CTX-701 conversation/confirmation persistence are verified, and CTX-702 Telegram bot transport adapter is the next slice before LLM/runtime wiring.
 - BL-011 / Epic 8 is planned and ready for review after go-live-critical Epic 5/Epic 7 work: CTX-801 covers async ingestion queue/worker semantics for Second Brain object webhooks, and CTX-802 covers S3 delete synchronization to remove stale documents/chunks from RAG.
 - BL-006 / Epic 5 is verified: Go `system/audit` persists append-only `audit_events`, Go `system/policy` evaluates static v1 capability decisions, source-of-truth denials, Finance confirmation, webhook actor authorization, and audit-backed decisions.
 - BL-011 / Epic 8 is verified: Second Brain webhook persists ingestion jobs and returns `202 Accepted`; worker processing handles upsert/delete events; delete sync removes stale `secondbrain_documents` and `secondbrain_document_chunks` from active RAG results.
@@ -211,11 +215,13 @@ Epic 4 is complete with Python-owned `/v1/chat/completions` gateway routing into
 - **Python Direct Public Gateway**: Retired the thin Go gRPC HTTP proxy routes completely. Python's FastAPI app now directly serves as the Public API Gateway & Service for all REST endpoints (`/api/secondbrain/*`, `/api/homelab/*`) and `/v1/chat/completions`.
 - Current sprint branch is `feat/obsidian-sync`.
 - CTX-204 is done: Second Brain Obsidian MinIO webhook sync uses an authenticated webhook route directly in Python FastAPI, standard-library AWS Signature V4 network adapter for real S3 bucket connection, and local filesystem-backed S3 simulation for offline tests. MinIO remains a mirror/snapshot of canonical Obsidian `second-brain/`, not a writable canonical source.
+- CTX-700 is verified: shared Python orchestration contracts now define transport-neutral conversation input, tool execution context, tool observations, module health, tool definitions, async `ModuleConnector`, `ConnectorRegistry`, and startup validation between tool registry targets and connector-supported targets.
+- CTX-701 is verified: Python AI service migration `000004_orchestrator_conversations.sql` adds `conversations`, `conversation_messages`, and `pending_confirmations`; `ConversationManager` persists context windows, resets stale conversations after inactivity, hashes tool args, enforces pending-confirmation TTL, and binds confirmations to channel/user actors.
 
 ## Next Steps
 
-- Human-supervised next items remain: go-live readiness, `CTX-701A` prompt contract, and Epic 7 LLM/ReAct runtime.
-- If continuing autonomous work, first reconcile stale Phase 0/Epic 6 artifacts without implementing prompt/LLM/go-live scope.
+- Next Epic 7 implementation item is `CTX-702` Telegram bot transport adapter using a fake orchestration handler first.
+- Remaining human-supervised items include LLM/ReAct runtime, provider adapters, tool registry, policy/audit bridge, module connectors, evals, and go-live readiness.
 
 ## Open Questions
 
