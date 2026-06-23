@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from datetime import datetime
+from datetime import UTC, datetime
 
 from ai_service.core.config import AIServiceSettings
 from ai_service.core.migrations import apply_migrations
@@ -15,7 +15,7 @@ from ai_service.core.repository import (
     sql_nullable,
     vector_literal,
 )
-from ai_service.secondbrain.models import Capture, SyncStatus, VaultChunk, VaultDocument
+from ai_service.secondbrain.models import Capture, IngestionJob, SyncStatus, VaultChunk, VaultDocument
 
 
 class SqliteSecondBrainRepository:
@@ -78,9 +78,78 @@ class SqliteSecondBrainRepository:
               FOREIGN KEY(document_id) REFERENCES secondbrain_documents(id) ON DELETE CASCADE
             );
 
+            CREATE TABLE IF NOT EXISTS secondbrain_ingestion_jobs (
+              id TEXT PRIMARY KEY,
+              owner_id TEXT NOT NULL,
+              bucket TEXT NOT NULL,
+              object_key TEXT NOT NULL,
+              event_type TEXT NOT NULL,
+              status TEXT NOT NULL,
+              attempts INTEGER NOT NULL,
+              message TEXT NOT NULL,
+              created_at TEXT NOT NULL,
+              updated_at TEXT NOT NULL
+            );
+
             """
         )
         self.conn.commit()
+
+    def save_ingestion_job(self, job: IngestionJob) -> IngestionJob:
+        self.conn.execute(
+            """
+            INSERT INTO secondbrain_ingestion_jobs (
+              id, owner_id, bucket, object_key, event_type, status,
+              attempts, message, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                job.id,
+                job.owner_id,
+                job.bucket,
+                job.object_key,
+                job.event_type,
+                job.status,
+                job.attempts,
+                job.message,
+                job.created_at.isoformat(),
+                job.updated_at.isoformat(),
+            ),
+        )
+        self.conn.commit()
+        return job
+
+    def get_ingestion_job(self, owner_id: str, job_id: str) -> IngestionJob | None:
+        row = self.conn.execute(
+            """
+            SELECT * FROM secondbrain_ingestion_jobs
+            WHERE owner_id = ? AND id = ?
+            """,
+            (owner_id, job_id),
+        ).fetchone()
+        return self._ingestion_job_from_row(row) if row else None
+
+    def update_ingestion_job_status(
+        self,
+        owner_id: str,
+        job_id: str,
+        status: str,
+        message: str,
+        attempts: int,
+    ) -> IngestionJob:
+        self.conn.execute(
+            """
+            UPDATE secondbrain_ingestion_jobs
+            SET status = ?, message = ?, attempts = ?, updated_at = ?
+            WHERE owner_id = ? AND id = ?
+            """,
+            (status, message, attempts, datetime.now(UTC).isoformat(), owner_id, job_id),
+        )
+        self.conn.commit()
+        job = self.get_ingestion_job(owner_id, job_id)
+        if job is None:
+            raise KeyError(f"ingestion job not found: {job_id}")
+        return job
 
     def save_capture(self, capture: Capture) -> Capture:
         self.conn.execute(
@@ -215,6 +284,15 @@ class SqliteSecondBrainRepository:
             )
         self.conn.commit()
 
+    def delete_document(self, owner_id: str, vault_path: str) -> bool:
+        document = self.get_document(owner_id, vault_path)
+        if document is None:
+            return False
+        self.conn.execute("DELETE FROM secondbrain_document_chunks WHERE document_id = ?", (document.id,))
+        self.conn.execute("DELETE FROM secondbrain_documents WHERE id = ?", (document.id,))
+        self.conn.commit()
+        return True
+
     def list_searchable_chunks(self, owner_id: str, include_archive: bool = False) -> list[tuple[VaultDocument, VaultChunk]]:
         archive_clause = "" if include_archive else "AND d.archived = 0"
         rows = self.conn.execute(
@@ -313,6 +391,20 @@ class SqliteSecondBrainRepository:
             embedding=tuple(float(value) for value in json.loads(row["c_embedding"])),
         )
 
+    def _ingestion_job_from_row(self, row: sqlite3.Row) -> IngestionJob:
+        return IngestionJob(
+            id=row["id"],
+            owner_id=row["owner_id"],
+            bucket=row["bucket"],
+            object_key=row["object_key"],
+            event_type=row["event_type"],
+            status=row["status"],
+            attempts=int(row["attempts"]),
+            message=row["message"],
+            created_at=datetime.fromisoformat(row["created_at"]),
+            updated_at=datetime.fromisoformat(row["updated_at"]),
+        )
+
 
 
 class PostgresPsqlSecondBrainRepository(PsqlRepositoryBase):
@@ -357,6 +449,7 @@ class PostgresPsqlSecondBrainRepository(PsqlRepositoryBase):
     def clear_owner(self, owner_id: str) -> None:
         self._execute(
             f"""
+            DELETE FROM secondbrain_ingestion_jobs WHERE owner_id = {sql_literal(owner_id)};
             DELETE FROM secondbrain_document_chunks WHERE owner_id = {sql_literal(owner_id)};
             DELETE FROM secondbrain_documents WHERE owner_id = {sql_literal(owner_id)};
             DELETE FROM secondbrain_captures WHERE owner_id = {sql_literal(owner_id)};
@@ -404,6 +497,74 @@ class PostgresPsqlSecondBrainRepository(PsqlRepositoryBase):
             """
         )
         return capture
+
+    def save_ingestion_job(self, job: IngestionJob) -> IngestionJob:
+        self._execute(
+            f"""
+            INSERT INTO secondbrain_ingestion_jobs (
+              id, owner_id, bucket, object_key, event_type, status,
+              attempts, message, created_at, updated_at
+            ) VALUES (
+              {sql_literal(job.id)},
+              {sql_literal(job.owner_id)},
+              {sql_literal(job.bucket)},
+              {sql_literal(job.object_key)},
+              {sql_literal(job.event_type)},
+              {sql_literal(job.status)},
+              {job.attempts},
+              {sql_literal(job.message)},
+              {sql_literal(job.created_at.isoformat())}::timestamptz,
+              {sql_literal(job.updated_at.isoformat())}::timestamptz
+            );
+            """
+        )
+        return job
+
+    def get_ingestion_job(self, owner_id: str, job_id: str) -> IngestionJob | None:
+        rows = self._query_json_lines(
+            f"""
+            SELECT jsonb_build_object(
+              'id', id,
+              'owner_id', owner_id,
+              'bucket', bucket,
+              'object_key', object_key,
+              'event_type', event_type,
+              'status', status,
+              'attempts', attempts,
+              'message', message,
+              'created_at', created_at,
+              'updated_at', updated_at
+            )
+            FROM secondbrain_ingestion_jobs
+            WHERE owner_id = {sql_literal(owner_id)}
+              AND id = {sql_literal(job_id)};
+            """
+        )
+        return ingestion_job_from_json(rows[0]) if rows else None
+
+    def update_ingestion_job_status(
+        self,
+        owner_id: str,
+        job_id: str,
+        status: str,
+        message: str,
+        attempts: int,
+    ) -> IngestionJob:
+        self._execute(
+            f"""
+            UPDATE secondbrain_ingestion_jobs
+            SET status = {sql_literal(status)},
+                message = {sql_literal(message)},
+                attempts = {attempts},
+                updated_at = now()
+            WHERE owner_id = {sql_literal(owner_id)}
+              AND id = {sql_literal(job_id)};
+            """
+        )
+        job = self.get_ingestion_job(owner_id, job_id)
+        if job is None:
+            raise KeyError(f"ingestion job not found: {job_id}")
+        return job
 
     def list_captures(self, owner_id: str) -> list[Capture]:
         rows = self._query_json_lines(
@@ -561,6 +722,21 @@ class PostgresPsqlSecondBrainRepository(PsqlRepositoryBase):
             """
         )
 
+    def delete_document(self, owner_id: str, vault_path: str) -> bool:
+        document = self.get_document(owner_id, vault_path)
+        if document is None:
+            return False
+        self._execute(
+            f"""
+            DELETE FROM secondbrain_document_chunks
+            WHERE document_id = {sql_literal(document.id)};
+
+            DELETE FROM secondbrain_documents
+            WHERE id = {sql_literal(document.id)};
+            """
+        )
+        return True
+
     def list_searchable_chunks(self, owner_id: str, include_archive: bool = False) -> list[tuple[VaultDocument, VaultChunk]]:
         archive_clause = "" if include_archive else "AND d.archived = false"
         rows = self._query_json_lines(
@@ -682,3 +858,17 @@ def chunk_from_json(row: dict[str, Any]) -> VaultChunk:
         embedding=embedding,
     )
 
+
+def ingestion_job_from_json(row: dict[str, Any]) -> IngestionJob:
+    return IngestionJob(
+        id=row["id"],
+        owner_id=row["owner_id"],
+        bucket=row["bucket"],
+        object_key=row["object_key"],
+        event_type=row["event_type"],
+        status=row["status"],
+        attempts=int(row["attempts"]),
+        message=row["message"],
+        created_at=datetime.fromisoformat(row["created_at"]),
+        updated_at=datetime.fromisoformat(row["updated_at"]),
+    )

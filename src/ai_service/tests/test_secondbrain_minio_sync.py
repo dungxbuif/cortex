@@ -95,6 +95,58 @@ Local S3 simulation indexes Obsidian markdown through the Second Brain pipeline.
         with self.assertRaises(ValueError):
             self.service.sync_minio_object(self.bucket, "second-brain/../secret.md", owner_id="minio-owner")
 
+    def test_submit_event_queues_job_and_worker_processes_it(self) -> None:
+        object_key = "second-brain/wiki/async-job.md"
+        self._write_object(object_key, "# Async Job\nWorker indexes queued object.")
+
+        job = self.service.submit_minio_event(self.bucket, object_key, owner_id="minio-owner")
+
+        self.assertEqual(job.status, "queued")
+        self.assertEqual(job.event_type, "upsert")
+
+        result = self.service.process_ingestion_job(job.id, owner_id="minio-owner")
+        processed = self.repo.get_ingestion_job("minio-owner", job.id)
+
+        self.assertEqual(result["status"], "indexed")
+        self.assertIsNotNone(processed)
+        self.assertEqual(processed.status, "succeeded")
+        self.assertEqual(processed.attempts, 1)
+
+    def test_delete_event_removes_document_and_chunks_from_search(self) -> None:
+        object_key = "second-brain/wiki/delete-me.md"
+        self._write_object(
+            object_key,
+            "# Delete Me\nThis document contains a unique stale phrase for removal.",
+        )
+        indexed = self.service.sync_minio_object(self.bucket, object_key, owner_id="minio-owner")
+        self.assertEqual(indexed["status"], "indexed")
+        self.assertTrue(self.service.search_knowledge("unique stale phrase", owner_id="minio-owner"))
+
+        delete_job = self.service.submit_minio_event(
+            self.bucket,
+            object_key,
+            owner_id="minio-owner",
+            event_name="s3:ObjectRemoved:Delete",
+        )
+        result = self.service.process_ingestion_job(delete_job.id, owner_id="minio-owner")
+
+        self.assertEqual(result["status"], "deleted")
+        self.assertEqual(self.service.search_knowledge("unique stale phrase", owner_id="minio-owner"), [])
+
+    def test_repeated_delete_event_is_idempotent_skip(self) -> None:
+        object_key = "second-brain/wiki/missing-delete.md"
+        delete_job = self.service.submit_minio_event(
+            self.bucket,
+            object_key,
+            owner_id="minio-owner",
+            event_name="s3:ObjectRemoved:Delete",
+        )
+
+        result = self.service.process_ingestion_job(delete_job.id, owner_id="minio-owner")
+
+        self.assertEqual(result["status"], "skipped")
+        self.assertEqual(result["message"], "document not found")
+
     def _write_object(self, object_key: str, content: str) -> None:
         path = self.bucket_root / object_key
         path.parent.mkdir(parents=True, exist_ok=True)

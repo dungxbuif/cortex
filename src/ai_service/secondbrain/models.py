@@ -79,3 +79,17 @@ class SyncStatus:
     failed_documents: int
     total_chunks: int
     last_indexed_at: datetime | None
+
+
+@dataclass(frozen=True)
+class IngestionJob:
+    id: str
+    owner_id: str
+    bucket: str
+    object_key: str
+    event_type: str
+    status: str
+    attempts: int
+    message: str
+    created_at: datetime
+    updated_at: datetime

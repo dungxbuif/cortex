@@ -8,6 +8,7 @@ from ai_service.core.models import CaptureStatus, DEFAULT_OWNER_ID, utc_now
 from ai_service.core.ports import Embedder, SecondBrainRepository
 from ai_service.core.vector import cosine_similarity, tokenize
 from ai_service.secondbrain.models import Capture, RawChunk, SearchResult, SyncStatus, VaultChunk
+from ai_service.secondbrain.models import IngestionJob
 from ai_service.secondbrain.repository import SqliteSecondBrainRepository
 
 MIN_SEARCH_SCORE = 0.16
@@ -190,6 +191,75 @@ class SecondBrainService:
         if chunks == 0:
             return _sync_result("skipped", key, "unchanged content", skipped=1)
         return _sync_result("indexed", key, f"indexed {chunks} chunks", processed=1)
+
+    def delete_minio_object(
+        self,
+        bucket: str,
+        object_key: str,
+        owner_id: str = DEFAULT_OWNER_ID,
+    ) -> dict[str, int | str]:
+        key = normalize_object_key(object_key)
+        if self.allowed_bucket and bucket != self.allowed_bucket:
+            raise ValueError("bucket is not allowed")
+        if not key.startswith(self.object_prefix):
+            return _sync_result("skipped", key, "object outside second-brain prefix", skipped=1)
+        if not key.endswith(".md"):
+            return _sync_result("skipped", key, "object is not markdown", skipped=1)
+        vault_path = key[len(self.object_prefix) :]
+        if not vault_path:
+            return _sync_result("skipped", key, "object key has no vault path", skipped=1)
+        deleted = self.repository.delete_document(owner_id, vault_path)
+        if not deleted:
+            return _sync_result("skipped", key, "document not found", skipped=1)
+        return _sync_result("deleted", key, "deleted document and chunks", processed=1)
+
+    def submit_minio_event(
+        self,
+        bucket: str,
+        object_key: str,
+        owner_id: str = DEFAULT_OWNER_ID,
+        event_name: str = "s3:ObjectCreated:Put",
+    ) -> IngestionJob:
+        key = normalize_object_key(object_key)
+        if self.allowed_bucket and bucket != self.allowed_bucket:
+            raise ValueError("bucket is not allowed")
+        event_type = _classify_minio_event(event_name)
+        now = utc_now()
+        job = IngestionJob(
+            id=str(uuid.uuid4()),
+            owner_id=owner_id,
+            bucket=bucket,
+            object_key=key,
+            event_type=event_type,
+            status="queued",
+            attempts=0,
+            message="queued",
+            created_at=now,
+            updated_at=now,
+        )
+        return self.repository.save_ingestion_job(job)
+
+    def process_ingestion_job(
+        self,
+        job_id: str,
+        owner_id: str = DEFAULT_OWNER_ID,
+    ) -> dict[str, int | str]:
+        job = self.repository.get_ingestion_job(owner_id, job_id)
+        if job is None:
+            raise KeyError(f"ingestion job not found: {job_id}")
+        attempts = job.attempts + 1
+        self.repository.update_ingestion_job_status(owner_id, job_id, "running", "processing", attempts)
+        try:
+            if job.event_type == "delete":
+                result = self.delete_minio_object(job.bucket, job.object_key, owner_id=owner_id)
+            else:
+                result = self.sync_minio_object(job.bucket, job.object_key, owner_id=owner_id)
+        except Exception as exc:
+            self.repository.update_ingestion_job_status(owner_id, job_id, "failed", str(exc), attempts)
+            raise
+        status = "succeeded" if result["status"] in {"indexed", "deleted", "skipped"} else "failed"
+        self.repository.update_ingestion_job_status(owner_id, job_id, status, str(result["message"]), attempts)
+        return result
 
     def get_sync_status(self, owner_id: str = DEFAULT_OWNER_ID) -> SyncStatus:
         return self.repository.sync_status(owner_id)
@@ -414,3 +484,10 @@ def _sync_result(
         "object_key": object_key,
         "message": message,
     }
+
+
+def _classify_minio_event(event_name: str) -> str:
+    normalized = (event_name or "").lower()
+    if "objectremoved" in normalized or "removed" in normalized or "delete" in normalized:
+        return "delete"
+    return "upsert"
