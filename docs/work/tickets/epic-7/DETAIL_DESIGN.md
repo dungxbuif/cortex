@@ -14,6 +14,7 @@ trace:
     - docs/work/tickets/epic-7/CTX-704.md
     - docs/work/tickets/epic-7/CTX-705.md
     - docs/work/tickets/epic-7/CTX-706.md
+    - docs/work/tickets/epic-7/CTX-706A.md
 ---
 
 # Epic 7 Detail Design: Full LLM/ReAct Orchestrator Completion
@@ -114,11 +115,13 @@ Implications:
 | --- | --- |
 | CTX-701A | Prompt contract and orchestration decision-flow design for human Q&A |
 | CTX-701 | LLM/ReAct runtime and prompt contract |
-| CTX-702 | Telegram bot transport adapter |
-| CTX-703 | Tool adapter execution layer |
-| CTX-704 | Module connectors for Finance, Second Brain, Homelab |
-| CTX-705 | Sync/completion gaps and graceful degradation |
-| CTX-706 | Evals and end-to-end chat tests |
+| CTX-702 | Tool Registry And JSON Schema Contracts |
+| CTX-703 | LLM/ReAct Runtime Loop async state machine |
+| CTX-704 | Telegram bot transport adapter |
+| CTX-705 | Module connectors for Second Brain and Homelab |
+| CTX-706 | Tool Adapter Executor |
+| CTX-706A | Policy/Audit gRPC Bridge & GrpcPolicyEnforcer |
+| CTX-707 | Evals and end-to-end chat tests |
 
 ## Verification Strategy
 
@@ -131,7 +134,7 @@ Implications:
 
 ## Open Constraints
 
-- Full write-capable Finance chat flows should wait for or integrate with Audit & Permissions.
+- Finance connector and full write-capable Finance chat flows should wait for or integrate with Audit & Permissions.
 - Homelab must remain read-only.
 - Second Brain chat must not write directly to the Vault.
 - Capture inbox remains excluded from RAG unless explicitly approved by module policy.

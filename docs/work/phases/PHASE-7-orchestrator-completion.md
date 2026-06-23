@@ -35,6 +35,7 @@ trace:
     - ../tickets/epic-7/CTX-704.md
     - ../tickets/epic-7/CTX-705.md
     - ../tickets/epic-7/CTX-706.md
+    - ../tickets/epic-7/CTX-706A.md
     - ../tickets/epic-7/CTX-707.md
     - ../tickets/epic-7/CTX-708.md
     - ../tickets/epic-7/CTX-709.md
