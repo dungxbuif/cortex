@@ -20,6 +20,7 @@ All notable changes should be recorded here.
 ## [Unreleased]
 
 ### Added
+- Implemented Epic 7 CTX-704 Telegram transport adapter: added Telegram update normalization into `ConversationInput`, explicit chat/user allowlist enforcement, typing actions, Markdown-lite to Telegram-safe HTML rendering for short messages, plaintext chunking for long responses, plain-text fallback, environment settings, optional `python-telegram-bot` wiring, and focused tests.
 - Completed Epic 7 CTX-701A design gate: prompt contract, orchestrator decision flow, Telegram-first surface decision, confirmation rules, citation behavior, and eval examples are reviewed in `DETAIL_DESIGN.md` before later LLM/ReAct runtime work.
 - Implemented Epic 7 CTX-700 and CTX-701 foundations: added shared Python orchestration contracts, connector registry startup validation, PostgreSQL-backed conversation and pending-confirmation state, migration `000004_orchestrator_conversations.sql`, and focused tests for registry validation, context trimming, inactivity reset, confirmation hashing, TTL expiration, and Telegram actor binding.
 - Implemented Phase 9 React/Tailwind Client Console: added `src/client` Vite app with a single chat conversation, future module tabs, right-side tool/citation/audit panels, OpenAI SSE client plumbing, FastAPI `/ui` hosting for built assets, internal single-user JWT bootstrap via `/api/auth/dev-token`, backend bearer-token validation mapped to user `11111111-1111-1111-1111-111111111111`, and SSE support for `/v1/chat/completions`.
