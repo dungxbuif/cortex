@@ -1,7 +1,8 @@
 ---
 artifact_type: adr
 id: ADR-001
-status: accepted
+status: superseded
+superseded_by: ADR-003
 owner: human
 human_fields: [decision, alternatives_considered]
 ai_fields: [context, consequences, linked_docs]
@@ -30,3 +31,8 @@ We will build the Cortex Backend as a **Modular Monolith** using **Go**.
 ## Linked Docs
 - `docs/raw_spec/spec.md`
 - `docs/architecture/ARCHITECTURE.md`
+- [ADR-003](ADR-003-second-brain-python-migration.md)
+
+## Superseded Note
+This ADR is superseded by **ADR-003**, which adopts a split runtime: **Python** for Orchestration, LLM routing, and AI-heavy processing (RAG, vector DB), and **Go** for public APIs and high-throughput/deterministic domain services.
+

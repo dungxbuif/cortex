@@ -28,12 +28,19 @@ trace:
     - docs/raw_spec/system/source-of-truth-sync.md
   tickets:
     - ../tickets/epic-7/CTX-701A.md
+    - ../tickets/epic-7/CTX-700.md
     - ../tickets/epic-7/CTX-701.md
     - ../tickets/epic-7/CTX-702.md
     - ../tickets/epic-7/CTX-703.md
     - ../tickets/epic-7/CTX-704.md
     - ../tickets/epic-7/CTX-705.md
     - ../tickets/epic-7/CTX-706.md
+    - ../tickets/epic-7/CTX-707.md
+    - ../tickets/epic-7/CTX-708.md
+    - ../tickets/epic-7/CTX-709.md
+    - ../tickets/epic-7/CTX-710.md
+    - ../tickets/epic-7/CTX-711.md
+    - ../tickets/epic-7/CTX-712.md
 ---
 
 # PHASE-7: Full LLM/ReAct Orchestrator Completion

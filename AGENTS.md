@@ -165,4 +165,4 @@ When working on Cortex, agents MUST obey the system-specific constraints defined
   - Second Brain local Obsidian Vault must NOT be written to directly by the agent. Agents may only write to the capture inbox/buffer DB.
   - Finance is allowed to write to its canonical database (PostgreSQL) via established APIs only after validation.
 - **RAG & Context**: RAG answers must provide citations if relying on indexed documents. RAG must not read transient unapproved capture buffers if explicitly disallowed by module rules.
-- **Tech Stack constraints**: Cortex backend must be built as a Modular Monolith in **Go** using PostgreSQL + pgvector. External integrations must be delegated to n8n where appropriate and expose results via webhooks to Cortex API.
+- **Tech Stack constraints**: Cortex backend uses **Python** for the Orchestrator/LLM runtime and AI-heavy processing, and **Go** for API-heavy, deterministic domain components. They communicate via internal gRPC. Both use PostgreSQL + pgvector. External integrations must be delegated to n8n where appropriate and expose results via webhooks to Cortex API.

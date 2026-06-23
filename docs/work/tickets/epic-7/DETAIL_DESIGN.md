@@ -25,23 +25,37 @@ Epic 4 created the Python gateway and deterministic routing layer, but the proje
 ## Design Goals
 
 - Keep domain modules free of prompts, LLM schemas, chat history, and ReAct state.
-- Make Python the owner of `/v1/chat/completions`, tool routing, prompt contracts, and response synthesis.
+- Make Python the owner of the orchestrator, tool routing, prompt contracts, and response synthesis.
 - Reuse existing Finance, Second Brain, and Homelab services instead of copying business logic into the orchestrator.
 - Use one shared PostgreSQL database; keep module isolation by table/repository boundary.
 - Gate write-capable tools through permission, confirmation, and audit policy.
 
+### Response Prompt
+
+```text
+Respond in concise plain text and structured lists.
+
+Use compact bullet summaries or <pre> aligned text blocks for Finance reports (do not use Markdown tables).
+For RAG-backed answers, include citations as a bullet list at the end:
+- Sources:
+- 1. <code>path/to/file.md @ commit</code>
+For clarification, ask one focused question and name the missing fields.
+For confirmation, summarize the exact action and ask for explicit approval.
+For denial, state the policy boundary and safe alternative.
+For fallback, explain what is unavailable and what the user can retry or check.
+```
+
 ## Target Component Model
 
 ```text
-+----------------+
-| Open WebUI     |
-| /v1/chat/...   |
-+-------+--------+
-        |
-        v
++-----------------------+
+| Telegram Bot Interface|
++-----------+-----------+
+            |
+            v
 +--------------------------+
 | Python Gateway           |
-| request/session adapter   |
+| request/session adapter  |
 +------------+-------------+
              |
              v
@@ -76,8 +90,23 @@ Epic 4 created the Python gateway and deterministic routing layer, but the proje
 - **Adapters are thin:** Tool adapters validate/authorize/map/execute only. Domain services own behavior.
 - **ReAct loop has hard limits:** Max turns, timeout, no-tool fallback, provider-error fallback, and clarification state prevent runaway loops.
 - **Citations are mandatory for RAG-backed answers:** Second Brain and Homelab results must carry source path/snippet/score into synthesis.
-- **Presentation owns citation layout:** The Orchestrator/Presentation Adapter formats source metadata into Markdown citations for Open WebUI. Second Brain citations should prefer Obsidian-friendly note/path labels when source metadata supports them; Homelab citations should keep repo path and commit SHA.
 - **One DB:** Finance canonical tables, `secondbrain_*`, and `homelab_*` remain in one shared database.
+
+## Chat Surface Decision
+
+Telegram bot is the single, exclusive user-facing chat surface for Epic 7 and beyond. OpenWebUI and `/v1/chat/completions` compatibility are completely dropped.
+
+Implications:
+
+- The orchestrator core processes structured `ConversationInput`, decoupled from HTTP transports, but currently only wired to Telegram.
+- Telegram adapter owns Telegram-specific concerns: webhook or polling setup, Telegram user/chat ID mapping, message normalization, response chunking, conversation history management, robust HTML escaping, and sending "typing..." actions during long LLM calls to preserve UX.
+- **Telegram Rendering Policy (HTML Mode)**:
+  - Default parse mode: `HTML` (not `MarkdownV2`, due to escaping complexities).
+  - Escape all user/model text using standard `html.escape`.
+  - Adapter whitelists tags: `<b>` for headings, `<i>` optional, `<code>` for inline IDs/paths, `<pre>` for blocks/tabular reports, `<a href="">` for safe URLs.
+  - Long message chunking: max 4096 chars, target size ~3500 chars, splitting by paragraph/line.
+  - Plain-text fallback: if HTML send fails due to malformed tags, retry with tags stripped/escaped.
+- Authorization starts with an explicit Telegram user/chat allowlist mapped to the current single Cortex owner. Do not rely on obscurity of the bot token as authorization.
 
 ## Ticket Breakdown
 
@@ -85,7 +114,7 @@ Epic 4 created the Python gateway and deterministic routing layer, but the proje
 | --- | --- |
 | CTX-701A | Prompt contract and orchestration decision-flow design for human Q&A |
 | CTX-701 | LLM/ReAct runtime and prompt contract |
-| CTX-702 | Tool registry and JSON schema contracts |
+| CTX-702 | Telegram bot transport adapter |
 | CTX-703 | Tool adapter execution layer |
 | CTX-704 | Module connectors for Finance, Second Brain, Homelab |
 | CTX-705 | Sync/completion gaps and graceful degradation |
@@ -93,12 +122,12 @@ Epic 4 created the Python gateway and deterministic routing layer, but the proje
 
 ## Verification Strategy
 
-- Unit tests for prompt policy, registry schemas, adapters, error mapping, and formatting.
-- Review tests/examples for prompt contract, decision states, tool-selection policy, clarification, confirmation, denial, and citation behavior before implementing runtime code.
+- Unit tests for prompt policy, registry schemas, adapters, error mapping, and Telegram HTML escaping/chunking logic.
+- Review tests/examples for prompt contract, decision states, tool-selection policy, and citation behavior.
 - Integration tests against local PostgreSQL `cortex` with pgvector.
 - Fake-provider replay tests for deterministic CI coverage.
 - Opt-in real-provider smoke/eval using env credentials only.
-- E2E tests against `/v1/chat/completions` for read, capture, confirmation, denial, and fallback cases.
+- E2E tests against Telegram bot interface for read, capture, confirmation, denial, and fallback cases.
 
 ## Open Constraints
 

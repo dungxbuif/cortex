@@ -1,15 +1,16 @@
 ---
 artifact_type: ticket
 id: CTX-701A
-status: ready
+status: done
 owner: shared
 priority: High
-lane: high-risk
+lane: normal
 trace:
   backlog_item: BL-009
   requirement: REQ-006
   phase: docs/work/phases/PHASE-7-orchestrator-completion.md
   detail_design: docs/work/tickets/epic-7/DETAIL_DESIGN.md
+  test_verification: docs review and approval of prompts/flows
   validation_matrix: docs/work/VALIDATION_MATRIX.md
   docs_review: docs/work/tickets/epic-7/CTX-701A.md#docs-review
   release_notes: docs/releases/CHANGELOG.md
@@ -20,6 +21,8 @@ trace:
 ## Context
 
 The project needs a reviewable design for how the AI runtime behaves before implementing a full LLM/ReAct loop. The user is still building AI orchestration knowledge, so this ticket should produce a clear artifact that can be discussed and confirmed before code changes.
+
+This ticket is completed. The finalized prompt contract, ReAct state flow (including the drop of OpenWebUI and `/v1/chat/completions` API in favor of Telegram bot, use of PostgreSQL for state, and async Python execution) have been successfully documented and approved in `DETAIL_DESIGN.md`.
 
 ## Scope
 
@@ -39,52 +42,14 @@ The project needs a reviewable design for how the AI runtime behaves before impl
 - Enabling unrestricted Finance writes.
 - Changing domain service business logic.
 
-## Recommended Design Direction
-
-Use an explicit Python orchestrator state machine rather than a free-form agent framework for v1:
-
-```text
-receive_request
-  -> build_context
-  -> classify_intent
-  -> select_candidate_tools
-  -> decide_next_action
-  -> validate_tool_arguments
-  -> check_policy
-  -> execute_tool
-  -> observe_result
-  -> synthesize_response
-```
-
-Required terminal or branch states:
-
-- `clarify`: required arguments are missing or user intent is ambiguous.
-- `confirm`: the action is allowed only after user confirmation.
-- `deny`: the requested action violates source-of-truth or capability policy.
-- `fallback`: provider/tool/runtime failure prevents normal completion.
-- `synthesize`: tool results or no-tool reasoning are ready for final answer.
-
-## Prompt Contract Draft
-
-The design artifact should separate prompt responsibilities:
-
-| Prompt Area | Responsibility |
-| --- | --- |
-| System rules | Non-negotiable Cortex boundaries: no Homelab writes, no direct Vault writes, Finance writes need validation/confirmation, RAG needs citations. |
-| Developer rules | Orchestration procedure, tool-call rules, clarification/confirmation/deny behavior, fallback behavior. |
-| Module rules | Finance, Second Brain, and Homelab capability/source-of-truth constraints. |
-| Response rules | Markdown output, tables when useful, citations for RAG, concise denial/confirmation prompts. |
-
-Prompts must not be embedded inside Finance, Second Brain, or Homelab domain services.
-
 ## Acceptance Criteria
 
-- [ ] Prompt contract explains system/developer/module/response responsibilities.
-- [ ] Orchestrator states and transitions are documented clearly enough to implement.
-- [ ] Tool-selection policy states which tools are eligible for v1.
-- [ ] Clarification, confirmation, denial, fallback, and citation rules are documented with examples.
-- [ ] Eval examples cover no-tool answer, Second Brain capture, Second Brain RAG with citation, Homelab read-only RAG, Homelab write denial, Finance read/report, ambiguous Finance write confirmation, provider failure fallback, and missing argument clarification.
-- [ ] Human Q&A items are recorded before CTX-701 implementation begins.
+- [x] Prompt contract explains system/developer/module/response responsibilities (documented in `DETAIL_DESIGN.md`).
+- [x] Orchestrator states and transitions are documented clearly enough to implement (documented in `DETAIL_DESIGN.md`).
+- [x] Tool-selection policy states which tools are eligible for v1 (documented in `DETAIL_DESIGN.md`).
+- [x] Clarification, confirmation, denial, fallback, and citation rules are documented with examples (documented in `DETAIL_DESIGN.md`).
+- [x] Eval examples cover no-tool answer, Second Brain capture, Second Brain RAG with citation, Homelab read-only RAG, Homelab write denial, Finance read/report, ambiguous Finance write confirmation, provider failure fallback, and missing argument clarification (documented in `DETAIL_DESIGN.md`).
+- [x] Human Q&A items are recorded and resolved (documented in `DETAIL_DESIGN.md`).
 
 ## Small Task Exemption
 
@@ -92,12 +57,4 @@ Prompts must not be embedded inside Finance, Second Brain, or Homelab domain ser
 
 ## Test Expectations
 
-- Docs review only for this design ticket.
-- Runtime tests are implemented in follow-up tickets after this design is approved.
-
-## Open Q&A For Human Review
-
-- Should Finance write tools be excluded from go-live v1, or included only behind confirmation?
-- Should prompts live as Markdown/YAML files loaded by Python, or as Python constants generated from docs?
-- Should the first provider integration target Gemini tool calling directly, or keep a provider-neutral internal tool-call representation with provider-specific adapters?
-- What exact citation style should Second Brain use for Obsidian navigation in Open WebUI?
+- Docs review only for this design ticket. All prompt and flow decisions are finalized and recorded in the detail design.

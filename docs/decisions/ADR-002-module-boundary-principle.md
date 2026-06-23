@@ -25,7 +25,7 @@ We enforce a strict **Module Boundary Principle**:
 
 ## Consequences
 - **Positive**: Domain logic is highly testable without LLMs. It is easy to swap the LLM provider or the orchestration framework later. The business rules remain deterministic and safe.
-- **Negative**: The Orchestrator layer has to be generic and powerful enough to map dynamic LLM outputs to strict Go structs for the domain APIs, requiring a robust Tool Adapter layer.
+- **Negative**: The Orchestrator layer (written in Python) has to be generic and powerful enough to map dynamic LLM outputs to strict gRPC schemas / API request parameters for the Go-based domain APIs, requiring a robust Tool Adapter layer.
 
 ## Linked Docs
 - `docs/raw_spec/spec.md`
