@@ -1,7 +1,7 @@
 ---
 artifact_type: detail_design
 id: DETAIL_DESIGN-AUDIT-POLICY
-status: ready_for_review
+status: approved
 owner: shared
 human_fields:
   - approval
@@ -35,7 +35,7 @@ trace:
 
 ## Approval Status
 
-Pending human/design approval before code implementation.
+Approved by human instruction: "Approve triển khai Epic 5 rồi Epic 8."
 
 ## Problem Statement
 
