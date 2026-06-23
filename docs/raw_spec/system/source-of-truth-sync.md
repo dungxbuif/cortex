@@ -135,3 +135,9 @@ Examples:
 - Indexing must be idempotent by source revision + path + content hash.
 - External docs/config must pass redaction before embedding.
 - Sync failures must not corrupt last good index.
+
+## 8. Current Cortex Implementation Notes
+
+- Second Brain MinIO/S3 webhook handling persists a `secondbrain_ingestion_jobs` row and returns `202 Accepted`; object fetch, chunking, embedding, and vector writes are handled by the worker execution path.
+- Second Brain object delete events are represented as ingestion jobs with `event_type = delete`; worker processing removes matching documents and chunks from active RAG tables.
+- Active Second Brain RAG content remains in PostgreSQL + pgvector tables (`secondbrain_documents`, `secondbrain_document_chunks`); ingestion jobs store only event metadata and processing status.

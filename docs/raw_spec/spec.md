@@ -42,15 +42,15 @@ Module specs:
 
 Hệ thống xoay quanh 4 luồng tương tác chính:
 
-1. **User <-> Open WebUI:** Giao diện người dùng duy nhất, hỗ trợ chat, quản lý lịch sử, render Markdown/UI đẹp mắt.
-2. **Open WebUI <-> Go Backend:** Open WebUI gọi Go Backend qua chuẩn OpenAI API (`/v1/chat/completions`). Go Backend đóng vai trò API proxy và Cortex Runtime.
+1. **User <-> Cortex Client / Open WebUI:** Giao diện người dùng chat, hiện có first-party React/Tailwind client nội bộ tại `/ui` và vẫn giữ tương thích Open WebUI qua chuẩn OpenAI API.
+2. **Client <-> Cortex Gateway:** Client gọi gateway qua chuẩn OpenAI API (`/v1/chat/completions`). Gateway/Orchestrator thuộc Python runtime trong triển khai hiện tại.
 3. **Go Backend <-> LLM Provider:** Runtime gọi model thật để reasoning, intent extraction, tool choice và response synthesis.
 4. **Go Backend <-> Module APIs / System Services:** Runtime gọi domain APIs, RAG/indexing, sync, audit, permission, database, Git mirror hoặc external integrations.
 
 Luồng chuẩn:
 
 ```text
-Chat / Open WebUI
+Chat / Cortex Client / Open WebUI
   -> OpenAI-compatible API Proxy
   -> Cortex Runtime / Orchestrator
   -> Capability & Permission Policy
@@ -101,8 +101,8 @@ Cortex không suy luận quyền theo tên module. Mỗi module khai báo capabi
 
 ### 6.1. OpenAI API Proxy & Session Management
 
-- **Chức năng:** Lắng nghe request `/v1/chat/completions` từ Open WebUI.
-- **Session/Context:** Open WebUI gửi Messages History; API gateway/Orchestrator tiếp nhận, nạp policy, chọn context nội bộ/RAG khi cần, gắn tool definitions hợp lệ rồi gọi LLM provider. Orchestrator thuộc Python runtime.
+- **Chức năng:** Lắng nghe request `/v1/chat/completions` từ Cortex Client hoặc Open WebUI-compatible client.
+- **Session/Context:** Client gửi Messages History; API gateway/Orchestrator tiếp nhận, nạp policy, chọn context nội bộ/RAG khi cần, gắn tool definitions hợp lệ rồi gọi LLM provider. Orchestrator thuộc Python runtime.
 
 ### 6.2. Cortex Runtime, Orchestrator & Dynamic Tool Registry
 
@@ -141,7 +141,7 @@ Cortex không suy luận quyền theo tên module. Mỗi module khai báo capabi
 
 ```text
 User message
-  -> Open WebUI
+  -> Cortex Client / Open WebUI
   -> OpenAI-compatible API Proxy
   -> Cortex Runtime
   -> Intent + capability check
@@ -175,7 +175,7 @@ N8n là external automation layer, không phải nơi chứa business logic chí
 
 ## 9. Technology Stack
 
-- **Interface/Client:** **Open WebUI** (chạy Docker local).
+- **Interface/Client:** First-party React/Tailwind Cortex Client at `/ui`; Open WebUI remains supported as an OpenAI-compatible client.
 - **Orchestrator / AI Runtime:** Python, LLM/tool runtime, context planning, provider clients, RAG coordination.
 - **API-heavy Components:** Go services/gateway where useful for public APIs, deterministic domain APIs, concurrency, and strict contracts.
 - **Second Brain Backend:** Python AI service for RAG/document processing, exposed to Go through internal gRPC; optional FastAPI dev/debug adapter; Celery/RQ workers; SQLAlchemy/psql migration tooling.

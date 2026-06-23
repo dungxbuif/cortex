@@ -21,6 +21,8 @@ According to the Source of Truth matrix (`docs/raw_spec/spec.md`):
 - **Finance Module**: Owns all its canonical data within Cortex PostgreSQL (Wallets, Categories, Transactions, Assets).
 - **Second Brain Module**: Owns only its *capture buffer* in PostgreSQL. The canonical Vault data is owned by local Obsidian files and is mirrored/indexed by Cortex.
 - **Homelab Module**: Completely read-only, sourcing from GitHub repos.
+- **System Audit**: Owns immutable audit/event records for policy decisions, tool calls, sync/index lineage, writes, denials, and debugging.
+- **Second Brain Ingestion Jobs**: Owns transient/durable job metadata for processing MinIO/S3 mirror events; document content and embeddings remain in `secondbrain_documents` and `secondbrain_document_chunks` with pgvector.
 
 ## Finance Entities
 
@@ -238,6 +240,68 @@ erDiagram
 - Transfers are stored as two `TRANSACTION` rows with the same `transfer_group_id`: one `transfer_out` row and one `transfer_in` row.
 - Soft delete is limited to `TRANSACTION`, `ASSET_TRANSACTION`, and `DEBT_PAYMENT`; soft-deleted rows are excluded from reports, valuation rebuilds, and debt settlement calculations.
 - Linked asset/debt cash movement rows require correction or reversal commands so related records stay consistent.
+
+## System And Second Brain Operational Entities
+
+```mermaid
+erDiagram
+    SECONDBRAIN_DOCUMENT ||--o{ SECONDBRAIN_DOCUMENT_CHUNK : "indexed into"
+    SECONDBRAIN_INGESTION_JOB }o--|| SECONDBRAIN_DOCUMENT : "creates or deletes by path"
+
+    AUDIT_EVENT {
+        string id PK
+        string event_type
+        string module
+        string actor_type
+        string actor_id
+        string conversation_id
+        string request_id
+        string tool_name
+        string capability
+        json source_ref
+        json target_ref
+        string status "success, failed, denied, skipped"
+        json metadata
+        datetime created_at
+    }
+
+    SECONDBRAIN_INGESTION_JOB {
+        string id PK
+        string owner_id
+        string bucket
+        string object_key
+        string event_type "upsert, delete"
+        string status "queued, running, succeeded, failed"
+        int attempts
+        string message
+        datetime created_at
+        datetime updated_at
+    }
+
+    SECONDBRAIN_DOCUMENT {
+        string id PK
+        string owner_id
+        string vault_path
+        string checksum
+        string index_status
+        datetime indexed_at
+    }
+
+    SECONDBRAIN_DOCUMENT_CHUNK {
+        string id PK
+        string document_id FK
+        string owner_id
+        string vault_path
+        int chunk_index
+        string content
+        vector embedding
+    }
+```
+
+- `audit_events` is append-only at the application service level; no update/delete API is exposed.
+- `secondbrain_ingestion_jobs` stores event/job metadata only, not Markdown body content or embeddings.
+- Active RAG content lives in `secondbrain_document_chunks.embedding` as pgvector data.
+- Delete ingestion jobs remove matching `secondbrain_documents` and `secondbrain_document_chunks` from active RAG search.
 - Initial report indexes:
   - `transactions(owner_id, occurred_at DESC)` where `deleted_at IS NULL`
   - `transactions(owner_id, wallet_id, occurred_at DESC)` where `deleted_at IS NULL`

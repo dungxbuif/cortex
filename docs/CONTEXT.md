@@ -32,16 +32,16 @@ updated: TBD
 
 ## Current Status
 
-- Status: Second Brain Obsidian MinIO Webhook Sync complete and verified against real S3 pipeline.
+- Status: Epic 5 Audit & Permissions, Epic 8 Async Ingestion/Delete Sync, and Phase 9 React/Tailwind Client Console are implemented and verified; go-live and LLM prompt/ReAct work remain excluded for human supervision.
 - Active backlog: `docs/work/BACKLOG.md`
-- Current queue focus: `BL-010` Second Brain Obsidian MinIO webhook sync on branch `feat/obsidian-sync`; implementation is complete, verified locally with simulation and E2E against real S3 bucket.
-- Active phase: docs/work/phases/PHASE-4-restructuring.md
+- Current queue focus: non-go-live, non-prompt/LLM tasks completed through `BL-006`, `BL-011`, and `BL-012`.
+- Active phase: None.
 - Active ticket: None.
 - Active bug: None.
 
 ## Current Focus
 
-Epic 4 is complete with Python-owned `/v1/chat/completions` gateway routing into existing Second Brain and Homelab services. Epic 7 has been added after the current epics/remaining tasks to capture full LLM/ReAct orchestration, prompt contracts, tool-call adapters, module connectors, sync/completion gaps, and eval/E2E proof.
+Epic 4 is complete with Python-owned `/v1/chat/completions` gateway routing into existing Second Brain and Homelab services. Epic 5 Audit & Permissions is verified. Epic 8 Async Ingestion/Delete Sync is verified. Phase 9 Client Console is verified with React/Tailwind, single-user JWT, and SSE. Epic 7 prompt/LLM/ReAct and go-live readiness remain intentionally out of autonomous implementation scope for human supervision.
 
 ## Recently Touched Areas
 
@@ -95,12 +95,22 @@ Epic 4 is complete with Python-owned `/v1/chat/completions` gateway routing into
 - `docs/work/tickets/epic-4/CTX-410.md`
 - `docs/work/phases/PHASE-7-orchestrator-completion.md`
 - `docs/work/tickets/epic-7/DETAIL_DESIGN.md`
+- `docs/work/tickets/epic-7/CTX-701A.md`
 - `docs/work/tickets/epic-7/CTX-701.md`
 - `docs/work/tickets/epic-7/CTX-702.md`
 - `docs/work/tickets/epic-7/CTX-703.md`
 - `docs/work/tickets/epic-7/CTX-704.md`
 - `docs/work/tickets/epic-7/CTX-705.md`
 - `docs/work/tickets/epic-7/CTX-706.md`
+- `docs/work/phases/PHASE-8-ingestion-hardening.md`
+- `docs/work/tickets/epic-8/DETAIL_DESIGN.md`
+- `docs/work/tickets/epic-8/CTX-801.md`
+- `docs/work/tickets/epic-8/CTX-802.md`
+- `src/backend/migrations/000002_audit_events.up.sql`
+- `src/backend/migrations/000002_audit_events.down.sql`
+- `src/backend/internal/modules/system/audit/`
+- `src/backend/internal/modules/system/policy/`
+- `src/ai_service/migrations/000003_secondbrain_ingestion_jobs.sql`
 - `src/ai_service/homelab/redaction.py`
 - `src/ai_service/homelab/link_validator.py`
 - `src/ai_service/homelab/markdown.py`
@@ -125,6 +135,13 @@ Epic 4 is complete with Python-owned `/v1/chat/completions` gateway routing into
 - `src/backend/internal/modules/ai/`
 - `src/proto/cortex.proto`
 - `scripts/simulate-secondbrain-s3-action.sh`
+- `docs/work/phases/PHASE-9-client-console.md`
+- `docs/work/tickets/client-console/DETAIL_DESIGN.md`
+- `docs/work/tickets/client-console/CTX-901.md`
+- `docs/decisions/ADR-005-internal-single-user-jwt.md`
+- `src/client/`
+- `src/ai_service/api.py`
+- `src/ai_service/tests/test_api_runtime.py`
 
 - `AGENTS.md`
 - `docs/`
@@ -179,14 +196,19 @@ Epic 4 is complete with Python-owned `/v1/chat/completions` gateway routing into
 - CTX-410 is verified: final local curl E2E through Go Gateway covers Python gRPC health, Second Brain capture create/list/status, Homelab link validation, Homelab sync, and Homelab search. Epic 4 phase is marked done.
 - CTX-411 is verified: Python gateway `/v1/chat/completions` routes chat capture and Homelab search intents into existing module services, uses the same PostgreSQL database with module-separated tables, and exposes the same deterministic router through Python gRPC `OrchestratorService.ChatCompletions`.
 - BL-009 / Epic 7 is planned and ready after existing epics/remaining tasks: CTX-701 through CTX-706 cover full LLM/ReAct runtime, tool registry, tool adapter execution, module connectors, sync/completion gaps, and eval/E2E proof.
+- CTX-701A is added as the first Epic 7 design step so prompt contracts, orchestration state flow, tool-selection rules, and eval examples can be Q&A reviewed before implementing CTX-701 runtime code.
+- BL-011 / Epic 8 is planned and ready for review after go-live-critical Epic 5/Epic 7 work: CTX-801 covers async ingestion queue/worker semantics for Second Brain object webhooks, and CTX-802 covers S3 delete synchronization to remove stale documents/chunks from RAG.
+- BL-006 / Epic 5 is verified: Go `system/audit` persists append-only `audit_events`, Go `system/policy` evaluates static v1 capability decisions, source-of-truth denials, Finance confirmation, webhook actor authorization, and audit-backed decisions.
+- BL-011 / Epic 8 is verified: Second Brain webhook persists ingestion jobs and returns `202 Accepted`; worker processing handles upsert/delete events; delete sync removes stale `secondbrain_documents` and `secondbrain_document_chunks` from active RAG results.
+- BL-012 / Phase 9 is verified: FastAPI serves a React/Tailwind client at `/ui`, app API routes validate an internal non-expiring JWT for the hard-coded single user `11111111-1111-1111-1111-111111111111`, `/v1/chat/completions` supports OpenAI-compatible SSE when `stream: true`, and the client uses one chat conversation with tabs reserved for future module UIs.
 - **Python Direct Public Gateway**: Retired the thin Go gRPC HTTP proxy routes completely. Python's FastAPI app now directly serves as the Public API Gateway & Service for all REST endpoints (`/api/secondbrain/*`, `/api/homelab/*`) and `/v1/chat/completions`.
 - Current sprint branch is `feat/obsidian-sync`.
 - CTX-204 is done: Second Brain Obsidian MinIO webhook sync uses an authenticated webhook route directly in Python FastAPI, standard-library AWS Signature V4 network adapter for real S3 bucket connection, and local filesystem-backed S3 simulation for offline tests. MinIO remains a mirror/snapshot of canonical Obsidian `second-brain/`, not a writable canonical source.
 
 ## Next Steps
 
-- Merge `feat/obsidian-sync` branch.
-- Await next priority. Recommended next choices: continue `BL-006` Audit & Permissions, then `BL-007` Orchestrator stubs or `BL-009` Full LLM/ReAct completion.
+- Human-supervised next items remain: go-live readiness, `CTX-701A` prompt contract, and Epic 7 LLM/ReAct runtime.
+- If continuing autonomous work, first reconcile stale Phase 0/Epic 6 artifacts without implementing prompt/LLM/go-live scope.
 
 ## Open Questions
 

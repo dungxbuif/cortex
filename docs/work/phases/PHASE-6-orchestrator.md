@@ -1,7 +1,7 @@
 ---
 artifact_type: phase
 id: PHASE-6
-status: ready
+status: blocked
 owner: human
 human_fields:
   - goal
@@ -33,3 +33,9 @@ Runtime Orchestrator & Tool Adapter
 
 ## Scope
 Implementation of associated tickets.
+
+## Blocked / Superseded
+
+- This phase is intentionally not implemented in the autonomous workstream because the user wants to supervise orchestration prompts and LLM/ReAct behavior.
+- CTX-601 through CTX-604 are superseded by Epic 7 planning and implementation tickets, especially CTX-701A through CTX-706.
+- No code should be implemented from this phase unless the human explicitly reopens the scope.

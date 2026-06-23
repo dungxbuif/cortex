@@ -27,6 +27,7 @@ trace:
     - docs/raw_spec/system/permission-policy.md
     - docs/raw_spec/system/source-of-truth-sync.md
   tickets:
+    - ../tickets/epic-7/CTX-701A.md
     - ../tickets/epic-7/CTX-701.md
     - ../tickets/epic-7/CTX-702.md
     - ../tickets/epic-7/CTX-703.md
@@ -45,9 +46,11 @@ Complete the real AI runtime after the base Python gateway exists: LLM/ReAct orc
 
 - Full LLM/ReAct chat loop behind Python `/v1/chat/completions`.
 - Prompt contracts, tool selection policy, context planning, and fallback/clarification behavior.
+- Human-reviewable prompt and orchestration decision-flow design before runtime implementation.
 - Tool-call schema registry and adapter execution for Finance, Second Brain, Homelab, and system services.
 - Module connector layer that reuses existing APIs/services instead of duplicating business logic.
 - Sync/completion gaps needed to make Open WebUI chat flows work end to end.
+- RAG citation layout for Second Brain and Homelab answers, including source links suitable for Open WebUI display.
 - Evaluation, replay, and E2E test harness for realistic chat scenarios.
 
 ## Out of Scope
@@ -64,10 +67,12 @@ High
 ## Success Criteria
 
 - `/v1/chat/completions` can run real LLM-backed tool routing for supported read/capture/write-safe flows.
+- Prompt contracts and orchestration state transitions are documented with examples before code implementation.
 - Tool calls are schema-validated before execution.
 - Write-capable actions use permission/confirmation gates.
 - Finance, Second Brain, and Homelab connectors call existing domain APIs/services.
 - RAG answers include citations when based on indexed documents.
+- Second Brain citations include Markdown/Obsidian-friendly source links or labels derived from indexed source metadata.
 - E2E/eval suite proves happy paths, ambiguous prompts, denied operations, and provider failure fallbacks.
 
 ## Risks

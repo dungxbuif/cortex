@@ -7,6 +7,7 @@ trace:
   phase: docs/work/phases/PHASE-7-orchestrator-completion.md
   backlog_item: BL-009
   tickets:
+    - docs/work/tickets/epic-7/CTX-701A.md
     - docs/work/tickets/epic-7/CTX-701.md
     - docs/work/tickets/epic-7/CTX-702.md
     - docs/work/tickets/epic-7/CTX-703.md
@@ -75,12 +76,14 @@ Epic 4 created the Python gateway and deterministic routing layer, but the proje
 - **Adapters are thin:** Tool adapters validate/authorize/map/execute only. Domain services own behavior.
 - **ReAct loop has hard limits:** Max turns, timeout, no-tool fallback, provider-error fallback, and clarification state prevent runaway loops.
 - **Citations are mandatory for RAG-backed answers:** Second Brain and Homelab results must carry source path/snippet/score into synthesis.
+- **Presentation owns citation layout:** The Orchestrator/Presentation Adapter formats source metadata into Markdown citations for Open WebUI. Second Brain citations should prefer Obsidian-friendly note/path labels when source metadata supports them; Homelab citations should keep repo path and commit SHA.
 - **One DB:** Finance canonical tables, `secondbrain_*`, and `homelab_*` remain in one shared database.
 
 ## Ticket Breakdown
 
 | Ticket | Purpose |
 | --- | --- |
+| CTX-701A | Prompt contract and orchestration decision-flow design for human Q&A |
 | CTX-701 | LLM/ReAct runtime and prompt contract |
 | CTX-702 | Tool registry and JSON schema contracts |
 | CTX-703 | Tool adapter execution layer |
@@ -91,6 +94,7 @@ Epic 4 created the Python gateway and deterministic routing layer, but the proje
 ## Verification Strategy
 
 - Unit tests for prompt policy, registry schemas, adapters, error mapping, and formatting.
+- Review tests/examples for prompt contract, decision states, tool-selection policy, clarification, confirmation, denial, and citation behavior before implementing runtime code.
 - Integration tests against local PostgreSQL `cortex` with pgvector.
 - Fake-provider replay tests for deterministic CI coverage.
 - Opt-in real-provider smoke/eval using env credentials only.
