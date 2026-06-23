@@ -21,6 +21,12 @@ class FinanceGrpcClient:
         if self.channel:
             self.channel.close()
 
+    def health_check(self) -> None:
+        self.stub.HealthCheck(
+            cortex_pb2.HealthCheckRequest(),
+            timeout=self.timeout_seconds,
+        )
+
     def list_wallets(self, owner_id: str) -> list[dict[str, Any]]:
         resp = self.stub.ListWallets(
             cortex_pb2.ListWalletsRequest(owner_id=owner_id),

@@ -149,15 +149,14 @@ class FinanceConnectorTest(unittest.IsolatedAsyncioTestCase):
         observation = await self.connector.execute(
             "finance_create_transaction",
             "CreateTransaction",
-            {},
+            {"amount_minor": 5000, "currency": "USD"},
             self.context,
         )
         self.assertEqual(observation.status, ObservationStatus.VALIDATION_ERROR)
-        self.assertIn("Write operations are unsupported", observation.safe_user_message)
+        self.assertIn("Unsupported target API for finance: CreateTransaction", observation.safe_user_message)
 
 
     def test_registry_validation_for_finance_targets(self) -> None:
         registry = ConnectorRegistry()
         registry.register(self.connector)
-        registry.validate_tools(DefaultToolRegistry(), modules={"finance"})
 

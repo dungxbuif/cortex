@@ -12,6 +12,7 @@ from ai_service.orchestrator.contracts import (
 from .helpers import _unsupported
 
 class FinanceClientProtocol(Protocol):
+    def health_check(self) -> None: ...
     def list_wallets(self, owner_id: str) -> list[dict[str, Any]]: ...
     def list_categories(self, owner_id: str) -> list[dict[str, Any]]: ...
     def get_financial_report(
@@ -37,21 +38,18 @@ class FinanceConnector:
             "ListCategories": self._list_categories,
             "GetFinancialReport": self._get_financial_report,
             "GetNetWorth": self._get_net_worth,
-            "CreateTransaction": self._create_transaction,
         }
 
     async def health(self) -> ModuleHealth:
         try:
-            if hasattr(self.client, "stub") and hasattr(self.client.stub, "HealthCheck"):
-                from ai_service.grpc import cortex_pb2
-                await asyncio.to_thread(self.client.stub.HealthCheck, cortex_pb2.HealthCheckRequest())
+            await asyncio.to_thread(self.client.health_check)
             status_msg = "ok"
         except Exception as exc:
             return ModuleHealth(module=self.module, status="degraded", message=str(exc))
         return ModuleHealth(module=self.module, status="ok", message=status_msg)
 
     def supported_targets(self) -> set[str]:
-        return {"ListWallets", "ListCategories", "GetFinancialReport", "GetNetWorth", "CreateTransaction"}
+        return {"ListWallets", "ListCategories", "GetFinancialReport", "GetNetWorth"}
 
     async def execute(
         self,
@@ -147,19 +145,7 @@ class FinanceConnector:
             data=net_worth,
         )
 
-    def _create_transaction(
-        self,
-        tool_name: str,
-        args: dict[str, Any],
-        context: ToolExecutionContext,
-    ) -> ToolObservation:
-        return ToolObservation(
-            status=ObservationStatus.VALIDATION_ERROR,
-            module=self.module,
-            tool=tool_name,
-            safe_user_message="Write operations are unsupported in the read-only Finance scope.",
-            warnings=("Write operations are future-scope.",),
-        )
+
 
 
 

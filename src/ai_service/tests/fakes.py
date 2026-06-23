@@ -7,6 +7,9 @@ class FakeFinanceGrpcClient:
         self.report: dict[str, Any] = {}
         self.net_worth: dict[str, Any] = {}
 
+    def health_check(self) -> None:
+        pass
+
     def list_wallets(self, owner_id: str) -> list[dict[str, Any]]:
         return self.wallets
 
