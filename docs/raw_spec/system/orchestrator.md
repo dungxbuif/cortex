@@ -13,6 +13,8 @@ Orchestrator là tầng điều phối giữa Chat UI, LLM provider, Tool Regist
 
 Orchestrator không chứa business logic của Finance, Second Brain hoặc Homelab. Nó chỉ hiểu intent, chọn tool hợp lệ, gọi API đúng quyền, xử lý kết quả và tổng hợp phản hồi.
 
+Implementation owner: Orchestrator is implemented in Python. It may call Go API-heavy/domain services and Python AI services through internal gRPC contracts. This keeps LLM/provider/tooling close to Python's AI ecosystem while preserving Go for deterministic API-heavy components.
+
 ## 2. Responsibilities
 
 - Nhận request OpenAI-compatible từ Open WebUI.

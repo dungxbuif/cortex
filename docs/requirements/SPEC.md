@@ -17,7 +17,7 @@ shared_fields: [status, trace]
 
 ## Product Summary
 
-Cortex is a personal AI system accessed through Open WebUI. It routes chat requests into deterministic domain APIs for personal finance, second-brain knowledge, and homelab knowledge. The Finance module is the first write-capable business module and uses PostgreSQL as its canonical source of truth.
+Cortex is a personal AI system accessed through Open WebUI. The Python gateway owns the OpenAI-compatible chat entrypoint and routes chat requests into deterministic domain APIs for personal finance, second-brain knowledge, and homelab knowledge. The Finance module is the first write-capable business module and uses PostgreSQL as its canonical source of truth.
 
 ## Goals
 
@@ -69,7 +69,7 @@ Cortex is a personal AI system accessed through Open WebUI. It routes chat reque
 ## Constraints
 
 - PostgreSQL is the canonical Finance data store.
-- Open WebUI remains the primary user interface through the OpenAI-compatible proxy.
+- Open WebUI remains the primary user interface through the Python-owned OpenAI-compatible proxy.
 - Provider-based market price sync is future scope; manual or internal price updates are allowed in the service design.
 
 ## Acceptance Criteria

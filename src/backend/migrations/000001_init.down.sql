@@ -1,2 +1,11 @@
--- Drop extension
+DROP TABLE IF EXISTS debt_payments;
+DROP TABLE IF EXISTS debt_loans;
+DROP TABLE IF EXISTS asset_prices;
+DROP TABLE IF EXISTS asset_holdings;
+DROP TABLE IF EXISTS asset_transactions;
+DROP TABLE IF EXISTS assets;
+DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS wallets;
+
 DROP EXTENSION IF EXISTS vector;

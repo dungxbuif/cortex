@@ -1,0 +1,188 @@
+syntax = "proto3";
+
+package cortex;
+
+option go_package = "cortex/internal/infrastructure/grpc/pb";
+
+// Common Messages
+
+message HealthCheckRequest {}
+message HealthCheckResponse {
+  string status = 1;
+}
+
+message SearchRequest {
+  string query = 1;
+  string owner_id = 2;
+  int32 top_k = 3;
+}
+
+message DocumentMetadata {
+  string id = 1;
+  string owner_id = 2;
+  string repo_url = 3;
+  string branch = 4;
+  string commit_sha = 5;
+  string file_path = 6;
+  string checksum = 7;
+  string index_status = 8;
+  string indexed_at = 9; // ISO8601 string
+}
+
+message ChunkMetadata {
+  string id = 1;
+  string document_id = 2;
+  string owner_id = 3;
+  string file_path = 4;
+  int32 chunk_index = 5;
+  string content = 6;
+  repeated string heading_chain = 7;
+  int32 token_count = 8;
+}
+
+message SearchResult {
+  ChunkMetadata chunk = 1;
+  DocumentMetadata document = 2;
+  float score = 3;
+}
+
+message SearchResponse {
+  repeated SearchResult results = 1;
+}
+
+// 1. Second Brain Service Definition
+
+service SecondBrainService {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+  rpc CreateCapture(CreateCaptureRequest) returns (CreateCaptureResponse);
+  rpc ListCaptures(ListCapturesRequest) returns (ListCapturesResponse);
+  rpc GetSyncStatus(GetSyncStatusRequest) returns (GetSyncStatusResponse);
+  rpc SearchSecondBrain(SearchRequest) returns (SearchResponse);
+  rpc SyncSecondBrainObject(SyncSecondBrainObjectRequest) returns (SyncSecondBrainObjectResponse);
+}
+
+message CreateCaptureRequest {
+  string raw_text = 1;
+  string source = 2;
+  string owner_id = 3;
+}
+
+message CaptureRecord {
+  string id = 1;
+  string status = 2;
+  string raw_text = 3;
+  string normalized_markdown = 4;
+  string vault_path = 5;
+  string created_at = 6;
+}
+
+message CreateCaptureResponse {
+  CaptureRecord capture = 1;
+}
+
+message ListCapturesRequest {
+  string owner_id = 1;
+}
+
+message ListCapturesResponse {
+  repeated CaptureRecord captures = 1;
+}
+
+message GetSyncStatusRequest {
+  string owner_id = 1;
+}
+
+message GetSyncStatusResponse {
+  int32 total_documents = 1;
+  int32 indexed_documents = 2;
+  int32 total_chunks = 3;
+}
+
+message SyncSecondBrainObjectRequest {
+  string bucket = 1;
+  string object_key = 2;
+  string event_id = 3;
+  string owner_id = 4;
+}
+
+message SyncSecondBrainObjectResponse {
+  string status = 1;
+  int32 processed_files = 2;
+  int32 skipped_files = 3;
+  int32 failed_files = 4;
+  string object_key = 5;
+  string message = 6;
+}
+
+// 2. Homelab Service Definition
+
+service HomelabService {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+  rpc SyncHomelab(SyncHomelabRequest) returns (SyncHomelabResponse);
+  rpc SearchHomelab(SearchRequest) returns (SearchResponse);
+  rpc ValidateLinks(ValidateLinksRequest) returns (ValidateLinksResponse);
+}
+
+message SyncHomelabRequest {
+  string repo_path = 1;
+  string repo_url = 2;
+  string branch = 3;
+  string commit_sha = 4;
+  string owner_id = 5;
+}
+
+message SyncHomelabResponse {
+  string status = 1;
+  int32 processed_files = 2;
+  int32 skipped_files = 3;
+  int32 failed_files = 4;
+}
+
+message ValidateLinksRequest {
+  string repo_path = 1;
+}
+
+message BrokenLink {
+  string source_file = 1;
+  int32 line_number = 2;
+  string raw_link = 3;
+  string reason = 4;
+}
+
+message ValidateLinksResponse {
+  string status = 1;
+  repeated BrokenLink broken_links = 2;
+}
+
+// 3. Orchestrator Service Definition
+
+service OrchestratorService {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+  rpc ChatCompletions(ChatCompletionsRequest) returns (ChatCompletionsResponse);
+}
+
+message ChatMessage {
+  string role = 1;      // "system", "user", "assistant"
+  string content = 2;
+  string name = 3;
+}
+
+message ChatCompletionsRequest {
+  repeated ChatMessage messages = 1;
+  string owner_id = 2;
+  string conversation_id = 3;
+  string request_id = 4;
+}
+
+message ChatCompletionsResponse {
+  string id = 1;
+  string object = 2;
+  int64 created = 3;
+  string model = 4;
+  message Choice {
+    int32 index = 1;
+    ChatMessage message = 2;
+    string finish_reason = 3;
+  }
+  repeated Choice choices = 5;
+}

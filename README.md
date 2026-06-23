@@ -28,3 +28,24 @@ This repository uses the **Harness** markdown-first framework to guide AI coding
 - **AI Model**: Gemini / OpenAI-compatible provider
 - **Database**: PostgreSQL with pgvector
 - **Automation**: N8n for background integrations and webhooks
+
+## Local AI Gateway Runtime
+
+For Epic 4 development, the Go Gateway can proxy to the Python AI service through
+internal gRPC.
+
+```bash
+scripts/run-ai-gateway-dev.sh
+```
+
+Defaults:
+
+- Python AI gRPC: `127.0.0.1:50051`
+- Go Gateway: `http://127.0.0.1:18080`
+- PostgreSQL: `postgres://dev:password@localhost:5432/cortex?sslmode=disable`
+
+In another terminal:
+
+```bash
+scripts/check-ai-gateway.sh
+```

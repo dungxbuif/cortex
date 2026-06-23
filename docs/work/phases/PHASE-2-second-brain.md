@@ -1,7 +1,7 @@
 ---
 artifact_type: phase
 id: PHASE-2
-status: ready
+status: done
 owner: human
 human_fields:
   - goal
@@ -23,7 +23,9 @@ trace:
   roadmap: ROADMAP
   requirements: []
   tickets:
-    - ../tickets/CTX-201.md\n    - ../tickets/CTX-202.md\n    - ../tickets/CTX-203.md
+    - ../tickets/epic-2/CTX-201.md
+    - ../tickets/epic-2/CTX-202.md
+    - ../tickets/epic-2/CTX-203.md
 ---
 
 # PHASE-2: Second Brain & Vault RAG

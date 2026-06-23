@@ -99,6 +99,8 @@ MinIO có thể dùng cho:
 
 MinIO không thay thế Obsidian Vault làm nơi biên soạn chính.
 
+Trong local/dev scope, Cortex mô phỏng MinIO/S3 bằng một bucket trên filesystem qua `SECOND_BRAIN_MINIO_LOCAL_ROOT`. Webhook chỉ nhận bucket/object key và chỉ index Markdown dưới prefix `second-brain/`; dữ liệu ngoài prefix này bị skip.
+
 ## 3. Capture Inbox Model
 
 Capture Inbox là buffer tạm cho note tạo từ chat trước khi đưa vào `second-brain/`.

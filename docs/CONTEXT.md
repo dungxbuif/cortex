@@ -32,18 +32,116 @@ updated: TBD
 
 ## Current Status
 
-- Status: Initial SDLC agent framework scaffold plus Cortex app MVP ticket planning.
+- Status: Epic 5 Audit & Permissions, Epic 8 Async Ingestion/Delete Sync, and Phase 9 React/Tailwind Client Console are implemented and verified; go-live and LLM prompt/ReAct work remain excluded for human supervision.
 - Active backlog: `docs/work/BACKLOG.md`
-- Current queue focus: `BL-APP-001` after `BL-001`, pending human priority choice.
-- Active phase: docs/work/phases/PHASE-1-finance.md
-- Active ticket: docs/work/tickets/epic-1/CTX-101.md
+- Current queue focus: non-go-live, non-prompt/LLM tasks completed through `BL-006`, `BL-011`, and `BL-012`.
+- Active phase: None.
+- Active ticket: None.
 - Active bug: None.
 
 ## Current Focus
 
-Review Epic 1 Finance API implementation and add missing DB integration/per-ticket acceptance tests.
+Epic 4 is complete with Python-owned `/v1/chat/completions` gateway routing into existing Second Brain and Homelab services. Epic 5 Audit & Permissions is verified. Epic 8 Async Ingestion/Delete Sync is verified. Phase 9 Client Console is verified with React/Tailwind, single-user JWT, and SSE. Epic 7 prompt/LLM/ReAct and go-live readiness remain intentionally out of autonomous implementation scope for human supervision.
 
 ## Recently Touched Areas
+
+- `docs/work/BACKLOG.md`
+- `docs/work/phases/PHASE-5-audit-policy.md`
+- `docs/work/phases/PHASE-6-orchestrator.md`
+- `docs/work/tickets/CTX-501.md`
+- `docs/work/tickets/CTX-502.md`
+- `docs/work/tickets/CTX-601.md`
+- `docs/work/tickets/CTX-602.md`
+- `docs/work/tickets/CTX-603.md`
+- `docs/work/tickets/CTX-604.md`
+- `AGENTS.md`
+- `docs/CONTEXT.md`
+- `docs/work/VALIDATION_MATRIX.md`
+- `docs/work/BACKLOG.md`
+- `docs/work/phases/PHASE-3-homelab.md`
+- `docs/work/tickets/epic-3/CTX-301.md`
+- `docs/work/tickets/epic-3/CTX-302.md`
+- `docs/work/tickets/epic-3/DETAIL_DESIGN.md`
+- `src/secondbrain/homelab.py`
+- `src/secondbrain/repository.py`
+- `src/secondbrain/api.py`
+- `src/secondbrain/models.py`
+- `src/secondbrain/tests/test_homelab.py`
+- `src/secondbrain/tests/test_api_runtime.py`
+- `docs/work/tickets/epic-4/DETAIL_DESIGN.md`
+- `docs/work/tickets/epic-4/implementation_plan.md`
+- `docs/work/tickets/epic-4/CTX-403.md`
+- `src/ai_service/__init__.py`
+- `src/ai_service/api.py`
+- `src/ai_service/tests/test_api_runtime.py`
+- `src/ai_service/tests/test_google_ai_smoke.py`
+- `src/ai_service/tests/test_homelab.py`
+- `src/ai_service/tests/test_postgres_real_vault_integration.py`
+- `src/ai_service/tests/test_secondbrain_service.py`
+- `docs/work/tickets/epic-4/CTX-404.md`
+- `docs/work/tickets/epic-4/CTX-405.md`
+- `src/ai_service/core/config.py`
+- `src/ai_service/core/google_ai.py`
+- `src/ai_service/core/ports.py`
+- `src/ai_service/providers/`
+- `docs/work/tickets/epic-4/CTX-406.md`
+- `src/ai_service/secondbrain/models.py`
+- `src/ai_service/secondbrain/repository.py`
+- `src/ai_service/homelab/models.py`
+- `src/ai_service/homelab/repository.py`
+- `docs/work/tickets/epic-4/CTX-407.md`
+- `docs/work/tickets/epic-4/CTX-408.md`
+- `docs/work/tickets/epic-4/CTX-409.md`
+- `docs/work/tickets/epic-4/CTX-410.md`
+- `docs/work/phases/PHASE-7-orchestrator-completion.md`
+- `docs/work/tickets/epic-7/DETAIL_DESIGN.md`
+- `docs/work/tickets/epic-7/CTX-701A.md`
+- `docs/work/tickets/epic-7/CTX-701.md`
+- `docs/work/tickets/epic-7/CTX-702.md`
+- `docs/work/tickets/epic-7/CTX-703.md`
+- `docs/work/tickets/epic-7/CTX-704.md`
+- `docs/work/tickets/epic-7/CTX-705.md`
+- `docs/work/tickets/epic-7/CTX-706.md`
+- `docs/work/phases/PHASE-8-ingestion-hardening.md`
+- `docs/work/tickets/epic-8/DETAIL_DESIGN.md`
+- `docs/work/tickets/epic-8/CTX-801.md`
+- `docs/work/tickets/epic-8/CTX-802.md`
+- `src/backend/migrations/000002_audit_events.up.sql`
+- `src/backend/migrations/000002_audit_events.down.sql`
+- `src/backend/internal/modules/system/audit/`
+- `src/backend/internal/modules/system/policy/`
+- `src/ai_service/migrations/000003_secondbrain_ingestion_jobs.sql`
+- `src/ai_service/homelab/redaction.py`
+- `src/ai_service/homelab/link_validator.py`
+- `src/ai_service/homelab/markdown.py`
+- `src/ai_service/tests/test_domain_helpers.py`
+- `src/ai_service/grpc/`
+- `src/ai_service/grpc_server.py`
+- `src/ai_service/tests/test_grpc_runtime.py`
+- `src/backend/internal/infrastructure/grpc/`
+- `src/backend/internal/modules/ai/`
+- `src/backend/internal/config/config.go`
+- `src/backend/cmd/server/main.go`
+- `src/proto/cortex.proto`
+- `scripts/run-ai-gateway-dev.sh`
+- `scripts/check-ai-gateway.sh`
+- `README.md`
+- `docs/work/tickets/epic-2/CTX-204.md`
+- `docs/work/tickets/epic-2/DETAIL_DESIGN_MINIO_WEBHOOK.md`
+- `docs/raw_spec/system/external-automation.md`
+- `src/ai_service/secondbrain/object_store.py`
+- `src/ai_service/secondbrain/service.py`
+- `src/ai_service/grpc/`
+- `src/backend/internal/modules/ai/`
+- `src/proto/cortex.proto`
+- `scripts/simulate-secondbrain-s3-action.sh`
+- `docs/work/phases/PHASE-9-client-console.md`
+- `docs/work/tickets/client-console/DETAIL_DESIGN.md`
+- `docs/work/tickets/client-console/CTX-901.md`
+- `docs/decisions/ADR-005-internal-single-user-jwt.md`
+- `src/client/`
+- `src/ai_service/api.py`
+- `src/ai_service/tests/test_api_runtime.py`
 
 - `AGENTS.md`
 - `docs/`
@@ -57,6 +155,7 @@ Review Epic 1 Finance API implementation and add missing DB integration/per-tick
 - `docs/architecture/ERD.md`
 - `docs/requirements/SPEC.md`
 - `docs/requirements/REQUIREMENTS.md`
+- `src/secondbrain/`
 
 ## Recent Decisions
 
@@ -75,14 +174,42 @@ Review Epic 1 Finance API implementation and add missing DB integration/per-tick
 - Epic 1 asset design must model historical transactions, current holdings, market price history, and portfolio valuation separately so net worth uses current value while expense reports ignore investment buys.
 - Master architecture, API, ERD, and requirements docs have been reconciled with the Epic 1 Finance asset valuation model.
 - Epic 1 optimization rules: holdings are rebuildable projections, price selection is deterministic by asset class, investment cash movements are excluded from ordinary reports by default, saving deposits are assets only when term/interest behavior exists, debt/loan records distinguish `i_owe` liabilities from `owed_to_me` receivables, financial reports use business-effective dates such as `occurred_at`, finance tables carry `created_at/by` plus `updated_at/by`, money is stored as integer minor units, asset quantities use fixed precision decimals, and transfers are paired rows sharing `transfer_group_id`.
-- Epic 1 Finance implementation now has domain models, DTOs, GORM-backed service logic, migrations, hard-coded single-user `owner-single-user`, and focused unit tests. Tickets remain `in_review` until live PostgreSQL migration smoke test and per-ticket acceptance tests are added.
+- Epic 1 Finance implementation has passed all exhaustive edge-case and E2E integration tests natively against PostgreSQL. All tickets verified and committed.
+- Second Brain has moved out of `src/backend/internal/modules/secondbrain` into standalone Python AI service path `src/ai_service`.
+- Second Brain implementation starts with deterministic, testable core behavior before external LLM calls: capture lifecycle, Markdown/frontmatter parsing, heading-aware chunking, sync counts, policy-safe search, wiki/staging priority ranking, query expansion, and optional FastAPI adapter.
+- Second Brain DB naming is standardized around `secondbrain_captures`, `secondbrain_documents`, and `secondbrain_document_chunks`; Python service uses the shared PostgreSQL instance/database with prefixed table ownership.
+- Second Brain local PostgreSQL integration test uses `dev/password` against database `cortex`, indexes 91 real local Vault markdown files, and passes 18/18 ground-truth retrieval checks.
+- `pgvector` is installed in the local Docker `postgres` container and enabled in database `cortex` as extension `vector` version `0.8.2`; `secondbrain_document_chunks.embedding` is verified as DB type `vector`.
+- Python AI service reads DB/model settings from environment variables and has versioned SQL migrations under `src/ai_service/migrations/`; migration `000001_secondbrain_pgvector` is applied in local DB `cortex` and sets embeddings to `VECTOR(768)`.
+- Google model smoke tests are implemented and opt-in with `SECOND_BRAIN_RUN_GOOGLE_SMOKE=true`; local attempt successfully connects and validates API/model/key for Gemini generation and embedding models.
+- **Real Google AI Embeddings** are fully integrated: The original deterministic hashes have been replaced by real `gemini-embedding-2` calls using Python's standard `urllib.request` library with exponential backoff handling to bypass rate limits. All 91 ground truth local documents were successfully embedded and verified natively with Google API.
+- **Checksum Sync Optimization**: RAG Sync operations now bypass unmodified documents using checksum-matching against existing metadata in the database, protecting API limits and reducing sync time drastically.
+- Architecture decision update: Python owns Orchestrator/LLM tool runtime and AI/RAG-heavy processing; Go is preferred for API-heavy deterministic services; Go↔Python communication uses internal gRPC. FastAPI is retained only as a Python dev/debug adapter.
+- Epic 4 is approved for incremental implementation by ticket breakdown: CTX-403 baseline/import repair, CTX-404 ports/providers, CTX-405 repository split, CTX-406 domain cleanup, CTX-407 Python gRPC, CTX-408 Go gateway, CTX-409 runtime harness, CTX-410 E2E/docs reconciliation.
+- CTX-403 is verified: `ai_service.*` import root passes, all Python tests import the renamed package, non-smoke tests use deterministic fake embeddings, and the Python suite passes against local PostgreSQL/pgvector without requiring Google credentials outside the opt-in smoke test.
+- CTX-404 is verified: `Embedder` port exists, Google provider code lives under `src/ai_service/providers/`, Second Brain and Homelab services no longer import `GoogleAIClient` directly, full Python suite passes, and opt-in Google smoke passes with `.env.local`.
+- CTX-405 is verified: Second Brain and Homelab models/repositories are domain-owned, `core/repository.py` only contains shared SQL/psql helpers, repository contract tests pass against SQLite and local PostgreSQL/pgvector, and the full Python suite plus opt-in Google smoke pass.
+- CTX-406 is verified: Second Brain and Homelab chunking produces raw chunks before embedding, Homelab redaction/link validation/chunking helpers are split into focused modules, pure helper tests pass, full Python suite passes, and opt-in Google smoke passes.
+- CTX-407 is verified: Python protobuf stubs, gRPC handlers, and `grpc_server.py` expose Second Brain/Homelab service calls through generated clients; in-process gRPC tests pass, full Python suite passes, and opt-in Google smoke passes.
+- CTX-408 is verified: Go protobuf stubs, AI service gRPC client, Echo proxy routes, and `AI_SERVICE_ADDRESS` config compile and test. `go test ./...`, Python AI suite, and opt-in Google smoke all pass.
+- CTX-409 is verified: local harness starts Python AI gRPC and Go Gateway together, `/api/ai/health` passes through Go->Python gRPC, backend/Python tests pass, and opt-in Google smoke passes.
+- CTX-410 is verified: final local curl E2E through Go Gateway covers Python gRPC health, Second Brain capture create/list/status, Homelab link validation, Homelab sync, and Homelab search. Epic 4 phase is marked done.
+- CTX-411 is verified: Python gateway `/v1/chat/completions` routes chat capture and Homelab search intents into existing module services, uses the same PostgreSQL database with module-separated tables, and exposes the same deterministic router through Python gRPC `OrchestratorService.ChatCompletions`.
+- BL-009 / Epic 7 is planned and ready after existing epics/remaining tasks: CTX-701 through CTX-706 cover full LLM/ReAct runtime, tool registry, tool adapter execution, module connectors, sync/completion gaps, and eval/E2E proof.
+- CTX-701A is added as the first Epic 7 design step so prompt contracts, orchestration state flow, tool-selection rules, and eval examples can be Q&A reviewed before implementing CTX-701 runtime code.
+- BL-011 / Epic 8 is planned and ready for review after go-live-critical Epic 5/Epic 7 work: CTX-801 covers async ingestion queue/worker semantics for Second Brain object webhooks, and CTX-802 covers S3 delete synchronization to remove stale documents/chunks from RAG.
+- BL-006 / Epic 5 is verified: Go `system/audit` persists append-only `audit_events`, Go `system/policy` evaluates static v1 capability decisions, source-of-truth denials, Finance confirmation, webhook actor authorization, and audit-backed decisions.
+- BL-011 / Epic 8 is verified: Second Brain webhook persists ingestion jobs and returns `202 Accepted`; worker processing handles upsert/delete events; delete sync removes stale `secondbrain_documents` and `secondbrain_document_chunks` from active RAG results.
+- BL-012 / Phase 9 is verified: FastAPI serves a React/Tailwind client at `/ui`, app API routes validate an internal non-expiring JWT for the hard-coded single user `11111111-1111-1111-1111-111111111111`, `/v1/chat/completions` supports OpenAI-compatible SSE when `stream: true`, and the client uses one chat conversation with tabs reserved for future module UIs.
+- **Python Direct Public Gateway**: Retired the thin Go gRPC HTTP proxy routes completely. Python's FastAPI app now directly serves as the Public API Gateway & Service for all REST endpoints (`/api/secondbrain/*`, `/api/homelab/*`) and `/v1/chat/completions`.
+- Current sprint branch is `feat/obsidian-sync`.
+- CTX-204 is done: Second Brain Obsidian MinIO webhook sync uses an authenticated webhook route directly in Python FastAPI, standard-library AWS Signature V4 network adapter for real S3 bucket connection, and local filesystem-backed S3 simulation for offline tests. MinIO remains a mirror/snapshot of canonical Obsidian `second-brain/`, not a writable canonical source.
 
 ## Next Steps
 
-- Add live PostgreSQL migration smoke test for `src/backend/migrations/000001_init.up.sql`.
-- Add per-ticket acceptance tests for CTX-101 through CTX-109, especially transaction atomicity, asset holding rebuilds, report exclusions, and debt settlement.
+- Human-supervised next items remain: go-live readiness, `CTX-701A` prompt contract, and Epic 7 LLM/ReAct runtime.
+- If continuing autonomous work, first reconcile stale Phase 0/Epic 6 artifacts without implementing prompt/LLM/go-live scope.
 
 ## Open Questions
 
-- Should Cortex app MVP (`BL-APP-001`) preempt framework standards finalization (`BL-001`)?
-- Confirm whether Epic 1 should include any additional base ticket before `CORTEX-1`.
+- None.

@@ -1,1 +1,49 @@
-/references
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Go
+/src/backend/bin/
+/src/backend/vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+/src/backend/cortex
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Local cache
+.gocache/
+.gopath/
+.venv/
+
+# Python compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Cortex specific
+/references/
+_bmad-output/
+.agents/
+.agent/
+src/ai_service/tests/testdata

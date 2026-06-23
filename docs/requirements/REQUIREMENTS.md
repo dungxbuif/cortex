@@ -28,7 +28,7 @@ shared_fields: [functional_requirements, non_functional_requirements]
 | REQ-006 | **Second Brain**: Capture insights and notes into an Inbox Database buffer. | Medium | `spec.md` | draft |
 | REQ-007 | **Second Brain**: Perform RAG (Retrieval-Augmented Generation) queries against a local Obsidian Vault. | Medium | `spec.md` | draft |
 | REQ-008 | **Homelab**: Perform read-only RAG and QA against the pulled Homelab repository. | Medium | `spec.md` | draft |
-| REQ-009 | Sync and index data from external canonical sources (Git repos, Obsidian vault) for RAG. | High | `spec.md` | draft |
+| REQ-009 | Sync and index data from external canonical sources and mirrors for RAG, including webhook-triggered indexing of Obsidian `second-brain/` Markdown objects from a MinIO-compatible mirror. | High | `spec.md` | draft |
 
 ## Non-Functional Requirements
 
