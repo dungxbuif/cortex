@@ -8,6 +8,7 @@ from ai_service.core.models import utc_now
 from ai_service.orchestrator.contracts import (
     ConnectorRegistry,
     ConversationInput,
+    Citation,
     ModuleConnector,
     ModuleHealth,
     ObservationStatus,
@@ -15,6 +16,7 @@ from ai_service.orchestrator.contracts import (
     ToolDefinition,
     ToolExecutionContext,
     ToolObservation,
+    StaticToolRegistry,
 )
 from ai_service.orchestrator.conversation import (
     Conversation,
@@ -25,6 +27,31 @@ from ai_service.orchestrator.conversation import (
 )
 from ai_service.orchestrator.react import LLMResponse, LLMToolCall, ProviderInterface, ReActOrchestrator
 from ai_service.orchestrator.registry import DefaultToolRegistry
+
+
+def write_capable_registry() -> StaticToolRegistry:
+    return StaticToolRegistry(
+        [
+            *DefaultToolRegistry().list_tools(),
+            ToolDefinition(
+                name="finance_create_transaction",
+                module="finance",
+                target_api="CreateTransaction",
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "amount_minor": {"type": "integer"},
+                        "currency": {"type": "string"},
+                        "description": {"type": "string"},
+                        "wallet_id": {"type": "string"},
+                    },
+                    "required": ["amount_minor", "currency", "description", "wallet_id"],
+                },
+                required_capabilities=("finance_write",),
+                confirmation="require_confirmation",
+            ),
+        ]
+    )
 
 
 class FakeProvider(ProviderInterface):
@@ -43,6 +70,9 @@ class FakeProvider(ProviderInterface):
         resp = self.responses[self.call_count]
         self.call_count += 1
         return resp
+
+    async def health(self) -> ModuleHealth:
+        return ModuleHealth(module="provider", status="ok")
 
 
 class FakeConnector(ModuleConnector):
@@ -67,6 +97,35 @@ class FakeConnector(ModuleConnector):
             tool=tool_name,
             safe_user_message="Fake executed",
             data={"target": target_api, "args": args},
+        )
+
+
+class FailingConnector(FakeConnector):
+    async def execute(
+        self,
+        tool_name: str,
+        target_api: str,
+        args: dict[str, Any],
+        context: ToolExecutionContext,
+    ) -> ToolObservation:
+        raise RuntimeError("StatusCode.UNAVAILABLE failed to connect")
+
+
+class CitedConnector(FakeConnector):
+    async def execute(
+        self,
+        tool_name: str,
+        target_api: str,
+        args: dict[str, Any],
+        context: ToolExecutionContext,
+    ) -> ToolObservation:
+        return ToolObservation(
+            status=ObservationStatus.SUCCESS,
+            module=self.module,
+            tool=tool_name,
+            safe_user_message="Found 1 result",
+            data={"indexed_at": "2026-06-20T00:00:00+00:00"},
+            citations=(Citation(label="Doc", source_path="doc.md", source_revision="rev"),),
         )
 
 
@@ -190,7 +249,7 @@ class ReActOrchestratorTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_successful_one_shot_response(self) -> None:
         provider = FakeProvider([LLMResponse(text="Hi there!")])
-        orchestrator = ReActOrchestrator(self.manager, self.registry, self.connectors, provider, self.policy)
+        orchestrator = ReActOrchestrator(self.manager, write_capable_registry(), self.connectors, provider, self.policy)
 
         res = await orchestrator.process_input(self.input)
         
@@ -205,12 +264,56 @@ class ReActOrchestratorTest(unittest.IsolatedAsyncioTestCase):
             ]),
             LLMResponse(text="Your net worth is 1M.")
         ])
-        orchestrator = ReActOrchestrator(self.manager, self.registry, self.connectors, provider, self.policy)
+        orchestrator = ReActOrchestrator(self.manager, write_capable_registry(), self.connectors, provider, self.policy)
 
         res = await orchestrator.process_input(self.input)
         
         self.assertEqual(res, "Your net worth is 1M.")
         self.assertEqual(len(self.manager.messages), 4)
+        self.assertIn("Fake executed", self.manager.messages[2].content)
+
+    async def test_final_response_appends_tool_warnings_and_citations(self) -> None:
+        connectors = ConnectorRegistry()
+        connectors.register(CitedConnector())
+        provider = FakeProvider([
+            LLMResponse(text="Searching...", tool_calls=[
+                LLMToolCall(id="call1", name="finance_get_net_worth", arguments={})
+            ]),
+            LLMResponse(text="Found it."),
+        ])
+        orchestrator = ReActOrchestrator(self.manager, self.registry, connectors, provider, self.policy)
+
+        res = await orchestrator.process_input(self.input)
+
+        self.assertIn("Found it.", res)
+        self.assertIn("Index có thể đã cũ", res)
+        self.assertIn("Sources:", res)
+        self.assertIn("doc.md @ rev", res)
+
+    async def test_health_snapshot_includes_provider_health(self) -> None:
+        provider = FakeProvider([LLMResponse(text="unused")])
+        orchestrator = ReActOrchestrator(self.manager, self.registry, self.connectors, provider, self.policy)
+
+        health = await orchestrator.health_snapshot()
+
+        self.assertTrue(any(item.module == "finance" and item.status == "ok" for item in health))
+        self.assertTrue(any(item.module == "provider" and item.status == "ok" for item in health))
+
+    async def test_grpc_unavailable_returns_controlled_fallback(self) -> None:
+        connectors = ConnectorRegistry()
+        connectors.register(FailingConnector())
+        provider = FakeProvider([
+            LLMResponse(text="Checking...", tool_calls=[
+                LLMToolCall(id="call1", name="finance_get_net_worth", arguments={})
+            ]),
+            LLMResponse(text="Should not be called"),
+        ])
+        orchestrator = ReActOrchestrator(self.manager, self.registry, connectors, provider, self.policy)
+
+        res = await orchestrator.process_input(self.input)
+
+        self.assertIn("Dịch vụ tạm thời không khả dụng", res)
+        self.assertEqual(provider.call_count, 1)
 
     async def test_policy_denial(self) -> None:
         self.policy.deny_next = True
@@ -254,7 +357,7 @@ class ReActOrchestratorTest(unittest.IsolatedAsyncioTestCase):
             # This second response won't be called in Step 1 because it suspends for confirmation
             LLMResponse(text="Should not reach here yet")
         ])
-        orchestrator = ReActOrchestrator(self.manager, self.registry, self.connectors, provider, self.policy)
+        orchestrator = ReActOrchestrator(self.manager, write_capable_registry(), self.connectors, provider, self.policy)
 
         res = await orchestrator.process_input(self.input)
         self.assertIn("confirm the action", res)
@@ -281,7 +384,7 @@ class ReActOrchestratorTest(unittest.IsolatedAsyncioTestCase):
             ]),
             LLMResponse(text="Transaction complete")
         ])
-        orchestrator = ReActOrchestrator(self.manager, self.registry, self.connectors, provider, self.policy)
+        orchestrator = ReActOrchestrator(self.manager, write_capable_registry(), self.connectors, provider, self.policy)
 
         # First step: trigger the confirmation
         await orchestrator.process_input(self.input)

@@ -32,16 +32,16 @@ updated: TBD
 
 ## Current Status
 
-- Status: Epic 5 Audit & Permissions, Epic 8 Async Ingestion/Delete Sync, Phase 9 React/Tailwind Client Console, and Epic 7 CTX-700 through CTX-704 orchestration foundations are implemented and verified; remaining module connector/eval work stays human-supervised.
+- Status: Epic 5 Audit & Permissions, Epic 8 Async Ingestion/Delete Sync, Phase 9 React/Tailwind Client Console, and Epic 7 CTX-700 through CTX-708 are implemented and verified; eval/E2E proof remains human-supervised.
 - Active backlog: `docs/work/BACKLOG.md`
-- Current queue focus: Epic 7 foundation work has advanced through `CTX-706A` and `CTX-706`; next Epic 7 slice is Finance connector scoping before write-capable Finance chat, followed by eval/E2E proof.
+- Current queue focus: Epic 7 work has advanced through `CTX-708`; next Epic 7 slice is `CTX-709` eval replay and E2E chat proof.
 - Active phase: None.
 - Active ticket: None.
 - Active bug: None.
 
 ## Current Focus
 
-Epic 4 is complete with Python-owned chat gateway routing into existing Second Brain and Homelab services. Epic 5 Audit & Permissions is verified. Epic 8 Async Ingestion/Delete Sync is verified. Phase 9 Client Console is verified with React/Tailwind, single-user JWT, and SSE. Epic 7 CTX-700 shared orchestration contracts, CTX-701 conversation/confirmation persistence, CTX-702 tool registry, CTX-703 ReAct loop, and CTX-704 Telegram transport are verified. Remaining Epic 7 module connectors, graceful degradation gaps, and eval work remains queued for human-supervised implementation.
+Epic 4 is complete with Python-owned chat gateway routing into existing Second Brain and Homelab services. Epic 5 Audit & Permissions is verified. Epic 8 Async Ingestion/Delete Sync is verified. Phase 9 Client Console is verified with React/Tailwind, single-user JWT, and SSE. Epic 7 CTX-700 through CTX-708 are verified, including Telegram transport, module connectors, Finance read bridge, tool execution, policy/audit bridge, presentation, health, and graceful degradation. Remaining Epic 7 eval work remains queued for human-supervised implementation.
 
 ## Recently Touched Areas
 
@@ -207,7 +207,7 @@ Epic 4 is complete with Python-owned chat gateway routing into existing Second B
 - CTX-409 is verified: local harness starts Python AI gRPC and Go Gateway together, `/api/ai/health` passes through Go->Python gRPC, backend/Python tests pass, and opt-in Google smoke passes.
 - CTX-410 is verified: final local curl E2E through Go Gateway covers Python gRPC health, Second Brain capture create/list/status, Homelab link validation, Homelab sync, and Homelab search. Epic 4 phase is marked done.
 - CTX-411 is verified: Python gateway `/v1/chat/completions` routes chat capture and Homelab search intents into existing module services, uses the same PostgreSQL database with module-separated tables, and exposes the same deterministic router through Python gRPC `OrchestratorService.ChatCompletions`.
-- BL-009 / Epic 7 is active and ready for incremental human-supervised implementation: CTX-701A prompt-contract design is done, CTX-700 through CTX-706A/CTX-706 are verified, and Finance connector/eval work remains.
+- BL-009 / Epic 7 is active and ready for incremental human-supervised implementation: CTX-701A prompt-contract design is done, CTX-700 through CTX-708 are verified, and CTX-709 eval/E2E proof remains.
 - BL-011 / Epic 8 is planned and ready for review after go-live-critical Epic 5/Epic 7 work: CTX-801 covers async ingestion queue/worker semantics for Second Brain object webhooks, and CTX-802 covers S3 delete synchronization to remove stale documents/chunks from RAG.
 - BL-006 / Epic 5 is verified: Go `system/audit` persists append-only `audit_events`, Go `system/policy` evaluates static v1 capability decisions, source-of-truth denials, Finance confirmation, webhook actor authorization, and audit-backed decisions.
 - BL-011 / Epic 8 is verified: Second Brain webhook persists ingestion jobs and returns `202 Accepted`; worker processing handles upsert/delete events; delete sync removes stale `secondbrain_documents` and `secondbrain_document_chunks` from active RAG results.
@@ -221,11 +221,13 @@ Epic 4 is complete with Python-owned chat gateway routing into existing Second B
 - CTX-705 is verified: `SecondBrainConnector` and `HomelabConnector` map ReAct tool calls into existing Python services, return normalized `ToolObservation` data and citations, preserve capture tags, preserve capture-inbox/no-Vault-write and Homelab redaction boundaries, reject unallowlisted Homelab local paths, and pass focused/full Python AI test suites.
 - CTX-706A is verified: `PolicyService` and `AuditService` are defined in protobuf, Go and Python stubs are regenerated, Go backend starts internal system gRPC services via `SYSTEM_GRPC_ADDRESS`, and Python `GrpcPolicyEnforcer`/`GrpcAuditSink` clients map decisions and audit events.
 - CTX-706 is verified: `ToolAdapterExecutor` validates schemas, evaluates policy decisions, handles deny/confirmation branches, dispatches connectors, maps connector failures, and emits audit events.
+- CTX-707 is verified: Finance read-only gRPC bridge and Python connector expose wallets, categories, reports, and net worth through established Go Finance services without direct Python Finance table access.
+- CTX-708 is verified: presentation helpers render citations and Finance summaries, Telegram sanitizes allowed HTML tags, connector health snapshots are available, stale-index warnings are generated, and unavailable gRPC services map to controlled fallback text.
 
 ## Next Steps
 
-- Next Epic 7 implementation step is Finance connector scoping and implementation before write-capable Finance chat.
-- Remaining human-supervised items include Finance connector completion, graceful degradation gaps, evals, and go-live readiness.
+- Next Epic 7 implementation step is CTX-709 eval replay and E2E chat proof.
+- Remaining human-supervised items include evals and go-live readiness.
 
 ## Open Questions
 

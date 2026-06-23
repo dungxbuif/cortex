@@ -9,6 +9,7 @@ from ai_service.orchestrator.config import OrchestratorConfig
 from ai_service.orchestrator.contracts import (
     ConnectorRegistry,
     ConversationInput,
+    ModuleHealth,
     PolicyEnforcer,
     ToolDefinition,
     ToolExecutionContext,
@@ -17,6 +18,11 @@ from ai_service.orchestrator.contracts import (
 from ai_service.orchestrator.conversation import ConversationManager
 from ai_service.orchestrator.executor import ToolExecutionEngine
 from ai_service.orchestrator.messages import SystemMessage
+from ai_service.orchestrator.presentation import (
+    append_tool_context_to_response,
+    graceful_degradation_message,
+    render_tool_results_for_chat,
+)
 from ai_service.orchestrator.registry import validate_schema
 
 @dataclass
@@ -37,6 +43,9 @@ class ProviderInterface(Protocol):
         messages: tuple[Any, ...],
         tools: list[ToolDefinition] | None = None,
     ) -> LLMResponse:
+        ...
+
+    async def health(self) -> ModuleHealth:
         ...
 
 logger = logging.getLogger(__name__)
@@ -65,6 +74,11 @@ class ReActOrchestrator:
             policy_enforcer=policy_enforcer,
             config=self.config,
         )
+
+    async def health_snapshot(self) -> tuple[ModuleHealth, ...]:
+        module_health = await self.connector_registry.health_snapshot()
+        provider_health = await _provider_health(self.provider)
+        return (*module_health, provider_health)
 
     async def process_input(self, user_input: ConversationInput) -> str:
         # Load conversation first to get the canonical database ID
@@ -159,7 +173,7 @@ class ReActOrchestrator:
         self.conversation_manager.save_message(
             conversation_id=canonical_conversation_id,
             role="tool",
-            content="",
+            content=render_tool_results_for_chat([result_data]),
             tool_result={"results": [result_data]},
         )
 
@@ -202,10 +216,16 @@ class ReActOrchestrator:
                 return llm_response
 
             if not llm_response.tool_calls:
-                self.conversation_manager.save_message(
-                    conversation_id=canonical_conversation_id, role="assistant", content=llm_response.text
+                current_context = self.conversation_manager.load_conversation(
+                    owner_id=user_input.owner_id,
+                    channel=user_input.channel,
+                    channel_ref=user_input.channel_ref,
                 )
-                return llm_response.text
+                final_text = append_tool_context_to_response(llm_response.text, _latest_tool_results(current_context.messages))
+                self.conversation_manager.save_message(
+                    conversation_id=canonical_conversation_id, role="assistant", content=final_text
+                )
+                return final_text
 
             # 2. Save intention
             self.conversation_manager.save_message(
@@ -278,8 +298,18 @@ class ReActOrchestrator:
                 )
                 return prompt_shown
 
+            fallback = _first_graceful_fallback(tool_results)
+            if fallback:
+                self.conversation_manager.save_message(
+                    conversation_id=canonical_conversation_id, role="assistant", content=fallback
+                )
+                return fallback
+
             self.conversation_manager.save_message(
-                conversation_id=canonical_conversation_id, role="tool", content="", tool_result={"results": tool_results}
+                conversation_id=canonical_conversation_id,
+                role="tool",
+                content=render_tool_results_for_chat(tool_results),
+                tool_result={"results": tool_results},
             )
 
         # Max turns exceeded
@@ -288,3 +318,31 @@ class ReActOrchestrator:
             conversation_id=canonical_conversation_id, role="assistant", content=fallback_msg
         )
         return fallback_msg
+
+
+def _first_graceful_fallback(tool_results: list[dict[str, Any]]) -> str:
+    for result in tool_results:
+        fallback = graceful_degradation_message(result)
+        if fallback:
+            return fallback
+    return ""
+
+
+def _latest_tool_results(messages: tuple[Any, ...]) -> list[dict[str, Any]]:
+    for message in reversed(messages):
+        tool_result = getattr(message, "tool_result", None)
+        if isinstance(tool_result, dict):
+            results = tool_result.get("results")
+            if isinstance(results, list):
+                return [result for result in results if isinstance(result, dict)]
+    return []
+
+
+async def _provider_health(provider: ProviderInterface) -> ModuleHealth:
+    health = getattr(provider, "health", None)
+    if not callable(health):
+        return ModuleHealth(module="provider", status="unknown", message="health check not implemented")
+    try:
+        return await health()
+    except Exception as exc:
+        return ModuleHealth(module="provider", status="degraded", message=str(exc))

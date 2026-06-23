@@ -15,6 +15,7 @@ from ai_service.orchestrator.telegram import (
     markdown_lite_to_telegram_html,
     parse_allowed_actors,
     parse_telegram_update,
+    sanitize_telegram_html,
 )
 
 
@@ -154,6 +155,13 @@ class TelegramHelpersTest(unittest.TestCase):
         self.assertIn("<i>italic</i>", rendered)
         self.assertIn("<code>code</code>", rendered)
         self.assertIn('<a href="https://example.com?a=1&amp;b=2">link</a>', rendered)
+
+    def test_sanitizes_telegram_html_tag_whitelist(self) -> None:
+        rendered = sanitize_telegram_html('<b data-x="1">ok</b><script>x</script><a href="ftp://bad">bad</a>')
+
+        self.assertIn("<b>ok</b>", rendered)
+        self.assertIn("&lt;script&gt;x&lt;/script&gt;", rendered)
+        self.assertIn("&lt;a href=\"ftp://bad\"&gt;bad&lt;/a&gt;", rendered)
 
     def test_markdown_lite_plain_text_removes_markup(self) -> None:
         plain = markdown_lite_to_plain_text("**Bold** `code` [link](https://example.com)")

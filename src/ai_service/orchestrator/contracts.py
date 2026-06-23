@@ -163,6 +163,12 @@ class ConnectorRegistry:
         except KeyError as exc:
             raise KeyError(f"connector not registered: {normalized}") from exc
 
+    async def health_snapshot(self) -> tuple[ModuleHealth, ...]:
+        checks = []
+        for connector in self._connectors.values():
+            checks.append(connector.health())
+        return tuple(await gather_health(checks))
+
     def validate_tools(self, tool_registry: ToolRegistry, modules: set[str] | None = None) -> None:
         errors: list[str] = []
         for tool in tool_registry.list_tools():
@@ -179,6 +185,16 @@ class ConnectorRegistry:
                 )
         if errors:
             raise ValueError("tool registry validation failed: " + "; ".join(errors))
+
+
+async def gather_health(checks: list[Any]) -> list[ModuleHealth]:
+    results: list[ModuleHealth] = []
+    for check in checks:
+        try:
+            results.append(await check)
+        except Exception as exc:
+            results.append(ModuleHealth(module="unknown", status="degraded", message=str(exc)))
+    return results
 
 
 class StaticToolRegistry:

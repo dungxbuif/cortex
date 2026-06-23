@@ -255,7 +255,43 @@ def markdown_lite_to_telegram_html(text: str) -> str:
 
     for key, value in placeholders.items():
         escaped = escaped.replace(key, value)
-    return escaped
+    return sanitize_telegram_html(escaped)
+
+
+ALLOWED_TELEGRAM_TAGS = {"b", "i", "code", "pre", "a"}
+
+
+def sanitize_telegram_html(text: str) -> str:
+    open_tags: list[str] = []
+
+    def replace_tag(match: re.Match[str]) -> str:
+        raw = match.group(0)
+        closing = match.group(1) == "/"
+        name = match.group(2).lower()
+        attrs = match.group(3) or ""
+        if name not in ALLOWED_TELEGRAM_TAGS:
+            return escape_telegram_html(raw)
+        if name == "a":
+            if closing:
+                if not open_tags or open_tags[-1] != "a":
+                    return escape_telegram_html(raw)
+                open_tags.pop()
+                return "</a>"
+            href_match = re.search(r"""href=["'](https?://[^"']+)["']""", attrs, flags=re.IGNORECASE)
+            if href_match is None:
+                return escape_telegram_html(raw)
+            href = html.unescape(href_match.group(1))
+            open_tags.append("a")
+            return f'<a href="{html.escape(href, quote=True)}">'
+        if closing:
+            if not open_tags or open_tags[-1] != name:
+                return escape_telegram_html(raw)
+            open_tags.pop()
+            return f"</{name}>"
+        open_tags.append(name)
+        return f"<{name}>"
+
+    return re.sub(r"<(/?)([A-Za-z0-9]+)([^>]*)>", replace_tag, text)
 
 
 def markdown_lite_to_plain_text(text: str) -> str:

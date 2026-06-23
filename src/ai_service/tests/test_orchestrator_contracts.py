@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+import asyncio
 
 from ai_service.orchestrator.contracts import (
     ConnectorRegistry,
@@ -94,6 +95,16 @@ class ConnectorRegistryTest(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, "not supported"):
             registry.validate_tools(tools)
+
+    def test_health_snapshot_collects_connector_health(self) -> None:
+        registry = ConnectorRegistry()
+        registry.register(FakeConnector())
+
+        health = asyncio.run(registry.health_snapshot())
+
+        self.assertEqual(len(health), 1)
+        self.assertEqual(health[0].module, "second_brain")
+        self.assertEqual(health[0].status, "ok")
 
 
 if __name__ == "__main__":
