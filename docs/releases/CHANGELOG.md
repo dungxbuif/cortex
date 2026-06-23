@@ -20,6 +20,7 @@ All notable changes should be recorded here.
 ## [Unreleased]
 
 ### Added
+- Implemented Epic 7 CTX-705 Second Brain and Homelab module connectors: added `SecondBrainConnector` and `HomelabConnector`, normalized service outputs into `ToolObservation` with citations, aligned registry target names for status/search/capture/link validation, preserved capture tags, protected capture-inbox and Homelab read-only boundaries, rejected unallowlisted Homelab local paths, and added focused connector tests.
 - Implemented Epic 7 CTX-704 Telegram transport adapter: added Telegram update normalization into `ConversationInput`, explicit chat/user allowlist enforcement, typing actions, Markdown-lite to Telegram-safe HTML rendering for short messages, plaintext chunking for long responses, plain-text fallback, environment settings, optional `python-telegram-bot` wiring, and focused tests.
 - Completed Epic 7 CTX-701A design gate: prompt contract, orchestrator decision flow, Telegram-first surface decision, confirmation rules, citation behavior, and eval examples are reviewed in `DETAIL_DESIGN.md` before later LLM/ReAct runtime work.
 - Implemented Epic 7 CTX-700 and CTX-701 foundations: added shared Python orchestration contracts, connector registry startup validation, PostgreSQL-backed conversation and pending-confirmation state, migration `000004_orchestrator_conversations.sql`, and focused tests for registry validation, context trimming, inactivity reset, confirmation hashing, TTL expiration, and Telegram actor binding.

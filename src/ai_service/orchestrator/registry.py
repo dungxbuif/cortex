@@ -78,89 +78,9 @@ def to_provider_format(tool: ToolDefinition) -> dict[str, Any]:
 class DefaultToolRegistry(ToolRegistry):
     def __init__(self) -> None:
         self._tools = [
-            ToolDefinition(
-                name="finance_get_net_worth",
-                module="finance",
-                target_api="GetNetWorth",
-                input_schema={
-                    "type": "object",
-                    "properties": {},
-                    "required": []
-                },
-                required_capabilities=("finance_read",),
-                confirmation="none",
-                output_contract="Returns the current net worth broken down by accounts.",
-                enabled_by_default=True,
-            ),
-            ToolDefinition(
-                name="finance_create_transaction",
-                module="finance",
-                target_api="CreateTransaction",
-                input_schema={
-                    "type": "object",
-                    "properties": {
-                        "amount_minor": {"type": "integer", "description": "Amount in minor units (e.g. cents)"},
-                        "currency": {"type": "string", "description": "3-letter currency code"},
-                        "description": {"type": "string", "description": "Transaction description"},
-                        "wallet_id": {"type": "string", "description": "Target wallet ID"}
-                    },
-                    "required": ["amount_minor", "currency", "description", "wallet_id"]
-                },
-                required_capabilities=("finance_write",),
-                confirmation="require_confirmation",
-                output_contract="Creates a new financial transaction.",
-                enabled_by_default=True,
-            ),
-            ToolDefinition(
-                name="secondbrain_search_knowledge",
-                module="second_brain",
-                target_api="SearchKnowledge",
-                input_schema={
-                    "type": "object",
-                    "properties": {
-                        "query": {"type": "string", "description": "Search query"},
-                        "limit": {"type": "integer", "description": "Max number of results"}
-                    },
-                    "required": ["query"]
-                },
-                required_capabilities=("secondbrain_read",),
-                confirmation="none",
-                output_contract="Returns markdown snippets from Second Brain matching the query.",
-                enabled_by_default=True,
-            ),
-            ToolDefinition(
-                name="secondbrain_capture_note",
-                module="second_brain",
-                target_api="CreateCapture",
-                input_schema={
-                    "type": "object",
-                    "properties": {
-                        "content": {"type": "string", "description": "Markdown content to capture"},
-                        "tags": {"type": "array", "items": {"type": "string"}, "description": "List of tags"}
-                    },
-                    "required": ["content"]
-                },
-                required_capabilities=("secondbrain_write",),
-                confirmation="none",
-                output_contract="Captures a new note to the Second Brain inbox.",
-                enabled_by_default=True,
-            ),
-            ToolDefinition(
-                name="homelab_search_files",
-                module="homelab",
-                target_api="SearchFiles",
-                input_schema={
-                    "type": "object",
-                    "properties": {
-                        "query": {"type": "string", "description": "Search query for files/code"}
-                    },
-                    "required": ["query"]
-                },
-                required_capabilities=("homelab_read",),
-                confirmation="none",
-                output_contract="Returns file paths and contents matching the query in Homelab.",
-                enabled_by_default=True,
-            ),
+            *_finance_tools(),
+            *_second_brain_tools(),
+            *_homelab_tools(),
         ]
 
     def list_tools(
@@ -172,3 +92,159 @@ class DefaultToolRegistry(ToolRegistry):
             and (not capability or capability in t.required_capabilities)
         ]
 
+
+def _finance_tools() -> list[ToolDefinition]:
+    return [
+        ToolDefinition(
+            name="finance_get_net_worth",
+            module="finance",
+            target_api="GetNetWorth",
+            input_schema={
+                "type": "object",
+                "properties": {},
+                "required": []
+            },
+            required_capabilities=("finance_read",),
+            confirmation="none",
+            output_contract="Returns the current net worth broken down by accounts.",
+            enabled_by_default=True,
+        ),
+        ToolDefinition(
+            name="finance_create_transaction",
+            module="finance",
+            target_api="CreateTransaction",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "amount_minor": {"type": "integer", "description": "Amount in minor units (e.g. cents)"},
+                    "currency": {"type": "string", "description": "3-letter currency code"},
+                    "description": {"type": "string", "description": "Transaction description"},
+                    "wallet_id": {"type": "string", "description": "Target wallet ID"}
+                },
+                "required": ["amount_minor", "currency", "description", "wallet_id"]
+            },
+            required_capabilities=("finance_write",),
+            confirmation="require_confirmation",
+            output_contract="Creates a new financial transaction.",
+            enabled_by_default=True,
+        ),
+    ]
+
+
+def _second_brain_tools() -> list[ToolDefinition]:
+    return [
+        ToolDefinition(
+            name="secondbrain_search_knowledge",
+            module="second_brain",
+            target_api="SearchKnowledge",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Search query"},
+                    "limit": {"type": "integer", "description": "Max number of results"}
+                },
+                "required": ["query"]
+            },
+            required_capabilities=("secondbrain_read",),
+            confirmation="none",
+            output_contract="Returns markdown snippets from Second Brain matching the query.",
+            enabled_by_default=True,
+        ),
+        ToolDefinition(
+            name="secondbrain_get_sync_status",
+            module="second_brain",
+            target_api="GetSyncStatus",
+            input_schema={
+                "type": "object",
+                "properties": {},
+                "required": []
+            },
+            required_capabilities=("secondbrain_read",),
+            confirmation="none",
+            output_contract="Returns Second Brain indexed document and chunk counts.",
+            enabled_by_default=True,
+        ),
+        ToolDefinition(
+            name="secondbrain_list_captures",
+            module="second_brain",
+            target_api="ListCaptures",
+            input_schema={
+                "type": "object",
+                "properties": {},
+                "required": []
+            },
+            required_capabilities=("secondbrain_read",),
+            confirmation="none",
+            output_contract="Lists recent Second Brain capture inbox records.",
+            enabled_by_default=True,
+        ),
+        ToolDefinition(
+            name="secondbrain_capture_note",
+            module="second_brain",
+            target_api="CreateCapture",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "content": {"type": "string", "description": "Markdown content to capture"},
+                    "tags": {"type": "array", "items": {"type": "string"}, "description": "List of tags"}
+                },
+                "required": ["content"]
+            },
+            required_capabilities=("secondbrain_write",),
+            confirmation="none",
+            output_contract="Captures a new note to the Second Brain inbox.",
+            enabled_by_default=True,
+        ),
+    ]
+
+
+def _homelab_tools() -> list[ToolDefinition]:
+    return [
+        ToolDefinition(
+            name="homelab_get_sync_status",
+            module="homelab",
+            target_api="GetSyncStatus",
+            input_schema={
+                "type": "object",
+                "properties": {},
+                "required": []
+            },
+            required_capabilities=("homelab_read",),
+            confirmation="none",
+            output_contract="Returns Homelab indexed document and chunk counts.",
+            enabled_by_default=True,
+        ),
+        ToolDefinition(
+            name="homelab_search_knowledge",
+            module="homelab",
+            target_api="SearchKnowledge",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Search query for Homelab docs"},
+                    "limit": {"type": "integer", "description": "Max number of results"}
+                },
+                "required": ["query"]
+            },
+            required_capabilities=("homelab_read",),
+            confirmation="none",
+            output_contract="Returns redacted Homelab markdown snippets matching the query.",
+            enabled_by_default=True,
+        ),
+        ToolDefinition(
+            name="homelab_validate_links",
+            module="homelab",
+            target_api="ValidateLinks",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "repo_path": {"type": "string", "description": "Local Homelab mirror path to validate"}
+                },
+                "required": ["repo_path"]
+            },
+            required_capabilities=("homelab_read",),
+            confirmation="none",
+            output_contract="Returns broken markdown links in a local Homelab mirror.",
+            enabled_by_default=True,
+        ),
+    ]

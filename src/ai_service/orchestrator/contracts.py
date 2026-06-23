@@ -124,9 +124,11 @@ class ConnectorRegistry:
         except KeyError as exc:
             raise KeyError(f"connector not registered: {normalized}") from exc
 
-    def validate_tools(self, tool_registry: ToolRegistry) -> None:
+    def validate_tools(self, tool_registry: ToolRegistry, modules: set[str] | None = None) -> None:
         errors: list[str] = []
         for tool in tool_registry.list_tools():
+            if modules is not None and tool.module not in modules:
+                continue
             connector = self._connectors.get(tool.module)
             if connector is None:
                 errors.append(f"{tool.name}: connector not registered for module {tool.module}")

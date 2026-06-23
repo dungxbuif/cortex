@@ -67,7 +67,7 @@ class ToolRegistryTest(unittest.TestCase):
         self.assertEqual(finance_write.confirmation, "require_confirmation")
         self.assertIn("finance_write", finance_write.required_capabilities)
 
-        homelab_read = next(t for t in tools if t.name == "homelab_search_files")
+        homelab_read = next(t for t in tools if t.name == "homelab_search_knowledge")
         self.assertEqual(homelab_read.confirmation, "none")
         self.assertIn("homelab_read", homelab_read.required_capabilities)
 

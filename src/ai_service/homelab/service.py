@@ -138,6 +138,9 @@ class HomelabService:
             for row in rows
         ]
 
+    def get_sync_status(self, owner_id: str = "homelab"):
+        return self.repository.sync_homelab_status(owner_id)
+
     def validate_markdown_links(self, repo_path: str) -> list[dict[str, Any]]:
         return validate_markdown_links(repo_path)
 
