@@ -52,3 +52,13 @@ func (s *FinanceService) CreateCategory(ctx context.Context, cmd domain.CreateCa
 	}
 	return category, nil
 }
+
+func (s *FinanceService) ListCategories(ctx context.Context, ownerID string) ([]domain.Category, error) {
+	var categories []domain.Category
+	err := s.db.WithContext(ctx).
+		Where("owner_id = ? AND status = ?", domain.NormalizeOwner(ownerID), "active").
+		Order("name ASC").
+		Find(&categories).Error
+	return categories, err
+}
+

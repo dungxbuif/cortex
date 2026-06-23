@@ -15,6 +15,10 @@ trace:
     - docs/work/tickets/epic-7/CTX-705.md
     - docs/work/tickets/epic-7/CTX-706.md
     - docs/work/tickets/epic-7/CTX-706A.md
+    - docs/work/tickets/epic-7/CTX-707.md
+    - docs/work/tickets/epic-7/CTX-708.md
+    - docs/work/tickets/epic-7/CTX-709.md
+    - docs/work/tickets/epic-7/CTX-710.md
 ---
 
 # Epic 7 Detail Design: Full LLM/ReAct Orchestrator Completion
@@ -121,7 +125,9 @@ Implications:
 | CTX-705 | Module connectors for Second Brain and Homelab |
 | CTX-706 | Tool Adapter Executor |
 | CTX-706A | Policy/Audit gRPC Bridge & GrpcPolicyEnforcer |
-| CTX-707 | Evals and end-to-end chat tests |
+| CTX-707 | Finance gRPC Bridge & Connector (Read Scope) |
+| CTX-708 | Presentation, Health, and Graceful Degradation |
+| CTX-709 | Eval Replay And E2E Chat |
 
 ## Verification Strategy
 

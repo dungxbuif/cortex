@@ -63,9 +63,6 @@ class ToolRegistryTest(unittest.TestCase):
         
         self.assertGreater(len(tools), 0)
 
-        finance_write = next(t for t in tools if t.name == "finance_create_transaction")
-        self.assertEqual(finance_write.confirmation, "require_confirmation")
-        self.assertIn("finance_write", finance_write.required_capabilities)
 
         homelab_read = next(t for t in tools if t.name == "homelab_search_knowledge")
         self.assertEqual(homelab_read.confirmation, "none")
@@ -75,11 +72,7 @@ class ToolRegistryTest(unittest.TestCase):
         registry = DefaultToolRegistry()
         finance_tools = registry.list_tools(module="finance")
         self.assertTrue(all(t.module == "finance" for t in finance_tools))
-        self.assertEqual(len(finance_tools), 2)
-        
-        write_tools = registry.list_tools(capability="finance_write")
-        self.assertEqual(len(write_tools), 1)
-        self.assertEqual(write_tools[0].name, "finance_create_transaction")
+        self.assertEqual(len(finance_tools), 4)
 
     def test_to_provider_format(self) -> None:
         registry = DefaultToolRegistry()

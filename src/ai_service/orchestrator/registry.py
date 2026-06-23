@@ -96,9 +96,9 @@ class DefaultToolRegistry(ToolRegistry):
 def _finance_tools() -> list[ToolDefinition]:
     return [
         ToolDefinition(
-            name="finance_get_net_worth",
+            name="finance_list_wallets",
             module="finance",
-            target_api="GetNetWorth",
+            target_api="ListWallets",
             input_schema={
                 "type": "object",
                 "properties": {},
@@ -106,29 +106,63 @@ def _finance_tools() -> list[ToolDefinition]:
             },
             required_capabilities=("finance_read",),
             confirmation="none",
-            output_contract="Returns the current net worth broken down by accounts.",
+            output_contract="Returns the list of financial wallets.",
             enabled_by_default=True,
         ),
         ToolDefinition(
-            name="finance_create_transaction",
+            name="finance_list_categories",
             module="finance",
-            target_api="CreateTransaction",
+            target_api="ListCategories",
+            input_schema={
+                "type": "object",
+                "properties": {},
+                "required": []
+            },
+            required_capabilities=("finance_read",),
+            confirmation="none",
+            output_contract="Returns the list of financial categories.",
+            enabled_by_default=True,
+        ),
+        ToolDefinition(
+            name="finance_get_financial_report",
+            module="finance",
+            target_api="GetFinancialReport",
             input_schema={
                 "type": "object",
                 "properties": {
-                    "amount_minor": {"type": "integer", "description": "Amount in minor units (e.g. cents)"},
-                    "currency": {"type": "string", "description": "3-letter currency code"},
-                    "description": {"type": "string", "description": "Transaction description"},
-                    "wallet_id": {"type": "string", "description": "Target wallet ID"}
+                    "period_start": {"type": "string", "description": "ISO8601 start timestamp (e.g. 2026-01-01T00:00:00Z)"},
+                    "period_end": {"type": "string", "description": "ISO8601 end timestamp (e.g. 2026-02-01T00:00:00Z)"},
+                    "wallet_id": {"type": "string", "description": "Optional wallet ID to filter by"},
+                    "category_id": {"type": "string", "description": "Optional category ID to filter by"},
+                    "include_investment": {"type": "boolean", "description": "Include investment transactions"},
+                    "group_by": {"type": "string", "description": "Group by period (none, day, month)"},
+                    "use_created_at_audit_date": {"type": "boolean", "description": "Use transaction creation time instead of occurred_at"}
                 },
-                "required": ["amount_minor", "currency", "description", "wallet_id"]
+                "required": ["period_start", "period_end"]
             },
-            required_capabilities=("finance_write",),
-            confirmation="require_confirmation",
-            output_contract="Creates a new financial transaction.",
+            required_capabilities=("finance_read",),
+            confirmation="none",
+            output_contract="Returns an aggregated financial report for a period.",
+            enabled_by_default=True,
+        ),
+        ToolDefinition(
+            name="finance_get_net_worth",
+            module="finance",
+            target_api="GetNetWorth",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "as_of": {"type": "string", "description": "Optional ISO8601 timestamp for net worth calculations"}
+                },
+                "required": []
+            },
+            required_capabilities=("finance_read",),
+            confirmation="none",
+            output_contract="Returns the current net worth broken down by accounts.",
             enabled_by_default=True,
         ),
     ]
+
 
 
 def _second_brain_tools() -> list[ToolDefinition]:

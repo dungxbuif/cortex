@@ -40,8 +40,6 @@ trace:
     - ../tickets/epic-7/CTX-708.md
     - ../tickets/epic-7/CTX-709.md
     - ../tickets/epic-7/CTX-710.md
-    - ../tickets/epic-7/CTX-711.md
-    - ../tickets/epic-7/CTX-712.md
 ---
 
 # PHASE-7: Full LLM/ReAct Orchestrator Completion

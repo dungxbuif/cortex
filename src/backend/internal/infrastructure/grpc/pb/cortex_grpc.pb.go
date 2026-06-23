@@ -945,3 +945,257 @@ var AuditService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "cortex.proto",
 }
+
+const (
+	FinanceService_HealthCheck_FullMethodName        = "/cortex.FinanceService/HealthCheck"
+	FinanceService_ListWallets_FullMethodName        = "/cortex.FinanceService/ListWallets"
+	FinanceService_ListCategories_FullMethodName     = "/cortex.FinanceService/ListCategories"
+	FinanceService_GetFinancialReport_FullMethodName = "/cortex.FinanceService/GetFinancialReport"
+	FinanceService_GetNetWorth_FullMethodName        = "/cortex.FinanceService/GetNetWorth"
+)
+
+// FinanceServiceClient is the client API for FinanceService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type FinanceServiceClient interface {
+	HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
+	ListWallets(ctx context.Context, in *ListWalletsRequest, opts ...grpc.CallOption) (*ListWalletsResponse, error)
+	ListCategories(ctx context.Context, in *ListCategoriesRequest, opts ...grpc.CallOption) (*ListCategoriesResponse, error)
+	GetFinancialReport(ctx context.Context, in *GetFinancialReportRequest, opts ...grpc.CallOption) (*GetFinancialReportResponse, error)
+	GetNetWorth(ctx context.Context, in *GetNetWorthRequest, opts ...grpc.CallOption) (*GetNetWorthResponse, error)
+}
+
+type financeServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewFinanceServiceClient(cc grpc.ClientConnInterface) FinanceServiceClient {
+	return &financeServiceClient{cc}
+}
+
+func (c *financeServiceClient) HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HealthCheckResponse)
+	err := c.cc.Invoke(ctx, FinanceService_HealthCheck_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *financeServiceClient) ListWallets(ctx context.Context, in *ListWalletsRequest, opts ...grpc.CallOption) (*ListWalletsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListWalletsResponse)
+	err := c.cc.Invoke(ctx, FinanceService_ListWallets_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *financeServiceClient) ListCategories(ctx context.Context, in *ListCategoriesRequest, opts ...grpc.CallOption) (*ListCategoriesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListCategoriesResponse)
+	err := c.cc.Invoke(ctx, FinanceService_ListCategories_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *financeServiceClient) GetFinancialReport(ctx context.Context, in *GetFinancialReportRequest, opts ...grpc.CallOption) (*GetFinancialReportResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetFinancialReportResponse)
+	err := c.cc.Invoke(ctx, FinanceService_GetFinancialReport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *financeServiceClient) GetNetWorth(ctx context.Context, in *GetNetWorthRequest, opts ...grpc.CallOption) (*GetNetWorthResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetNetWorthResponse)
+	err := c.cc.Invoke(ctx, FinanceService_GetNetWorth_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// FinanceServiceServer is the server API for FinanceService service.
+// All implementations must embed UnimplementedFinanceServiceServer
+// for forward compatibility.
+type FinanceServiceServer interface {
+	HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
+	ListWallets(context.Context, *ListWalletsRequest) (*ListWalletsResponse, error)
+	ListCategories(context.Context, *ListCategoriesRequest) (*ListCategoriesResponse, error)
+	GetFinancialReport(context.Context, *GetFinancialReportRequest) (*GetFinancialReportResponse, error)
+	GetNetWorth(context.Context, *GetNetWorthRequest) (*GetNetWorthResponse, error)
+	mustEmbedUnimplementedFinanceServiceServer()
+}
+
+// UnimplementedFinanceServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedFinanceServiceServer struct{}
+
+func (UnimplementedFinanceServiceServer) HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method HealthCheck not implemented")
+}
+func (UnimplementedFinanceServiceServer) ListWallets(context.Context, *ListWalletsRequest) (*ListWalletsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListWallets not implemented")
+}
+func (UnimplementedFinanceServiceServer) ListCategories(context.Context, *ListCategoriesRequest) (*ListCategoriesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListCategories not implemented")
+}
+func (UnimplementedFinanceServiceServer) GetFinancialReport(context.Context, *GetFinancialReportRequest) (*GetFinancialReportResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetFinancialReport not implemented")
+}
+func (UnimplementedFinanceServiceServer) GetNetWorth(context.Context, *GetNetWorthRequest) (*GetNetWorthResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetNetWorth not implemented")
+}
+func (UnimplementedFinanceServiceServer) mustEmbedUnimplementedFinanceServiceServer() {}
+func (UnimplementedFinanceServiceServer) testEmbeddedByValue()                        {}
+
+// UnsafeFinanceServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to FinanceServiceServer will
+// result in compilation errors.
+type UnsafeFinanceServiceServer interface {
+	mustEmbedUnimplementedFinanceServiceServer()
+}
+
+func RegisterFinanceServiceServer(s grpc.ServiceRegistrar, srv FinanceServiceServer) {
+	// If the following call panics, it indicates UnimplementedFinanceServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&FinanceService_ServiceDesc, srv)
+}
+
+func _FinanceService_HealthCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HealthCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FinanceServiceServer).HealthCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FinanceService_HealthCheck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FinanceServiceServer).HealthCheck(ctx, req.(*HealthCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FinanceService_ListWallets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListWalletsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FinanceServiceServer).ListWallets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FinanceService_ListWallets_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FinanceServiceServer).ListWallets(ctx, req.(*ListWalletsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FinanceService_ListCategories_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCategoriesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FinanceServiceServer).ListCategories(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FinanceService_ListCategories_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FinanceServiceServer).ListCategories(ctx, req.(*ListCategoriesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FinanceService_GetFinancialReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFinancialReportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FinanceServiceServer).GetFinancialReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FinanceService_GetFinancialReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FinanceServiceServer).GetFinancialReport(ctx, req.(*GetFinancialReportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FinanceService_GetNetWorth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNetWorthRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FinanceServiceServer).GetNetWorth(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FinanceService_GetNetWorth_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FinanceServiceServer).GetNetWorth(ctx, req.(*GetNetWorthRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// FinanceService_ServiceDesc is the grpc.ServiceDesc for FinanceService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var FinanceService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "cortex.FinanceService",
+	HandlerType: (*FinanceServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "HealthCheck",
+			Handler:    _FinanceService_HealthCheck_Handler,
+		},
+		{
+			MethodName: "ListWallets",
+			Handler:    _FinanceService_ListWallets_Handler,
+		},
+		{
+			MethodName: "ListCategories",
+			Handler:    _FinanceService_ListCategories_Handler,
+		},
+		{
+			MethodName: "GetFinancialReport",
+			Handler:    _FinanceService_GetFinancialReport_Handler,
+		},
+		{
+			MethodName: "GetNetWorth",
+			Handler:    _FinanceService_GetNetWorth_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "cortex.proto",
+}

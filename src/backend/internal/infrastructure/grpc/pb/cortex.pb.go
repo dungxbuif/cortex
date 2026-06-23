@@ -1961,6 +1961,822 @@ func (x *AppendAuditEventResponse) GetAuditEventId() string {
 	return ""
 }
 
+type ListWalletsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OwnerId       string                 `protobuf:"bytes,1,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListWalletsRequest) Reset() {
+	*x = ListWalletsRequest{}
+	mi := &file_cortex_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListWalletsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListWalletsRequest) ProtoMessage() {}
+
+func (x *ListWalletsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cortex_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListWalletsRequest.ProtoReflect.Descriptor instead.
+func (*ListWalletsRequest) Descriptor() ([]byte, []int) {
+	return file_cortex_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *ListWalletsRequest) GetOwnerId() string {
+	if x != nil {
+		return x.OwnerId
+	}
+	return ""
+}
+
+type WalletRecord struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Id                  string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	OwnerId             string                 `protobuf:"bytes,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	Name                string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Type                string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
+	Currency            string                 `protobuf:"bytes,5,opt,name=currency,proto3" json:"currency,omitempty"`
+	InitialBalanceMinor int64                  `protobuf:"varint,6,opt,name=initial_balance_minor,json=initialBalanceMinor,proto3" json:"initial_balance_minor,omitempty"`
+	CurrentBalanceMinor int64                  `protobuf:"varint,7,opt,name=current_balance_minor,json=currentBalanceMinor,proto3" json:"current_balance_minor,omitempty"`
+	IncludeInTotal      bool                   `protobuf:"varint,8,opt,name=include_in_total,json=includeInTotal,proto3" json:"include_in_total,omitempty"`
+	Status              string                 `protobuf:"bytes,9,opt,name=status,proto3" json:"status,omitempty"`
+	CreatedAt           string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"` // ISO8601 string
+	UpdatedAt           string                 `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"` // ISO8601 string
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *WalletRecord) Reset() {
+	*x = WalletRecord{}
+	mi := &file_cortex_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WalletRecord) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WalletRecord) ProtoMessage() {}
+
+func (x *WalletRecord) ProtoReflect() protoreflect.Message {
+	mi := &file_cortex_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WalletRecord.ProtoReflect.Descriptor instead.
+func (*WalletRecord) Descriptor() ([]byte, []int) {
+	return file_cortex_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *WalletRecord) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *WalletRecord) GetOwnerId() string {
+	if x != nil {
+		return x.OwnerId
+	}
+	return ""
+}
+
+func (x *WalletRecord) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *WalletRecord) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *WalletRecord) GetCurrency() string {
+	if x != nil {
+		return x.Currency
+	}
+	return ""
+}
+
+func (x *WalletRecord) GetInitialBalanceMinor() int64 {
+	if x != nil {
+		return x.InitialBalanceMinor
+	}
+	return 0
+}
+
+func (x *WalletRecord) GetCurrentBalanceMinor() int64 {
+	if x != nil {
+		return x.CurrentBalanceMinor
+	}
+	return 0
+}
+
+func (x *WalletRecord) GetIncludeInTotal() bool {
+	if x != nil {
+		return x.IncludeInTotal
+	}
+	return false
+}
+
+func (x *WalletRecord) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *WalletRecord) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *WalletRecord) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+type ListWalletsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Wallets       []*WalletRecord        `protobuf:"bytes,1,rep,name=wallets,proto3" json:"wallets,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListWalletsResponse) Reset() {
+	*x = ListWalletsResponse{}
+	mi := &file_cortex_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListWalletsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListWalletsResponse) ProtoMessage() {}
+
+func (x *ListWalletsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cortex_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListWalletsResponse.ProtoReflect.Descriptor instead.
+func (*ListWalletsResponse) Descriptor() ([]byte, []int) {
+	return file_cortex_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *ListWalletsResponse) GetWallets() []*WalletRecord {
+	if x != nil {
+		return x.Wallets
+	}
+	return nil
+}
+
+type ListCategoriesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OwnerId       string                 `protobuf:"bytes,1,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCategoriesRequest) Reset() {
+	*x = ListCategoriesRequest{}
+	mi := &file_cortex_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCategoriesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCategoriesRequest) ProtoMessage() {}
+
+func (x *ListCategoriesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cortex_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCategoriesRequest.ProtoReflect.Descriptor instead.
+func (*ListCategoriesRequest) Descriptor() ([]byte, []int) {
+	return file_cortex_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *ListCategoriesRequest) GetOwnerId() string {
+	if x != nil {
+		return x.OwnerId
+	}
+	return ""
+}
+
+type CategoryRecord struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	OwnerId       string                 `protobuf:"bytes,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	ParentId      *string                `protobuf:"bytes,3,opt,name=parent_id,json=parentId,proto3,oneof" json:"parent_id,omitempty"`
+	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Type          string                 `protobuf:"bytes,5,opt,name=type,proto3" json:"type,omitempty"`
+	Aliases       string                 `protobuf:"bytes,6,opt,name=aliases,proto3" json:"aliases,omitempty"`
+	Status        string                 `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"` // ISO8601 string
+	UpdatedAt     string                 `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"` // ISO8601 string
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CategoryRecord) Reset() {
+	*x = CategoryRecord{}
+	mi := &file_cortex_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CategoryRecord) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CategoryRecord) ProtoMessage() {}
+
+func (x *CategoryRecord) ProtoReflect() protoreflect.Message {
+	mi := &file_cortex_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CategoryRecord.ProtoReflect.Descriptor instead.
+func (*CategoryRecord) Descriptor() ([]byte, []int) {
+	return file_cortex_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *CategoryRecord) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CategoryRecord) GetOwnerId() string {
+	if x != nil {
+		return x.OwnerId
+	}
+	return ""
+}
+
+func (x *CategoryRecord) GetParentId() string {
+	if x != nil && x.ParentId != nil {
+		return *x.ParentId
+	}
+	return ""
+}
+
+func (x *CategoryRecord) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CategoryRecord) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *CategoryRecord) GetAliases() string {
+	if x != nil {
+		return x.Aliases
+	}
+	return ""
+}
+
+func (x *CategoryRecord) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *CategoryRecord) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *CategoryRecord) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+type ListCategoriesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Categories    []*CategoryRecord      `protobuf:"bytes,1,rep,name=categories,proto3" json:"categories,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCategoriesResponse) Reset() {
+	*x = ListCategoriesResponse{}
+	mi := &file_cortex_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCategoriesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCategoriesResponse) ProtoMessage() {}
+
+func (x *ListCategoriesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cortex_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCategoriesResponse.ProtoReflect.Descriptor instead.
+func (*ListCategoriesResponse) Descriptor() ([]byte, []int) {
+	return file_cortex_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *ListCategoriesResponse) GetCategories() []*CategoryRecord {
+	if x != nil {
+		return x.Categories
+	}
+	return nil
+}
+
+type GetFinancialReportRequest struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	OwnerId               string                 `protobuf:"bytes,1,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	PeriodStart           string                 `protobuf:"bytes,2,opt,name=period_start,json=periodStart,proto3" json:"period_start,omitempty"` // ISO8601 string
+	PeriodEnd             string                 `protobuf:"bytes,3,opt,name=period_end,json=periodEnd,proto3" json:"period_end,omitempty"`       // ISO8601 string
+	WalletId              *string                `protobuf:"bytes,4,opt,name=wallet_id,json=walletId,proto3,oneof" json:"wallet_id,omitempty"`
+	CategoryId            *string                `protobuf:"bytes,5,opt,name=category_id,json=categoryId,proto3,oneof" json:"category_id,omitempty"`
+	IncludeInvestment     bool                   `protobuf:"varint,6,opt,name=include_investment,json=includeInvestment,proto3" json:"include_investment,omitempty"`
+	GroupBy               string                 `protobuf:"bytes,7,opt,name=group_by,json=groupBy,proto3" json:"group_by,omitempty"`
+	UseCreatedAtAuditDate bool                   `protobuf:"varint,8,opt,name=use_created_at_audit_date,json=useCreatedAtAuditDate,proto3" json:"use_created_at_audit_date,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *GetFinancialReportRequest) Reset() {
+	*x = GetFinancialReportRequest{}
+	mi := &file_cortex_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFinancialReportRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFinancialReportRequest) ProtoMessage() {}
+
+func (x *GetFinancialReportRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cortex_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFinancialReportRequest.ProtoReflect.Descriptor instead.
+func (*GetFinancialReportRequest) Descriptor() ([]byte, []int) {
+	return file_cortex_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *GetFinancialReportRequest) GetOwnerId() string {
+	if x != nil {
+		return x.OwnerId
+	}
+	return ""
+}
+
+func (x *GetFinancialReportRequest) GetPeriodStart() string {
+	if x != nil {
+		return x.PeriodStart
+	}
+	return ""
+}
+
+func (x *GetFinancialReportRequest) GetPeriodEnd() string {
+	if x != nil {
+		return x.PeriodEnd
+	}
+	return ""
+}
+
+func (x *GetFinancialReportRequest) GetWalletId() string {
+	if x != nil && x.WalletId != nil {
+		return *x.WalletId
+	}
+	return ""
+}
+
+func (x *GetFinancialReportRequest) GetCategoryId() string {
+	if x != nil && x.CategoryId != nil {
+		return *x.CategoryId
+	}
+	return ""
+}
+
+func (x *GetFinancialReportRequest) GetIncludeInvestment() bool {
+	if x != nil {
+		return x.IncludeInvestment
+	}
+	return false
+}
+
+func (x *GetFinancialReportRequest) GetGroupBy() string {
+	if x != nil {
+		return x.GroupBy
+	}
+	return ""
+}
+
+func (x *GetFinancialReportRequest) GetUseCreatedAtAuditDate() bool {
+	if x != nil {
+		return x.UseCreatedAtAuditDate
+	}
+	return false
+}
+
+type GetFinancialReportResponse struct {
+	state                            protoimpl.MessageState `protogen:"open.v1"`
+	PeriodStart                      string                 `protobuf:"bytes,1,opt,name=period_start,json=periodStart,proto3" json:"period_start,omitempty"`
+	PeriodEnd                        string                 `protobuf:"bytes,2,opt,name=period_end,json=periodEnd,proto3" json:"period_end,omitempty"`
+	GroupBy                          string                 `protobuf:"bytes,3,opt,name=group_by,json=groupBy,proto3" json:"group_by,omitempty"`
+	IncomeTotalMinor                 int64                  `protobuf:"varint,4,opt,name=income_total_minor,json=incomeTotalMinor,proto3" json:"income_total_minor,omitempty"`
+	ExpenseTotalMinor                int64                  `protobuf:"varint,5,opt,name=expense_total_minor,json=expenseTotalMinor,proto3" json:"expense_total_minor,omitempty"`
+	NetCashflowMinor                 int64                  `protobuf:"varint,6,opt,name=net_cashflow_minor,json=netCashflowMinor,proto3" json:"net_cashflow_minor,omitempty"`
+	TransferInTotalMinor             int64                  `protobuf:"varint,7,opt,name=transfer_in_total_minor,json=transferInTotalMinor,proto3" json:"transfer_in_total_minor,omitempty"`
+	TransferOutTotalMinor            int64                  `protobuf:"varint,8,opt,name=transfer_out_total_minor,json=transferOutTotalMinor,proto3" json:"transfer_out_total_minor,omitempty"`
+	ExcludedTotalMinor               int64                  `protobuf:"varint,9,opt,name=excluded_total_minor,json=excludedTotalMinor,proto3" json:"excluded_total_minor,omitempty"`
+	InvestmentCashMovementTotalMinor int64                  `protobuf:"varint,10,opt,name=investment_cash_movement_total_minor,json=investmentCashMovementTotalMinor,proto3" json:"investment_cash_movement_total_minor,omitempty"`
+	ByCategory                       map[string]int64       `protobuf:"bytes,11,rep,name=by_category,json=byCategory,proto3" json:"by_category,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	ByWallet                         map[string]int64       `protobuf:"bytes,12,rep,name=by_wallet,json=byWallet,proto3" json:"by_wallet,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	ByPeriod                         map[string]int64       `protobuf:"bytes,13,rep,name=by_period,json=byPeriod,proto3" json:"by_period,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	Warnings                         []string               `protobuf:"bytes,14,rep,name=warnings,proto3" json:"warnings,omitempty"`
+	unknownFields                    protoimpl.UnknownFields
+	sizeCache                        protoimpl.SizeCache
+}
+
+func (x *GetFinancialReportResponse) Reset() {
+	*x = GetFinancialReportResponse{}
+	mi := &file_cortex_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFinancialReportResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFinancialReportResponse) ProtoMessage() {}
+
+func (x *GetFinancialReportResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cortex_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFinancialReportResponse.ProtoReflect.Descriptor instead.
+func (*GetFinancialReportResponse) Descriptor() ([]byte, []int) {
+	return file_cortex_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *GetFinancialReportResponse) GetPeriodStart() string {
+	if x != nil {
+		return x.PeriodStart
+	}
+	return ""
+}
+
+func (x *GetFinancialReportResponse) GetPeriodEnd() string {
+	if x != nil {
+		return x.PeriodEnd
+	}
+	return ""
+}
+
+func (x *GetFinancialReportResponse) GetGroupBy() string {
+	if x != nil {
+		return x.GroupBy
+	}
+	return ""
+}
+
+func (x *GetFinancialReportResponse) GetIncomeTotalMinor() int64 {
+	if x != nil {
+		return x.IncomeTotalMinor
+	}
+	return 0
+}
+
+func (x *GetFinancialReportResponse) GetExpenseTotalMinor() int64 {
+	if x != nil {
+		return x.ExpenseTotalMinor
+	}
+	return 0
+}
+
+func (x *GetFinancialReportResponse) GetNetCashflowMinor() int64 {
+	if x != nil {
+		return x.NetCashflowMinor
+	}
+	return 0
+}
+
+func (x *GetFinancialReportResponse) GetTransferInTotalMinor() int64 {
+	if x != nil {
+		return x.TransferInTotalMinor
+	}
+	return 0
+}
+
+func (x *GetFinancialReportResponse) GetTransferOutTotalMinor() int64 {
+	if x != nil {
+		return x.TransferOutTotalMinor
+	}
+	return 0
+}
+
+func (x *GetFinancialReportResponse) GetExcludedTotalMinor() int64 {
+	if x != nil {
+		return x.ExcludedTotalMinor
+	}
+	return 0
+}
+
+func (x *GetFinancialReportResponse) GetInvestmentCashMovementTotalMinor() int64 {
+	if x != nil {
+		return x.InvestmentCashMovementTotalMinor
+	}
+	return 0
+}
+
+func (x *GetFinancialReportResponse) GetByCategory() map[string]int64 {
+	if x != nil {
+		return x.ByCategory
+	}
+	return nil
+}
+
+func (x *GetFinancialReportResponse) GetByWallet() map[string]int64 {
+	if x != nil {
+		return x.ByWallet
+	}
+	return nil
+}
+
+func (x *GetFinancialReportResponse) GetByPeriod() map[string]int64 {
+	if x != nil {
+		return x.ByPeriod
+	}
+	return nil
+}
+
+func (x *GetFinancialReportResponse) GetWarnings() []string {
+	if x != nil {
+		return x.Warnings
+	}
+	return nil
+}
+
+type GetNetWorthRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OwnerId       string                 `protobuf:"bytes,1,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	AsOf          string                 `protobuf:"bytes,2,opt,name=as_of,json=asOf,proto3" json:"as_of,omitempty"` // ISO8601 string
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetNetWorthRequest) Reset() {
+	*x = GetNetWorthRequest{}
+	mi := &file_cortex_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetNetWorthRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNetWorthRequest) ProtoMessage() {}
+
+func (x *GetNetWorthRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cortex_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNetWorthRequest.ProtoReflect.Descriptor instead.
+func (*GetNetWorthRequest) Descriptor() ([]byte, []int) {
+	return file_cortex_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *GetNetWorthRequest) GetOwnerId() string {
+	if x != nil {
+		return x.OwnerId
+	}
+	return ""
+}
+
+func (x *GetNetWorthRequest) GetAsOf() string {
+	if x != nil {
+		return x.AsOf
+	}
+	return ""
+}
+
+type GetNetWorthResponse struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	AsOf                string                 `protobuf:"bytes,1,opt,name=as_of,json=asOf,proto3" json:"as_of,omitempty"`
+	CashTotalMinor      int64                  `protobuf:"varint,2,opt,name=cash_total_minor,json=cashTotalMinor,proto3" json:"cash_total_minor,omitempty"`
+	AssetValueMinor     int64                  `protobuf:"varint,3,opt,name=asset_value_minor,json=assetValueMinor,proto3" json:"asset_value_minor,omitempty"`
+	LiabilityMinor      int64                  `protobuf:"varint,4,opt,name=liability_minor,json=liabilityMinor,proto3" json:"liability_minor,omitempty"`
+	ReceivableMinor     int64                  `protobuf:"varint,5,opt,name=receivable_minor,json=receivableMinor,proto3" json:"receivable_minor,omitempty"`
+	NetWorthMinor       int64                  `protobuf:"varint,6,opt,name=net_worth_minor,json=netWorthMinor,proto3" json:"net_worth_minor,omitempty"`
+	RealizedGainMinor   int64                  `protobuf:"varint,7,opt,name=realized_gain_minor,json=realizedGainMinor,proto3" json:"realized_gain_minor,omitempty"`
+	UnrealizedGainMinor int64                  `protobuf:"varint,8,opt,name=unrealized_gain_minor,json=unrealizedGainMinor,proto3" json:"unrealized_gain_minor,omitempty"`
+	Warnings            []string               `protobuf:"bytes,9,rep,name=warnings,proto3" json:"warnings,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *GetNetWorthResponse) Reset() {
+	*x = GetNetWorthResponse{}
+	mi := &file_cortex_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetNetWorthResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNetWorthResponse) ProtoMessage() {}
+
+func (x *GetNetWorthResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cortex_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNetWorthResponse.ProtoReflect.Descriptor instead.
+func (*GetNetWorthResponse) Descriptor() ([]byte, []int) {
+	return file_cortex_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *GetNetWorthResponse) GetAsOf() string {
+	if x != nil {
+		return x.AsOf
+	}
+	return ""
+}
+
+func (x *GetNetWorthResponse) GetCashTotalMinor() int64 {
+	if x != nil {
+		return x.CashTotalMinor
+	}
+	return 0
+}
+
+func (x *GetNetWorthResponse) GetAssetValueMinor() int64 {
+	if x != nil {
+		return x.AssetValueMinor
+	}
+	return 0
+}
+
+func (x *GetNetWorthResponse) GetLiabilityMinor() int64 {
+	if x != nil {
+		return x.LiabilityMinor
+	}
+	return 0
+}
+
+func (x *GetNetWorthResponse) GetReceivableMinor() int64 {
+	if x != nil {
+		return x.ReceivableMinor
+	}
+	return 0
+}
+
+func (x *GetNetWorthResponse) GetNetWorthMinor() int64 {
+	if x != nil {
+		return x.NetWorthMinor
+	}
+	return 0
+}
+
+func (x *GetNetWorthResponse) GetRealizedGainMinor() int64 {
+	if x != nil {
+		return x.RealizedGainMinor
+	}
+	return 0
+}
+
+func (x *GetNetWorthResponse) GetUnrealizedGainMinor() int64 {
+	if x != nil {
+		return x.UnrealizedGainMinor
+	}
+	return 0
+}
+
+func (x *GetNetWorthResponse) GetWarnings() []string {
+	if x != nil {
+		return x.Warnings
+	}
+	return nil
+}
+
 type ChatCompletionsResponse_Choice struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Index         int32                  `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`
@@ -1972,7 +2788,7 @@ type ChatCompletionsResponse_Choice struct {
 
 func (x *ChatCompletionsResponse_Choice) Reset() {
 	*x = ChatCompletionsResponse_Choice{}
-	mi := &file_cortex_proto_msgTypes[29]
+	mi := &file_cortex_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1984,7 +2800,7 @@ func (x *ChatCompletionsResponse_Choice) String() string {
 func (*ChatCompletionsResponse_Choice) ProtoMessage() {}
 
 func (x *ChatCompletionsResponse_Choice) ProtoReflect() protoreflect.Message {
-	mi := &file_cortex_proto_msgTypes[29]
+	mi := &file_cortex_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2201,7 +3017,100 @@ const file_cortex_proto_rawDesc = "" +
 	"target_ref\x18\v \x03(\v2\x16.cortex.StringMapEntryR\ttargetRef\x122\n" +
 	"\bmetadata\x18\f \x03(\v2\x16.cortex.StringMapEntryR\bmetadata\"@\n" +
 	"\x18AppendAuditEventResponse\x12$\n" +
-	"\x0eaudit_event_id\x18\x01 \x01(\tR\fauditEventId2\xed\x03\n" +
+	"\x0eaudit_event_id\x18\x01 \x01(\tR\fauditEventId\"/\n" +
+	"\x12ListWalletsRequest\x12\x19\n" +
+	"\bowner_id\x18\x01 \x01(\tR\aownerId\"\xe5\x02\n" +
+	"\fWalletRecord\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\bowner_id\x18\x02 \x01(\tR\aownerId\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x12\n" +
+	"\x04type\x18\x04 \x01(\tR\x04type\x12\x1a\n" +
+	"\bcurrency\x18\x05 \x01(\tR\bcurrency\x122\n" +
+	"\x15initial_balance_minor\x18\x06 \x01(\x03R\x13initialBalanceMinor\x122\n" +
+	"\x15current_balance_minor\x18\a \x01(\x03R\x13currentBalanceMinor\x12(\n" +
+	"\x10include_in_total\x18\b \x01(\bR\x0eincludeInTotal\x12\x16\n" +
+	"\x06status\x18\t \x01(\tR\x06status\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\n" +
+	" \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\v \x01(\tR\tupdatedAt\"E\n" +
+	"\x13ListWalletsResponse\x12.\n" +
+	"\awallets\x18\x01 \x03(\v2\x14.cortex.WalletRecordR\awallets\"2\n" +
+	"\x15ListCategoriesRequest\x12\x19\n" +
+	"\bowner_id\x18\x01 \x01(\tR\aownerId\"\x83\x02\n" +
+	"\x0eCategoryRecord\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\bowner_id\x18\x02 \x01(\tR\aownerId\x12 \n" +
+	"\tparent_id\x18\x03 \x01(\tH\x00R\bparentId\x88\x01\x01\x12\x12\n" +
+	"\x04name\x18\x04 \x01(\tR\x04name\x12\x12\n" +
+	"\x04type\x18\x05 \x01(\tR\x04type\x12\x18\n" +
+	"\aaliases\x18\x06 \x01(\tR\aaliases\x12\x16\n" +
+	"\x06status\x18\a \x01(\tR\x06status\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\b \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\t \x01(\tR\tupdatedAtB\f\n" +
+	"\n" +
+	"_parent_id\"P\n" +
+	"\x16ListCategoriesResponse\x126\n" +
+	"\n" +
+	"categories\x18\x01 \x03(\v2\x16.cortex.CategoryRecordR\n" +
+	"categories\"\xe2\x02\n" +
+	"\x19GetFinancialReportRequest\x12\x19\n" +
+	"\bowner_id\x18\x01 \x01(\tR\aownerId\x12!\n" +
+	"\fperiod_start\x18\x02 \x01(\tR\vperiodStart\x12\x1d\n" +
+	"\n" +
+	"period_end\x18\x03 \x01(\tR\tperiodEnd\x12 \n" +
+	"\twallet_id\x18\x04 \x01(\tH\x00R\bwalletId\x88\x01\x01\x12$\n" +
+	"\vcategory_id\x18\x05 \x01(\tH\x01R\n" +
+	"categoryId\x88\x01\x01\x12-\n" +
+	"\x12include_investment\x18\x06 \x01(\bR\x11includeInvestment\x12\x19\n" +
+	"\bgroup_by\x18\a \x01(\tR\agroupBy\x128\n" +
+	"\x19use_created_at_audit_date\x18\b \x01(\bR\x15useCreatedAtAuditDateB\f\n" +
+	"\n" +
+	"_wallet_idB\x0e\n" +
+	"\f_category_id\"\xbf\a\n" +
+	"\x1aGetFinancialReportResponse\x12!\n" +
+	"\fperiod_start\x18\x01 \x01(\tR\vperiodStart\x12\x1d\n" +
+	"\n" +
+	"period_end\x18\x02 \x01(\tR\tperiodEnd\x12\x19\n" +
+	"\bgroup_by\x18\x03 \x01(\tR\agroupBy\x12,\n" +
+	"\x12income_total_minor\x18\x04 \x01(\x03R\x10incomeTotalMinor\x12.\n" +
+	"\x13expense_total_minor\x18\x05 \x01(\x03R\x11expenseTotalMinor\x12,\n" +
+	"\x12net_cashflow_minor\x18\x06 \x01(\x03R\x10netCashflowMinor\x125\n" +
+	"\x17transfer_in_total_minor\x18\a \x01(\x03R\x14transferInTotalMinor\x127\n" +
+	"\x18transfer_out_total_minor\x18\b \x01(\x03R\x15transferOutTotalMinor\x120\n" +
+	"\x14excluded_total_minor\x18\t \x01(\x03R\x12excludedTotalMinor\x12N\n" +
+	"$investment_cash_movement_total_minor\x18\n" +
+	" \x01(\x03R investmentCashMovementTotalMinor\x12S\n" +
+	"\vby_category\x18\v \x03(\v22.cortex.GetFinancialReportResponse.ByCategoryEntryR\n" +
+	"byCategory\x12M\n" +
+	"\tby_wallet\x18\f \x03(\v20.cortex.GetFinancialReportResponse.ByWalletEntryR\bbyWallet\x12M\n" +
+	"\tby_period\x18\r \x03(\v20.cortex.GetFinancialReportResponse.ByPeriodEntryR\bbyPeriod\x12\x1a\n" +
+	"\bwarnings\x18\x0e \x03(\tR\bwarnings\x1a=\n" +
+	"\x0fByCategoryEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01\x1a;\n" +
+	"\rByWalletEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01\x1a;\n" +
+	"\rByPeriodEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01\"D\n" +
+	"\x12GetNetWorthRequest\x12\x19\n" +
+	"\bowner_id\x18\x01 \x01(\tR\aownerId\x12\x13\n" +
+	"\x05as_of\x18\x02 \x01(\tR\x04asOf\"\xfc\x02\n" +
+	"\x13GetNetWorthResponse\x12\x13\n" +
+	"\x05as_of\x18\x01 \x01(\tR\x04asOf\x12(\n" +
+	"\x10cash_total_minor\x18\x02 \x01(\x03R\x0ecashTotalMinor\x12*\n" +
+	"\x11asset_value_minor\x18\x03 \x01(\x03R\x0fassetValueMinor\x12'\n" +
+	"\x0fliability_minor\x18\x04 \x01(\x03R\x0eliabilityMinor\x12)\n" +
+	"\x10receivable_minor\x18\x05 \x01(\x03R\x0freceivableMinor\x12&\n" +
+	"\x0fnet_worth_minor\x18\x06 \x01(\x03R\rnetWorthMinor\x12.\n" +
+	"\x13realized_gain_minor\x18\a \x01(\x03R\x11realizedGainMinor\x122\n" +
+	"\x15unrealized_gain_minor\x18\b \x01(\x03R\x13unrealizedGainMinor\x12\x1a\n" +
+	"\bwarnings\x18\t \x03(\tR\bwarnings2\xed\x03\n" +
 	"\x12SecondBrainService\x12F\n" +
 	"\vHealthCheck\x12\x1a.cortex.HealthCheckRequest\x1a\x1b.cortex.HealthCheckResponse\x12L\n" +
 	"\rCreateCapture\x12\x1c.cortex.CreateCaptureRequest\x1a\x1d.cortex.CreateCaptureResponse\x12I\n" +
@@ -2222,7 +3131,13 @@ const file_cortex_proto_rawDesc = "" +
 	"\x0eEvaluatePolicy\x12\x1d.cortex.EvaluatePolicyRequest\x1a\x1e.cortex.EvaluatePolicyResponse2\xad\x01\n" +
 	"\fAuditService\x12F\n" +
 	"\vHealthCheck\x12\x1a.cortex.HealthCheckRequest\x1a\x1b.cortex.HealthCheckResponse\x12U\n" +
-	"\x10AppendAuditEvent\x12\x1f.cortex.AppendAuditEventRequest\x1a .cortex.AppendAuditEventResponseB(Z&cortex/internal/infrastructure/grpc/pbb\x06proto3"
+	"\x10AppendAuditEvent\x12\x1f.cortex.AppendAuditEventRequest\x1a .cortex.AppendAuditEventResponse2\x96\x03\n" +
+	"\x0eFinanceService\x12F\n" +
+	"\vHealthCheck\x12\x1a.cortex.HealthCheckRequest\x1a\x1b.cortex.HealthCheckResponse\x12F\n" +
+	"\vListWallets\x12\x1a.cortex.ListWalletsRequest\x1a\x1b.cortex.ListWalletsResponse\x12O\n" +
+	"\x0eListCategories\x12\x1d.cortex.ListCategoriesRequest\x1a\x1e.cortex.ListCategoriesResponse\x12[\n" +
+	"\x12GetFinancialReport\x12!.cortex.GetFinancialReportRequest\x1a\".cortex.GetFinancialReportResponse\x12F\n" +
+	"\vGetNetWorth\x12\x1a.cortex.GetNetWorthRequest\x1a\x1b.cortex.GetNetWorthResponseB(Z&cortex/internal/infrastructure/grpc/pbb\x06proto3"
 
 var (
 	file_cortex_proto_rawDescOnce sync.Once
@@ -2236,7 +3151,7 @@ func file_cortex_proto_rawDescGZIP() []byte {
 	return file_cortex_proto_rawDescData
 }
 
-var file_cortex_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_cortex_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
 var file_cortex_proto_goTypes = []any{
 	(*HealthCheckRequest)(nil),             // 0: cortex.HealthCheckRequest
 	(*HealthCheckResponse)(nil),            // 1: cortex.HealthCheckResponse
@@ -2267,7 +3182,20 @@ var file_cortex_proto_goTypes = []any{
 	(*EvaluatePolicyResponse)(nil),         // 26: cortex.EvaluatePolicyResponse
 	(*AppendAuditEventRequest)(nil),        // 27: cortex.AppendAuditEventRequest
 	(*AppendAuditEventResponse)(nil),       // 28: cortex.AppendAuditEventResponse
-	(*ChatCompletionsResponse_Choice)(nil), // 29: cortex.ChatCompletionsResponse.Choice
+	(*ListWalletsRequest)(nil),             // 29: cortex.ListWalletsRequest
+	(*WalletRecord)(nil),                   // 30: cortex.WalletRecord
+	(*ListWalletsResponse)(nil),            // 31: cortex.ListWalletsResponse
+	(*ListCategoriesRequest)(nil),          // 32: cortex.ListCategoriesRequest
+	(*CategoryRecord)(nil),                 // 33: cortex.CategoryRecord
+	(*ListCategoriesResponse)(nil),         // 34: cortex.ListCategoriesResponse
+	(*GetFinancialReportRequest)(nil),      // 35: cortex.GetFinancialReportRequest
+	(*GetFinancialReportResponse)(nil),     // 36: cortex.GetFinancialReportResponse
+	(*GetNetWorthRequest)(nil),             // 37: cortex.GetNetWorthRequest
+	(*GetNetWorthResponse)(nil),            // 38: cortex.GetNetWorthResponse
+	(*ChatCompletionsResponse_Choice)(nil), // 39: cortex.ChatCompletionsResponse.Choice
+	nil,                                    // 40: cortex.GetFinancialReportResponse.ByCategoryEntry
+	nil,                                    // 41: cortex.GetFinancialReportResponse.ByWalletEntry
+	nil,                                    // 42: cortex.GetFinancialReportResponse.ByPeriodEntry
 }
 var file_cortex_proto_depIdxs = []int32{
 	4,  // 0: cortex.SearchResult.chunk:type_name -> cortex.ChunkMetadata
@@ -2277,51 +3205,66 @@ var file_cortex_proto_depIdxs = []int32{
 	9,  // 4: cortex.ListCapturesResponse.captures:type_name -> cortex.CaptureRecord
 	20, // 5: cortex.ValidateLinksResponse.broken_links:type_name -> cortex.BrokenLink
 	22, // 6: cortex.ChatCompletionsRequest.messages:type_name -> cortex.ChatMessage
-	29, // 7: cortex.ChatCompletionsResponse.choices:type_name -> cortex.ChatCompletionsResponse.Choice
+	39, // 7: cortex.ChatCompletionsResponse.choices:type_name -> cortex.ChatCompletionsResponse.Choice
 	7,  // 8: cortex.EvaluatePolicyRequest.source_ref:type_name -> cortex.StringMapEntry
 	7,  // 9: cortex.EvaluatePolicyRequest.target_ref:type_name -> cortex.StringMapEntry
 	7,  // 10: cortex.EvaluatePolicyRequest.metadata:type_name -> cortex.StringMapEntry
 	7,  // 11: cortex.AppendAuditEventRequest.source_ref:type_name -> cortex.StringMapEntry
 	7,  // 12: cortex.AppendAuditEventRequest.target_ref:type_name -> cortex.StringMapEntry
 	7,  // 13: cortex.AppendAuditEventRequest.metadata:type_name -> cortex.StringMapEntry
-	22, // 14: cortex.ChatCompletionsResponse.Choice.message:type_name -> cortex.ChatMessage
-	0,  // 15: cortex.SecondBrainService.HealthCheck:input_type -> cortex.HealthCheckRequest
-	8,  // 16: cortex.SecondBrainService.CreateCapture:input_type -> cortex.CreateCaptureRequest
-	11, // 17: cortex.SecondBrainService.ListCaptures:input_type -> cortex.ListCapturesRequest
-	13, // 18: cortex.SecondBrainService.GetSyncStatus:input_type -> cortex.GetSyncStatusRequest
-	2,  // 19: cortex.SecondBrainService.SearchSecondBrain:input_type -> cortex.SearchRequest
-	15, // 20: cortex.SecondBrainService.SyncSecondBrainObject:input_type -> cortex.SyncSecondBrainObjectRequest
-	0,  // 21: cortex.HomelabService.HealthCheck:input_type -> cortex.HealthCheckRequest
-	17, // 22: cortex.HomelabService.SyncHomelab:input_type -> cortex.SyncHomelabRequest
-	2,  // 23: cortex.HomelabService.SearchHomelab:input_type -> cortex.SearchRequest
-	19, // 24: cortex.HomelabService.ValidateLinks:input_type -> cortex.ValidateLinksRequest
-	0,  // 25: cortex.OrchestratorService.HealthCheck:input_type -> cortex.HealthCheckRequest
-	23, // 26: cortex.OrchestratorService.ChatCompletions:input_type -> cortex.ChatCompletionsRequest
-	0,  // 27: cortex.PolicyService.HealthCheck:input_type -> cortex.HealthCheckRequest
-	25, // 28: cortex.PolicyService.EvaluatePolicy:input_type -> cortex.EvaluatePolicyRequest
-	0,  // 29: cortex.AuditService.HealthCheck:input_type -> cortex.HealthCheckRequest
-	27, // 30: cortex.AuditService.AppendAuditEvent:input_type -> cortex.AppendAuditEventRequest
-	1,  // 31: cortex.SecondBrainService.HealthCheck:output_type -> cortex.HealthCheckResponse
-	10, // 32: cortex.SecondBrainService.CreateCapture:output_type -> cortex.CreateCaptureResponse
-	12, // 33: cortex.SecondBrainService.ListCaptures:output_type -> cortex.ListCapturesResponse
-	14, // 34: cortex.SecondBrainService.GetSyncStatus:output_type -> cortex.GetSyncStatusResponse
-	6,  // 35: cortex.SecondBrainService.SearchSecondBrain:output_type -> cortex.SearchResponse
-	16, // 36: cortex.SecondBrainService.SyncSecondBrainObject:output_type -> cortex.SyncSecondBrainObjectResponse
-	1,  // 37: cortex.HomelabService.HealthCheck:output_type -> cortex.HealthCheckResponse
-	18, // 38: cortex.HomelabService.SyncHomelab:output_type -> cortex.SyncHomelabResponse
-	6,  // 39: cortex.HomelabService.SearchHomelab:output_type -> cortex.SearchResponse
-	21, // 40: cortex.HomelabService.ValidateLinks:output_type -> cortex.ValidateLinksResponse
-	1,  // 41: cortex.OrchestratorService.HealthCheck:output_type -> cortex.HealthCheckResponse
-	24, // 42: cortex.OrchestratorService.ChatCompletions:output_type -> cortex.ChatCompletionsResponse
-	1,  // 43: cortex.PolicyService.HealthCheck:output_type -> cortex.HealthCheckResponse
-	26, // 44: cortex.PolicyService.EvaluatePolicy:output_type -> cortex.EvaluatePolicyResponse
-	1,  // 45: cortex.AuditService.HealthCheck:output_type -> cortex.HealthCheckResponse
-	28, // 46: cortex.AuditService.AppendAuditEvent:output_type -> cortex.AppendAuditEventResponse
-	31, // [31:47] is the sub-list for method output_type
-	15, // [15:31] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	30, // 14: cortex.ListWalletsResponse.wallets:type_name -> cortex.WalletRecord
+	33, // 15: cortex.ListCategoriesResponse.categories:type_name -> cortex.CategoryRecord
+	40, // 16: cortex.GetFinancialReportResponse.by_category:type_name -> cortex.GetFinancialReportResponse.ByCategoryEntry
+	41, // 17: cortex.GetFinancialReportResponse.by_wallet:type_name -> cortex.GetFinancialReportResponse.ByWalletEntry
+	42, // 18: cortex.GetFinancialReportResponse.by_period:type_name -> cortex.GetFinancialReportResponse.ByPeriodEntry
+	22, // 19: cortex.ChatCompletionsResponse.Choice.message:type_name -> cortex.ChatMessage
+	0,  // 20: cortex.SecondBrainService.HealthCheck:input_type -> cortex.HealthCheckRequest
+	8,  // 21: cortex.SecondBrainService.CreateCapture:input_type -> cortex.CreateCaptureRequest
+	11, // 22: cortex.SecondBrainService.ListCaptures:input_type -> cortex.ListCapturesRequest
+	13, // 23: cortex.SecondBrainService.GetSyncStatus:input_type -> cortex.GetSyncStatusRequest
+	2,  // 24: cortex.SecondBrainService.SearchSecondBrain:input_type -> cortex.SearchRequest
+	15, // 25: cortex.SecondBrainService.SyncSecondBrainObject:input_type -> cortex.SyncSecondBrainObjectRequest
+	0,  // 26: cortex.HomelabService.HealthCheck:input_type -> cortex.HealthCheckRequest
+	17, // 27: cortex.HomelabService.SyncHomelab:input_type -> cortex.SyncHomelabRequest
+	2,  // 28: cortex.HomelabService.SearchHomelab:input_type -> cortex.SearchRequest
+	19, // 29: cortex.HomelabService.ValidateLinks:input_type -> cortex.ValidateLinksRequest
+	0,  // 30: cortex.OrchestratorService.HealthCheck:input_type -> cortex.HealthCheckRequest
+	23, // 31: cortex.OrchestratorService.ChatCompletions:input_type -> cortex.ChatCompletionsRequest
+	0,  // 32: cortex.PolicyService.HealthCheck:input_type -> cortex.HealthCheckRequest
+	25, // 33: cortex.PolicyService.EvaluatePolicy:input_type -> cortex.EvaluatePolicyRequest
+	0,  // 34: cortex.AuditService.HealthCheck:input_type -> cortex.HealthCheckRequest
+	27, // 35: cortex.AuditService.AppendAuditEvent:input_type -> cortex.AppendAuditEventRequest
+	0,  // 36: cortex.FinanceService.HealthCheck:input_type -> cortex.HealthCheckRequest
+	29, // 37: cortex.FinanceService.ListWallets:input_type -> cortex.ListWalletsRequest
+	32, // 38: cortex.FinanceService.ListCategories:input_type -> cortex.ListCategoriesRequest
+	35, // 39: cortex.FinanceService.GetFinancialReport:input_type -> cortex.GetFinancialReportRequest
+	37, // 40: cortex.FinanceService.GetNetWorth:input_type -> cortex.GetNetWorthRequest
+	1,  // 41: cortex.SecondBrainService.HealthCheck:output_type -> cortex.HealthCheckResponse
+	10, // 42: cortex.SecondBrainService.CreateCapture:output_type -> cortex.CreateCaptureResponse
+	12, // 43: cortex.SecondBrainService.ListCaptures:output_type -> cortex.ListCapturesResponse
+	14, // 44: cortex.SecondBrainService.GetSyncStatus:output_type -> cortex.GetSyncStatusResponse
+	6,  // 45: cortex.SecondBrainService.SearchSecondBrain:output_type -> cortex.SearchResponse
+	16, // 46: cortex.SecondBrainService.SyncSecondBrainObject:output_type -> cortex.SyncSecondBrainObjectResponse
+	1,  // 47: cortex.HomelabService.HealthCheck:output_type -> cortex.HealthCheckResponse
+	18, // 48: cortex.HomelabService.SyncHomelab:output_type -> cortex.SyncHomelabResponse
+	6,  // 49: cortex.HomelabService.SearchHomelab:output_type -> cortex.SearchResponse
+	21, // 50: cortex.HomelabService.ValidateLinks:output_type -> cortex.ValidateLinksResponse
+	1,  // 51: cortex.OrchestratorService.HealthCheck:output_type -> cortex.HealthCheckResponse
+	24, // 52: cortex.OrchestratorService.ChatCompletions:output_type -> cortex.ChatCompletionsResponse
+	1,  // 53: cortex.PolicyService.HealthCheck:output_type -> cortex.HealthCheckResponse
+	26, // 54: cortex.PolicyService.EvaluatePolicy:output_type -> cortex.EvaluatePolicyResponse
+	1,  // 55: cortex.AuditService.HealthCheck:output_type -> cortex.HealthCheckResponse
+	28, // 56: cortex.AuditService.AppendAuditEvent:output_type -> cortex.AppendAuditEventResponse
+	1,  // 57: cortex.FinanceService.HealthCheck:output_type -> cortex.HealthCheckResponse
+	31, // 58: cortex.FinanceService.ListWallets:output_type -> cortex.ListWalletsResponse
+	34, // 59: cortex.FinanceService.ListCategories:output_type -> cortex.ListCategoriesResponse
+	36, // 60: cortex.FinanceService.GetFinancialReport:output_type -> cortex.GetFinancialReportResponse
+	38, // 61: cortex.FinanceService.GetNetWorth:output_type -> cortex.GetNetWorthResponse
+	41, // [41:62] is the sub-list for method output_type
+	20, // [20:41] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_cortex_proto_init() }
@@ -2329,15 +3272,17 @@ func file_cortex_proto_init() {
 	if File_cortex_proto != nil {
 		return
 	}
+	file_cortex_proto_msgTypes[33].OneofWrappers = []any{}
+	file_cortex_proto_msgTypes[35].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cortex_proto_rawDesc), len(file_cortex_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   30,
+			NumMessages:   43,
 			NumExtensions: 0,
-			NumServices:   5,
+			NumServices:   6,
 		},
 		GoTypes:           file_cortex_proto_goTypes,
 		DependencyIndexes: file_cortex_proto_depIdxs,

@@ -246,3 +246,101 @@ message AppendAuditEventRequest {
 message AppendAuditEventResponse {
   string audit_event_id = 1;
 }
+
+// 5. Finance Service Definition
+
+service FinanceService {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+  rpc ListWallets(ListWalletsRequest) returns (ListWalletsResponse);
+  rpc ListCategories(ListCategoriesRequest) returns (ListCategoriesResponse);
+  rpc GetFinancialReport(GetFinancialReportRequest) returns (GetFinancialReportResponse);
+  rpc GetNetWorth(GetNetWorthRequest) returns (GetNetWorthResponse);
+}
+
+message ListWalletsRequest {
+  string owner_id = 1;
+}
+
+message WalletRecord {
+  string id = 1;
+  string owner_id = 2;
+  string name = 3;
+  string type = 4;
+  string currency = 5;
+  int64 initial_balance_minor = 6;
+  int64 current_balance_minor = 7;
+  bool include_in_total = 8;
+  string status = 9;
+  string created_at = 10; // ISO8601 string
+  string updated_at = 11; // ISO8601 string
+}
+
+message ListWalletsResponse {
+  repeated WalletRecord wallets = 1;
+}
+
+message ListCategoriesRequest {
+  string owner_id = 1;
+}
+
+message CategoryRecord {
+  string id = 1;
+  string owner_id = 2;
+  optional string parent_id = 3;
+  string name = 4;
+  string type = 5;
+  string aliases = 6;
+  string status = 7;
+  string created_at = 8;  // ISO8601 string
+  string updated_at = 9;  // ISO8601 string
+}
+
+message ListCategoriesResponse {
+  repeated CategoryRecord categories = 1;
+}
+
+message GetFinancialReportRequest {
+  string owner_id = 1;
+  string period_start = 2; // ISO8601 string
+  string period_end = 3;   // ISO8601 string
+  optional string wallet_id = 4;
+  optional string category_id = 5;
+  bool include_investment = 6;
+  string group_by = 7;
+  bool use_created_at_audit_date = 8;
+}
+
+message GetFinancialReportResponse {
+  string period_start = 1;
+  string period_end = 2;
+  string group_by = 3;
+  int64 income_total_minor = 4;
+  int64 expense_total_minor = 5;
+  int64 net_cashflow_minor = 6;
+  int64 transfer_in_total_minor = 7;
+  int64 transfer_out_total_minor = 8;
+  int64 excluded_total_minor = 9;
+  int64 investment_cash_movement_total_minor = 10;
+  map<string, int64> by_category = 11;
+  map<string, int64> by_wallet = 12;
+  map<string, int64> by_period = 13;
+  repeated string warnings = 14;
+}
+
+message GetNetWorthRequest {
+  string owner_id = 1;
+  string as_of = 2; // ISO8601 string
+}
+
+message GetNetWorthResponse {
+  string as_of = 1;
+  int64 cash_total_minor = 2;
+  int64 asset_value_minor = 3;
+  int64 liability_minor = 4;
+  int64 receivable_minor = 5;
+  int64 net_worth_minor = 6;
+  int64 realized_gain_minor = 7;
+  int64 unrealized_gain_minor = 8;
+  repeated string warnings = 9;
+}
+

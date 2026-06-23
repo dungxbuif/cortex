@@ -107,8 +107,6 @@ Epic 4 is complete with Python-owned chat gateway routing into existing Second B
 - `docs/work/tickets/epic-7/CTX-708.md`
 - `docs/work/tickets/epic-7/CTX-709.md`
 - `docs/work/tickets/epic-7/CTX-710.md`
-- `docs/work/tickets/epic-7/CTX-711.md`
-- `docs/work/tickets/epic-7/CTX-712.md`
 - `docs/work/phases/PHASE-8-ingestion-hardening.md`
 - `docs/work/tickets/epic-8/DETAIL_DESIGN.md`
 - `docs/work/tickets/epic-8/CTX-801.md`

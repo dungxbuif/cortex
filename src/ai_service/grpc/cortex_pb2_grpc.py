@@ -2,9 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 import warnings
-
 from ai_service.grpc import cortex_pb2 as cortex__pb2
-
 GRPC_GENERATED_VERSION = '1.81.1'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
@@ -871,6 +869,256 @@ class AuditService:
             '/cortex.AuditService/AppendAuditEvent',
             cortex__pb2.AppendAuditEventRequest.SerializeToString,
             cortex__pb2.AppendAuditEventResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+
+class FinanceServiceStub:
+    """5. Finance Service Definition
+
+    """
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.HealthCheck = channel.unary_unary(
+                '/cortex.FinanceService/HealthCheck',
+                request_serializer=cortex__pb2.HealthCheckRequest.SerializeToString,
+                response_deserializer=cortex__pb2.HealthCheckResponse.FromString,
+                _registered_method=True)
+        self.ListWallets = channel.unary_unary(
+                '/cortex.FinanceService/ListWallets',
+                request_serializer=cortex__pb2.ListWalletsRequest.SerializeToString,
+                response_deserializer=cortex__pb2.ListWalletsResponse.FromString,
+                _registered_method=True)
+        self.ListCategories = channel.unary_unary(
+                '/cortex.FinanceService/ListCategories',
+                request_serializer=cortex__pb2.ListCategoriesRequest.SerializeToString,
+                response_deserializer=cortex__pb2.ListCategoriesResponse.FromString,
+                _registered_method=True)
+        self.GetFinancialReport = channel.unary_unary(
+                '/cortex.FinanceService/GetFinancialReport',
+                request_serializer=cortex__pb2.GetFinancialReportRequest.SerializeToString,
+                response_deserializer=cortex__pb2.GetFinancialReportResponse.FromString,
+                _registered_method=True)
+        self.GetNetWorth = channel.unary_unary(
+                '/cortex.FinanceService/GetNetWorth',
+                request_serializer=cortex__pb2.GetNetWorthRequest.SerializeToString,
+                response_deserializer=cortex__pb2.GetNetWorthResponse.FromString,
+                _registered_method=True)
+
+
+class FinanceServiceServicer:
+    """5. Finance Service Definition
+
+    """
+
+    def HealthCheck(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ListWallets(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ListCategories(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetFinancialReport(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetNetWorth(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_FinanceServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'HealthCheck': grpc.unary_unary_rpc_method_handler(
+                    servicer.HealthCheck,
+                    request_deserializer=cortex__pb2.HealthCheckRequest.FromString,
+                    response_serializer=cortex__pb2.HealthCheckResponse.SerializeToString,
+            ),
+            'ListWallets': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListWallets,
+                    request_deserializer=cortex__pb2.ListWalletsRequest.FromString,
+                    response_serializer=cortex__pb2.ListWalletsResponse.SerializeToString,
+            ),
+            'ListCategories': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListCategories,
+                    request_deserializer=cortex__pb2.ListCategoriesRequest.FromString,
+                    response_serializer=cortex__pb2.ListCategoriesResponse.SerializeToString,
+            ),
+            'GetFinancialReport': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetFinancialReport,
+                    request_deserializer=cortex__pb2.GetFinancialReportRequest.FromString,
+                    response_serializer=cortex__pb2.GetFinancialReportResponse.SerializeToString,
+            ),
+            'GetNetWorth': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetNetWorth,
+                    request_deserializer=cortex__pb2.GetNetWorthRequest.FromString,
+                    response_serializer=cortex__pb2.GetNetWorthResponse.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'cortex.FinanceService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('cortex.FinanceService', rpc_method_handlers)
+
+
+ # This class is part of an EXPERIMENTAL API.
+class FinanceService:
+    """5. Finance Service Definition
+
+    """
+
+    @staticmethod
+    def HealthCheck(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/cortex.FinanceService/HealthCheck',
+            cortex__pb2.HealthCheckRequest.SerializeToString,
+            cortex__pb2.HealthCheckResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ListWallets(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/cortex.FinanceService/ListWallets',
+            cortex__pb2.ListWalletsRequest.SerializeToString,
+            cortex__pb2.ListWalletsResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ListCategories(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/cortex.FinanceService/ListCategories',
+            cortex__pb2.ListCategoriesRequest.SerializeToString,
+            cortex__pb2.ListCategoriesResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetFinancialReport(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/cortex.FinanceService/GetFinancialReport',
+            cortex__pb2.GetFinancialReportRequest.SerializeToString,
+            cortex__pb2.GetFinancialReportResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetNetWorth(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/cortex.FinanceService/GetNetWorth',
+            cortex__pb2.GetNetWorthRequest.SerializeToString,
+            cortex__pb2.GetNetWorthResponse.FromString,
             options,
             channel_credentials,
             insecure,
