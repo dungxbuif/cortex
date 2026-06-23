@@ -114,10 +114,10 @@ Implications:
 | --- | --- |
 | CTX-701A | Prompt contract and orchestration decision-flow design for human Q&A |
 | CTX-701 | LLM/ReAct runtime and prompt contract |
-| CTX-702 | Telegram bot transport adapter |
-| CTX-703 | Tool adapter execution layer |
-| CTX-704 | Module connectors for Finance, Second Brain, Homelab |
-| CTX-705 | Sync/completion gaps and graceful degradation |
+| CTX-702 | Tool Registry And JSON Schema Contracts |
+| CTX-703 | LLM/ReAct Runtime Loop async state machine |
+| CTX-704 | Telegram bot transport adapter |
+| CTX-705 | Module connectors for Finance, Second Brain, Homelab |
 | CTX-706 | Evals and end-to-end chat tests |
 
 ## Verification Strategy

@@ -80,7 +80,9 @@ class ToolDefinition:
 
 
 class ToolRegistry(Protocol):
-    def list_tools(self) -> list[ToolDefinition]:
+    def list_tools(
+        self, module: str | None = None, capability: str | None = None
+    ) -> list[ToolDefinition]:
         ...
 
 
@@ -142,5 +144,17 @@ class StaticToolRegistry:
     def __init__(self, tools: list[ToolDefinition]) -> None:
         self._tools = tuple(tools)
 
-    def list_tools(self) -> list[ToolDefinition]:
-        return list(self._tools)
+    def list_tools(
+        self, module: str | None = None, capability: str | None = None
+    ) -> list[ToolDefinition]:
+        return [
+            t for t in self._tools
+            if (not module or t.module == module)
+            and (not capability or capability in t.required_capabilities)
+        ]
+
+class PolicyEnforcer(Protocol):
+    async def authorize(
+        self, actor_id: str, capabilities: tuple[str, ...], context: ToolExecutionContext
+    ) -> bool:
+        ...
