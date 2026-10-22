@@ -17,7 +17,7 @@ class FakeEmbedder:
         return [self.embed_text(text) for text in texts]
 
 
-class SecondBrainMinIOSyncTest(unittest.TestCase):
+class SecondBrainS3SyncTest(unittest.TestCase):
     def setUp(self) -> None:
         self.temp_dir = tempfile.TemporaryDirectory()
         self.root = Path(self.temp_dir.name)
@@ -37,75 +37,75 @@ class SecondBrainMinIOSyncTest(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_indexes_markdown_object_under_second_brain_prefix(self) -> None:
-        object_key = "second-brain/wiki/minio-sync.md"
+        object_key = "second-brain/wiki/s3-sync.md"
         self._write_object(
             object_key,
             """---
 type: wiki
-title: "MinIO Sync"
+title: "S3 Sync"
 tags: [second-brain, sync]
 ---
 
-# MinIO Sync
+# S3 Sync
 
 Local S3 simulation indexes Obsidian markdown through the Second Brain pipeline.
 """,
         )
 
-        result = self.service.sync_minio_object(self.bucket, object_key, owner_id="minio-owner")
+        result = self.service.sync_s3_object(self.bucket, object_key, owner_id="s3-owner")
 
         self.assertEqual(result["status"], "indexed")
         self.assertEqual(result["processed_files"], 1)
-        status = self.service.get_sync_status(owner_id="minio-owner")
+        status = self.service.get_sync_status(owner_id="s3-owner")
         self.assertEqual(status.indexed_documents, 1)
         self.assertGreater(status.total_chunks, 0)
-        results = self.service.search_knowledge("local s3 simulation obsidian", owner_id="minio-owner")
-        self.assertEqual(results[0].document.vault_path, "wiki/minio-sync.md")
+        results = self.service.search_knowledge("local s3 simulation obsidian", owner_id="s3-owner")
+        self.assertEqual(results[0].document.vault_path, "wiki/s3-sync.md")
 
     def test_replayed_object_is_idempotent_by_checksum(self) -> None:
         object_key = "second-brain/wiki/idempotent.md"
         self._write_object(object_key, "---\ntype: wiki\ntitle: Idempotent\n---\n# Idempotent\nSame content")
 
-        first = self.service.sync_minio_object(self.bucket, object_key, owner_id="minio-owner")
-        second = self.service.sync_minio_object(self.bucket, object_key, owner_id="minio-owner")
+        first = self.service.sync_s3_object(self.bucket, object_key, owner_id="s3-owner")
+        second = self.service.sync_s3_object(self.bucket, object_key, owner_id="s3-owner")
 
         self.assertEqual(first["status"], "indexed")
         self.assertEqual(second["status"], "skipped")
         self.assertEqual(second["message"], "unchanged content")
-        status = self.service.get_sync_status(owner_id="minio-owner")
+        status = self.service.get_sync_status(owner_id="s3-owner")
         self.assertEqual(status.total_documents, 1)
 
     def test_skips_out_of_prefix_and_non_markdown_objects(self) -> None:
         self._write_object("other/wiki.md", "# Outside")
         self._write_object("second-brain/assets/image.png", "not markdown")
 
-        outside = self.service.sync_minio_object(self.bucket, "other/wiki.md", owner_id="minio-owner")
-        asset = self.service.sync_minio_object(self.bucket, "second-brain/assets/image.png", owner_id="minio-owner")
+        outside = self.service.sync_s3_object(self.bucket, "other/wiki.md", owner_id="s3-owner")
+        asset = self.service.sync_s3_object(self.bucket, "second-brain/assets/image.png", owner_id="s3-owner")
 
         self.assertEqual(outside["status"], "skipped")
         self.assertEqual(outside["message"], "object outside second-brain prefix")
         self.assertEqual(asset["status"], "skipped")
         self.assertEqual(asset["message"], "object is not markdown")
-        status = self.service.get_sync_status(owner_id="minio-owner")
+        status = self.service.get_sync_status(owner_id="s3-owner")
         self.assertEqual(status.total_documents, 0)
 
     def test_rejects_wrong_bucket_and_traversal_key(self) -> None:
         with self.assertRaises(ValueError):
-            self.service.sync_minio_object("wrong", "second-brain/wiki/a.md", owner_id="minio-owner")
+            self.service.sync_s3_object("wrong", "second-brain/wiki/a.md", owner_id="s3-owner")
         with self.assertRaises(ValueError):
-            self.service.sync_minio_object(self.bucket, "second-brain/../secret.md", owner_id="minio-owner")
+            self.service.sync_s3_object(self.bucket, "second-brain/../secret.md", owner_id="s3-owner")
 
     def test_submit_event_queues_job_and_worker_processes_it(self) -> None:
         object_key = "second-brain/wiki/async-job.md"
         self._write_object(object_key, "# Async Job\nWorker indexes queued object.")
 
-        job = self.service.submit_minio_event(self.bucket, object_key, owner_id="minio-owner")
+        job = self.service.submit_s3_event(self.bucket, object_key, owner_id="s3-owner")
 
         self.assertEqual(job.status, "queued")
         self.assertEqual(job.event_type, "upsert")
 
-        result = self.service.process_ingestion_job(job.id, owner_id="minio-owner")
-        processed = self.repo.get_ingestion_job("minio-owner", job.id)
+        result = self.service.process_ingestion_job(job.id, owner_id="s3-owner")
+        processed = self.repo.get_ingestion_job("s3-owner", job.id)
 
         self.assertEqual(result["status"], "indexed")
         self.assertIsNotNone(processed)
@@ -118,31 +118,31 @@ Local S3 simulation indexes Obsidian markdown through the Second Brain pipeline.
             object_key,
             "# Delete Me\nThis document contains a unique stale phrase for removal.",
         )
-        indexed = self.service.sync_minio_object(self.bucket, object_key, owner_id="minio-owner")
+        indexed = self.service.sync_s3_object(self.bucket, object_key, owner_id="s3-owner")
         self.assertEqual(indexed["status"], "indexed")
-        self.assertTrue(self.service.search_knowledge("unique stale phrase", owner_id="minio-owner"))
+        self.assertTrue(self.service.search_knowledge("unique stale phrase", owner_id="s3-owner"))
 
-        delete_job = self.service.submit_minio_event(
+        delete_job = self.service.submit_s3_event(
             self.bucket,
             object_key,
-            owner_id="minio-owner",
+            owner_id="s3-owner",
             event_name="s3:ObjectRemoved:Delete",
         )
-        result = self.service.process_ingestion_job(delete_job.id, owner_id="minio-owner")
+        result = self.service.process_ingestion_job(delete_job.id, owner_id="s3-owner")
 
         self.assertEqual(result["status"], "deleted")
-        self.assertEqual(self.service.search_knowledge("unique stale phrase", owner_id="minio-owner"), [])
+        self.assertEqual(self.service.search_knowledge("unique stale phrase", owner_id="s3-owner"), [])
 
     def test_repeated_delete_event_is_idempotent_skip(self) -> None:
         object_key = "second-brain/wiki/missing-delete.md"
-        delete_job = self.service.submit_minio_event(
+        delete_job = self.service.submit_s3_event(
             self.bucket,
             object_key,
-            owner_id="minio-owner",
+            owner_id="s3-owner",
             event_name="s3:ObjectRemoved:Delete",
         )
 
-        result = self.service.process_ingestion_job(delete_job.id, owner_id="minio-owner")
+        result = self.service.process_ingestion_job(delete_job.id, owner_id="s3-owner")
 
         self.assertEqual(result["status"], "skipped")
         self.assertEqual(result["message"], "document not found")

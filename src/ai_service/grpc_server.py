@@ -28,8 +28,8 @@ def create_server(
         repository=PostgresPsqlSecondBrainRepository.from_env(),
         embedder=embedder,
         object_store=LocalS3ObjectStore.from_env(),
-        allowed_bucket=os.getenv("SECOND_BRAIN_MINIO_BUCKET") or None,
-        object_prefix=os.getenv("SECOND_BRAIN_MINIO_PREFIX", "second-brain/"),
+        allowed_bucket=os.getenv("SECOND_BRAIN_S3_BUCKET") or os.getenv("SECOND_BRAIN_MINIO_BUCKET") or None,
+        object_prefix=os.getenv("SECOND_BRAIN_S3_PREFIX") or os.getenv("SECOND_BRAIN_MINIO_PREFIX", "second-brain/"),
     )
     hl_service = homelab_service or HomelabService(
         repository=PostgresPsqlHomelabRepository.from_env(),

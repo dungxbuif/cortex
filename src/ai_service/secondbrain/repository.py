@@ -228,6 +228,13 @@ class SqliteSecondBrainRepository:
         ).fetchone()
         return self._document_from_join_row(row) if row else None
 
+    def list_document_paths(self, owner_id: str) -> list[str]:
+        rows = self.conn.execute(
+            "SELECT vault_path FROM secondbrain_documents WHERE owner_id = ?",
+            (owner_id,),
+        ).fetchall()
+        return [str(row["vault_path"]) for row in rows]
+
     def upsert_document_with_chunks(self, document: VaultDocument, chunks: list[VaultChunk]) -> None:
         self.conn.execute(
             """
@@ -656,6 +663,15 @@ class PostgresPsqlSecondBrainRepository(PsqlRepositoryBase):
             """
         )
         return document_from_json(rows[0]) if rows else None
+
+    def list_document_paths(self, owner_id: str) -> list[str]:
+        return self._query(
+            f"""
+            SELECT vault_path
+            FROM secondbrain_documents
+            WHERE owner_id = {sql_literal(owner_id)};
+            """
+        )
 
     def upsert_document_with_chunks(self, document: VaultDocument, chunks: list[VaultChunk]) -> None:
         values = [

@@ -13,6 +13,7 @@ from ai_service.secondbrain.repository import SqliteSecondBrainRepository
 from ai_service.secondbrain.service import SecondBrainService
 from ai_service.homelab.service import HomelabService
 from ai_service.orchestrator.service import ChatMessage, OrchestratorService
+from ai_service.s3_webhook import S3WebhookEvent, S3WebhookRoots, parse_s3_webhook_event
 
 SINGLE_USER_ID = "11111111-1111-1111-1111-111111111111"
 
@@ -26,6 +27,10 @@ def create_app(
     object_store: Any | None = None,
     allowed_bucket: str | None = None,
     object_prefix: str | None = None,
+    s3_secondbrain_root: str | None = None,
+    s3_homelab_root: str | None = None,
+    rustfs_secondbrain_root: str | None = None,
+    rustfs_homelab_root: str | None = None,
 ) -> Any:
     """Create the optional FastAPI transport adapter.
 
@@ -68,11 +73,25 @@ def create_app(
     if object_store is None:
         object_store = LocalS3ObjectStore.from_env()
     if allowed_bucket is None:
-        allowed_bucket = os.getenv("SECOND_BRAIN_MINIO_BUCKET") or None
+        allowed_bucket = os.getenv("SECOND_BRAIN_S3_BUCKET") or os.getenv("SECOND_BRAIN_MINIO_BUCKET") or None
     if object_prefix is None:
-        object_prefix = os.getenv("SECOND_BRAIN_MINIO_PREFIX", "second-brain/")
+        object_prefix = os.getenv("SECOND_BRAIN_S3_PREFIX") or os.getenv("SECOND_BRAIN_MINIO_PREFIX", "second-brain/")
+    if s3_secondbrain_root is None:
+        s3_secondbrain_root = rustfs_secondbrain_root or os.getenv("CORTEX_S3_SECOND_BRAIN_ROOT") or os.getenv("CORTEX_RUSTFS_SECOND_BRAIN_ROOT", "")
+    if s3_homelab_root is None:
+        s3_homelab_root = rustfs_homelab_root or os.getenv("CORTEX_S3_HOMELAB_ROOT") or os.getenv("CORTEX_RUSTFS_HOMELAB_ROOT", "")
 
     jwt_secret = os.getenv("CORTEX_INTERNAL_JWT_SECRET", "cortex-local-internal-only-secret")
+    s3_webhook_token = (
+        os.getenv("CORTEX_S3_WEBHOOK_TOKEN")
+        or os.getenv("CORTEX_S3_API_KEY")
+        or os.getenv("CORTEX_RUSTFS_API_KEY")
+        or "local-dev-s3-token"
+    )
+    s3_webhook_roots = S3WebhookRoots(
+        second_brain=Path(s3_secondbrain_root),
+        homelab=Path(s3_homelab_root),
+    )
     app = FastAPI(title="Cortex API")
     client_dist_dir = Path(__file__).resolve().parents[1] / "client" / "dist"
     service = SecondBrainService(
@@ -320,7 +339,7 @@ def create_app(
             raise HTTPException(status_code=400, detail="bucket and object_key are required")
 
         try:
-            job = service.submit_minio_event(
+            job = service.submit_s3_event(
                 bucket=str(bucket),
                 object_key=str(object_key),
                 owner_id=SINGLE_USER_ID,
@@ -332,7 +351,61 @@ def create_app(
         except Exception as exc:
             raise HTTPException(status_code=500, detail=str(exc)) from exc
 
+    @app.post("/api/webhooks/s3", status_code=202)
+    def webhook_s3(
+        payload: dict[str, Any],
+        x_cortex_s3_token: str | None = Header(None, alias="X-Cortex-S3-Token"),
+    ) -> dict[str, Any]:
+        if not x_cortex_s3_token or x_cortex_s3_token != s3_webhook_token:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+        try:
+            event = parse_s3_webhook_event(payload, s3_webhook_roots)
+            result = _process_s3_webhook_event(event, service, homelab_service, owner_id=SINGLE_USER_ID)
+            return {"status": "accepted", "event": _serialize(asdict(event)), "result": _serialize(result)}
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    @app.post("/api/webhooks/rustfs", status_code=202)
+    def webhook_rustfs_alias(
+        payload: dict[str, Any],
+        x_cortex_rustfs_token: str | None = Header(None, alias="X-Cortex-RustFS-Token"),
+    ) -> dict[str, Any]:
+        if not x_cortex_rustfs_token or x_cortex_rustfs_token != s3_webhook_token:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+        try:
+            event = parse_s3_webhook_event(payload, s3_webhook_roots)
+            result = _process_s3_webhook_event(event, service, homelab_service, owner_id=SINGLE_USER_ID)
+            return {"status": "accepted", "event": _serialize(asdict(event)), "result": _serialize(result)}
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
     return app
+
+
+def _process_s3_webhook_event(
+    event: S3WebhookEvent,
+    service: SecondBrainService,
+    homelab_service: HomelabService,
+    owner_id: str,
+) -> dict[str, Any]:
+    if event.domain == "second_brain":
+        return service.sync_local_tree(event.root, owner_id=owner_id)
+    return homelab_service.sync_repository(
+        repo_path=str(event.root),
+        repo_url="github.com/dungxbuif/Homelab",
+        branch="main",
+        commit_sha="s3-compatible",
+        owner_id=owner_id,
+        delete_missing=True,
+    )
 
 
 def _run_chat_completion(orchestrator_service: OrchestratorService, payload: dict[str, Any], owner_id: str):
@@ -447,6 +520,8 @@ def _b64url_decode(value: str) -> bytes:
 
 
 def _serialize(value: Any) -> Any:
+    if isinstance(value, Path):
+        return str(value)
     if isinstance(value, dict):
         return {key: _serialize(item) for key, item in value.items()}
     if isinstance(value, list):

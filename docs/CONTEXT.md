@@ -32,16 +32,16 @@ updated: TBD
 
 ## Current Status
 
-- Status: Epic 5 Audit & Permissions, Epic 8 Async Ingestion/Delete Sync, Phase 9 React/Tailwind Client Console, and Epic 7 CTX-700 through CTX-708 are implemented and verified; eval/E2E proof remains human-supervised.
+- Status: Epic 5 Audit & Permissions, Epic 8 CTX-801 through CTX-803, Phase 9 React/Tailwind Client Console, and Epic 7 CTX-700 through CTX-708 are implemented and verified; eval/E2E proof remains human-supervised.
 - Active backlog: `docs/work/BACKLOG.md`
-- Current queue focus: Epic 7 work has advanced through `CTX-708`; next Epic 7 slice is `CTX-709` eval replay and E2E chat proof.
+- Current queue focus: Epic 8 work has advanced through `CTX-803`; next slice is `CTX-709` eval replay and E2E chat proof.
 - Active phase: None.
 - Active ticket: None.
 - Active bug: None.
 
 ## Current Focus
 
-Epic 4 is complete with Python-owned chat gateway routing into existing Second Brain and Homelab services. Epic 5 Audit & Permissions is verified. Epic 8 Async Ingestion/Delete Sync is verified. Phase 9 Client Console is verified with React/Tailwind, single-user JWT, and SSE. Epic 7 CTX-700 through CTX-708 are verified, including Telegram transport, module connectors, Finance read bridge, tool execution, policy/audit bridge, presentation, health, and graceful degradation. Remaining Epic 7 eval work remains queued for human-supervised implementation.
+Epic 4 is complete with Python-owned chat gateway routing into existing Second Brain and Homelab services. Epic 5 Audit & Permissions is verified. Epic 8 CTX-801 through CTX-803 are verified, including S3-compatible async ingestion, delete sync, and full-resync webhook triggers for Second Brain/Homelab. Phase 9 Client Console is verified with React/Tailwind, single-user JWT, and SSE. Epic 7 CTX-700 through CTX-708 are verified, including Telegram transport, module connectors, Finance read bridge, tool execution, policy/audit bridge, presentation, health, and graceful degradation. Remaining eval/E2E proof remains queued for human-supervised implementation.
 
 ## Recently Touched Areas
 
@@ -214,7 +214,7 @@ Epic 4 is complete with Python-owned chat gateway routing into existing Second B
 - BL-012 / Phase 9 is verified: FastAPI serves a React/Tailwind client at `/ui`, app API routes validate an internal non-expiring JWT for the hard-coded single user `11111111-1111-1111-1111-111111111111`, `/v1/chat/completions` supports OpenAI-compatible SSE when `stream: true`, and the client uses one chat conversation with tabs reserved for future module UIs.
 - **Python Direct Public Gateway**: Retired the thin Go gRPC HTTP proxy routes completely. Python's FastAPI app now directly serves as the Public API Gateway & Service for all REST endpoints (`/api/secondbrain/*`, `/api/homelab/*`) and `/v1/chat/completions`.
 - Current sprint branch is `feat/obsidian-sync`.
-- CTX-204 is done: Second Brain Obsidian MinIO webhook sync uses an authenticated webhook route directly in Python FastAPI, standard-library AWS Signature V4 network adapter for real S3 bucket connection, and local filesystem-backed S3 simulation for offline tests. MinIO remains a mirror/snapshot of canonical Obsidian `second-brain/`, not a writable canonical source.
+- CTX-204 is done: Second Brain Obsidian S3-compatible webhook sync uses an authenticated webhook route directly in Python FastAPI, standard-library AWS Signature V4 network adapter for real S3 bucket connection, and local filesystem-backed S3 simulation for offline tests. S3-compatible storage remains a mirror/snapshot of canonical Obsidian `second-brain/`, not a writable canonical source.
 - CTX-700 is verified: shared Python orchestration contracts now define transport-neutral conversation input, tool execution context, tool observations, module health, tool definitions, async `ModuleConnector`, `ConnectorRegistry`, and startup validation between tool registry targets and connector-supported targets.
 - CTX-701 is verified: Python AI service migration `000004_orchestrator_conversations.sql` adds `conversations`, `conversation_messages`, and `pending_confirmations`; `ConversationManager` persists context windows, resets stale conversations after inactivity, hashes tool args, enforces pending-confirmation TTL, and binds confirmations to channel/user actors.
 - CTX-704 is verified: Telegram transport adapter normalizes text updates into `ConversationInput`, enforces explicit chat/user allowlist authorization, sends typing actions, renders Markdown-lite into Telegram-safe HTML for short messages, sends long responses as plaintext chunks, retries plain text fallback, loads env settings, and exposes optional `python-telegram-bot` wiring.
@@ -223,10 +223,11 @@ Epic 4 is complete with Python-owned chat gateway routing into existing Second B
 - CTX-706 is verified: `ToolAdapterExecutor` validates schemas, evaluates policy decisions, handles deny/confirmation branches, dispatches connectors, maps connector failures, and emits audit events.
 - CTX-707 is verified: Finance read-only gRPC bridge and Python connector expose wallets, categories, reports, and net worth through established Go Finance services without direct Python Finance table access.
 - CTX-708 is verified: presentation helpers render citations and Finance summaries, Telegram sanitizes allowed HTML tags, connector health snapshots are available, stale-index warnings are generated, and unavailable gRPC services map to controlled fallback text.
+- CTX-803 is verified: S3-compatible events call `POST /api/webhooks/s3` with `X-Cortex-S3-Token`; while S3-compatible event payloads are still stabilizing, accepted events trigger full root resync for `second_brain` or `homelab` and remove stale derived RAG rows for missing Markdown files.
 
 ## Next Steps
 
-- Next Epic 7 implementation step is CTX-709 eval replay and E2E chat proof.
+- Next implementation step is CTX-709 eval replay and E2E chat proof.
 - Remaining human-supervised items include evals and go-live readiness.
 
 ## Open Questions

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 import uuid
 
 from .markdown import build_document, chunk_markdown, normalize_capture_markdown, suggest_tags
@@ -167,7 +168,7 @@ class SecondBrainService:
         self.repository.upsert_document_with_chunks(document, chunks)
         return len(chunks)
 
-    def sync_minio_object(
+    def sync_s3_object(
         self,
         bucket: str,
         object_key: str,
@@ -192,7 +193,15 @@ class SecondBrainService:
             return _sync_result("skipped", key, "unchanged content", skipped=1)
         return _sync_result("indexed", key, f"indexed {chunks} chunks", processed=1)
 
-    def delete_minio_object(
+    def sync_minio_object(
+        self,
+        bucket: str,
+        object_key: str,
+        owner_id: str = DEFAULT_OWNER_ID,
+    ) -> dict[str, int | str]:
+        return self.sync_s3_object(bucket, object_key, owner_id=owner_id)
+
+    def delete_s3_object(
         self,
         bucket: str,
         object_key: str,
@@ -213,7 +222,57 @@ class SecondBrainService:
             return _sync_result("skipped", key, "document not found", skipped=1)
         return _sync_result("deleted", key, "deleted document and chunks", processed=1)
 
-    def submit_minio_event(
+    def delete_minio_object(
+        self,
+        bucket: str,
+        object_key: str,
+        owner_id: str = DEFAULT_OWNER_ID,
+    ) -> dict[str, int | str]:
+        return self.delete_s3_object(bucket, object_key, owner_id=owner_id)
+
+    def sync_local_tree(
+        self,
+        root_path: str | Path,
+        owner_id: str = DEFAULT_OWNER_ID,
+    ) -> dict[str, int | str]:
+        root = Path(root_path)
+        if not root.exists() or not root.is_dir():
+            raise FileNotFoundError(f"Second Brain root does not exist or is not a directory: {root}")
+
+        processed_files = 0
+        skipped_files = 0
+        failed_files = 0
+        deleted_files = 0
+        present_paths: set[str] = set()
+
+        for path in sorted(root.rglob("*.md")):
+            if not path.is_file():
+                continue
+            vault_path = path.relative_to(root).as_posix()
+            present_paths.add(vault_path)
+            try:
+                markdown = path.read_text(encoding="utf-8", errors="ignore")
+                chunks = self.index_vault_document(vault_path, markdown, owner_id=owner_id)
+                if chunks == 0:
+                    skipped_files += 1
+                else:
+                    processed_files += 1
+            except Exception:
+                failed_files += 1
+
+        for stale_path in sorted(set(self.repository.list_document_paths(owner_id)) - present_paths):
+            if self.repository.delete_document(owner_id, stale_path):
+                deleted_files += 1
+
+        return {
+            "status": "success",
+            "processed_files": processed_files,
+            "skipped_files": skipped_files,
+            "failed_files": failed_files,
+            "deleted_files": deleted_files,
+        }
+
+    def submit_s3_event(
         self,
         bucket: str,
         object_key: str,
@@ -223,7 +282,7 @@ class SecondBrainService:
         key = normalize_object_key(object_key)
         if self.allowed_bucket and bucket != self.allowed_bucket:
             raise ValueError("bucket is not allowed")
-        event_type = _classify_minio_event(event_name)
+        event_type = _classify_s3_event(event_name)
         now = utc_now()
         job = IngestionJob(
             id=str(uuid.uuid4()),
@@ -239,6 +298,15 @@ class SecondBrainService:
         )
         return self.repository.save_ingestion_job(job)
 
+    def submit_minio_event(
+        self,
+        bucket: str,
+        object_key: str,
+        owner_id: str = DEFAULT_OWNER_ID,
+        event_name: str = "s3:ObjectCreated:Put",
+    ) -> IngestionJob:
+        return self.submit_s3_event(bucket, object_key, owner_id=owner_id, event_name=event_name)
+
     def process_ingestion_job(
         self,
         job_id: str,
@@ -251,9 +319,9 @@ class SecondBrainService:
         self.repository.update_ingestion_job_status(owner_id, job_id, "running", "processing", attempts)
         try:
             if job.event_type == "delete":
-                result = self.delete_minio_object(job.bucket, job.object_key, owner_id=owner_id)
+                result = self.delete_s3_object(job.bucket, job.object_key, owner_id=owner_id)
             else:
-                result = self.sync_minio_object(job.bucket, job.object_key, owner_id=owner_id)
+                result = self.sync_s3_object(job.bucket, job.object_key, owner_id=owner_id)
         except Exception as exc:
             self.repository.update_ingestion_job_status(owner_id, job_id, "failed", str(exc), attempts)
             raise
@@ -486,8 +554,12 @@ def _sync_result(
     }
 
 
-def _classify_minio_event(event_name: str) -> str:
+def _classify_s3_event(event_name: str) -> str:
     normalized = (event_name or "").lower()
     if "objectremoved" in normalized or "removed" in normalized or "delete" in normalized:
         return "delete"
     return "upsert"
+
+
+def _classify_minio_event(event_name: str) -> str:
+    return _classify_s3_event(event_name)

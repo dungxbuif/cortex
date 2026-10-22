@@ -26,6 +26,7 @@ class HomelabService:
         branch: str = "main",
         commit_sha: str = "latest",
         owner_id: str = "homelab",
+        delete_missing: bool = False,
     ) -> dict[str, int | str]:
         path = Path(repo_path)
         if not path.exists() or not path.is_dir():
@@ -34,6 +35,8 @@ class HomelabService:
         processed_files = 0
         skipped_files = 0
         failed_files = 0
+        deleted_files = 0
+        present_files: set[str] = set()
 
         for root, dirs, files in os.walk(repo_path):
             dirs[:] = [d for d in dirs if d not in EXCLUDE_FOLDERS]
@@ -42,6 +45,7 @@ class HomelabService:
                     continue
                 abs_file_path = os.path.join(root, file)
                 rel_file_path = os.path.relpath(abs_file_path, repo_path)
+                present_files.add(rel_file_path)
 
                 try:
                     with open(abs_file_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -73,11 +77,17 @@ class HomelabService:
                 except Exception:
                     failed_files += 1
 
+        if delete_missing:
+            for stale_path in sorted(set(self.repository.list_homelab_document_paths(owner_id)) - present_files):
+                if self.repository.delete_homelab_document(owner_id, stale_path):
+                    deleted_files += 1
+
         return {
             "status": "success",
             "processed_files": processed_files,
             "skipped_files": skipped_files,
             "failed_files": failed_files,
+            "deleted_files": deleted_files,
         }
 
     def search_knowledge(self, query: str, owner_id: str = "homelab", top_k: int = 5) -> list[HomelabSearchResult]:

@@ -65,13 +65,13 @@ class GrpcRuntimeTest(unittest.TestCase):
         search = self.sb.SearchSecondBrain(cortex_pb2.SearchRequest(owner_id="grpc-owner", query="Capture grpc", top_k=5))
         self.assertEqual(len(search.results), 0)
 
-    def test_secondbrain_sync_minio_object_indexes_local_s3_markdown(self) -> None:
+    def test_secondbrain_sync_object_indexes_local_s3_markdown(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
-            object_path = root / "obsidian" / "second-brain" / "wiki" / "grpc-minio.md"
+            object_path = root / "obsidian" / "second-brain" / "wiki" / "grpc-s3.md"
             object_path.parent.mkdir(parents=True)
             object_path.write_text(
-                "---\ntype: wiki\ntitle: gRPC MinIO\n---\n# gRPC MinIO\nObsidian sync over local S3 action.",
+                "---\ntype: wiki\ntitle: gRPC S3\n---\n# gRPC S3\nObsidian sync over local S3 action.",
                 encoding="utf-8",
             )
             service = SecondBrainService(
@@ -95,8 +95,8 @@ class GrpcRuntimeTest(unittest.TestCase):
             sync = self.sb.SyncSecondBrainObject(
                 cortex_pb2.SyncSecondBrainObjectRequest(
                     bucket="obsidian",
-                    object_key="second-brain/wiki/grpc-minio.md",
-                    owner_id="grpc-minio",
+                    object_key="second-brain/wiki/grpc-s3.md",
+                    owner_id="grpc-s3",
                 )
             )
             self.assertEqual(sync.status, "indexed")
@@ -105,8 +105,8 @@ class GrpcRuntimeTest(unittest.TestCase):
             replay = self.sb.SyncSecondBrainObject(
                 cortex_pb2.SyncSecondBrainObjectRequest(
                     bucket="obsidian",
-                    object_key="second-brain/wiki/grpc-minio.md",
-                    owner_id="grpc-minio",
+                    object_key="second-brain/wiki/grpc-s3.md",
+                    owner_id="grpc-s3",
                 )
             )
             self.assertEqual(replay.status, "skipped")

@@ -68,6 +68,8 @@ class FastAPIRuntimeTest(unittest.TestCase):
         self.assertIn("/api/homelab/search", paths)
         self.assertIn("/api/homelab/validate-links", paths)
         self.assertIn("/api/webhooks/n8n/secondbrain/obsidian-sync", paths)
+        self.assertIn("/api/webhooks/s3", paths)
+        self.assertIn("/api/webhooks/rustfs", paths)
 
         self.assertEqual(self.repository.embedding_column_type(), "vector")
 
@@ -292,7 +294,7 @@ class FastAPIRuntimeTest(unittest.TestCase):
             bucket_dir.mkdir()
             doc_path = bucket_dir / "second-brain" / "wiki" / "webhook-test.md"
             doc_path.parent.mkdir(parents=True, exist_ok=True)
-            doc_path.write_text("# Webhook Success\nSync from MinIO worked.", encoding="utf-8")
+            doc_path.write_text("# Webhook Success\nSync from S3-compatible storage worked.", encoding="utf-8")
             
             app_with_s3 = create_app(
                 secondbrain_repository=self.repository,

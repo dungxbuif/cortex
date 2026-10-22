@@ -1,7 +1,7 @@
 ---
 artifact_type: phase
 id: PHASE-8-ingestion-hardening
-status: done
+status: ready
 owner: human
 human_fields:
   - goal
@@ -26,8 +26,9 @@ trace:
     - docs/raw_spec/system/source-of-truth-sync.md
     - docs/raw_spec/system/rag-indexing.md
   tickets:
-    - ../tickets/epic-8/CTX-801.md
     - ../tickets/epic-8/CTX-802.md
+    - ../tickets/epic-8/CTX-803.md
+    - ../tickets/epic-8/CTX-709.md
 ---
 
 # PHASE-8: Async Ingestion & Delete Sync Hardening
@@ -44,6 +45,7 @@ Harden Second Brain external ingestion after the current synchronous MinIO webho
 - Process S3 object delete events by removing or tombstoning the matching `secondbrain_documents` row and deleting related `secondbrain_document_chunks`.
 - Track ingestion job status, retries, failure reasons, source revision/hash, and idempotency keys.
 - Preserve existing checksum-aware indexing behavior and source-of-truth rules.
+- Add a unified S3-compatible webhook that can trigger full-domain resync for Second Brain and Homelab while S3-compatible is still under development.
 
 ## Out of Scope
 
@@ -51,6 +53,7 @@ Harden Second Brain external ingestion after the current synchronous MinIO webho
 - Replacing n8n as the webhook/event source.
 - Broad production deployment automation beyond the queue/worker runtime contract.
 - Reworking unrelated Homelab or Finance ingestion paths.
+- Implementing the S3-compatible daemon itself.
 
 ## Priority
 
@@ -62,6 +65,7 @@ High after Epic 5 and Epic 7 go-live-critical work.
 - Webhook route validates the event and returns `202 Accepted` after enqueueing or persisting a durable job.
 - Worker retries rate-limited provider calls without blocking API request threads.
 - Delete events remove stale Second Brain documents and chunks from RAG results.
+- S3-compatible events trigger full root resync and remove stale derived RAG rows for Second Brain and Homelab.
 - Job status and deletion behavior are covered by integration tests.
 - Validation matrix, architecture/source-of-truth docs, and changelog are reconciled.
 
@@ -89,7 +93,9 @@ High after Epic 5 and Epic 7 go-live-critical work.
 ## Completion Summary
 
 - CTX-801 and CTX-802 are verified.
+- CTX-803 is verified: `POST /api/webhooks/s3` authenticates with `X-Cortex-S3-Token`, validates S3-compatible event domains and optional paths against configured roots, triggers full root resync for `second_brain` or `homelab`, and deletes stale derived RAG rows when files disappear.
 - Webhook handling now authenticates and persists a Second Brain ingestion job before returning `202 Accepted`; object download, chunking, embedding, and vector writes happen through the worker execution path.
 - Added PostgreSQL-backed ingestion job table and SQLite/PostgreSQL repository support using explicit job metadata columns.
 - Delete events such as `s3:ObjectRemoved:*` remove matching `secondbrain_documents` and `secondbrain_document_chunks` records from the active RAG index.
-- Verification passed with focused MinIO/job/delete tests, API runtime test, full Python AI suite, full Go backend suite, script syntax check, and `git diff --check`.
+- Verification passed with focused S3-compatible job/delete tests, focused S3-compatible webhook tests, API runtime test, full Python AI suite, full Go backend suite, script syntax check, and `git diff --check`.
+- Remaining Epic 8 slice: CTX-709 eval replay and E2E chat proof.

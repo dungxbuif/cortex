@@ -78,6 +78,13 @@ class SqliteHomelabRepository:
         ).fetchone()
         return self._homelab_document_from_join_row(row) if row else None
 
+    def list_homelab_document_paths(self, owner_id: str) -> list[str]:
+        rows = self.conn.execute(
+            "SELECT file_path FROM homelab_documents WHERE owner_id = ?",
+            (owner_id,),
+        ).fetchall()
+        return [str(row["file_path"]) for row in rows]
+
     def upsert_homelab_document_with_chunks(self, document: HomelabDocument, chunks: list[HomelabChunk]) -> None:
         self.conn.execute(
             """
@@ -127,6 +134,15 @@ class SqliteHomelabRepository:
                 ),
             )
         self.conn.commit()
+
+    def delete_homelab_document(self, owner_id: str, file_path: str) -> bool:
+        document = self.get_homelab_document(owner_id, file_path)
+        if document is None:
+            return False
+        self.conn.execute("DELETE FROM homelab_document_chunks WHERE document_id = ?", (document.id,))
+        self.conn.execute("DELETE FROM homelab_documents WHERE id = ?", (document.id,))
+        self.conn.commit()
+        return True
 
     def list_searchable_homelab_chunks(self, owner_id: str) -> list[tuple[HomelabDocument, HomelabChunk]]:
         rows = self.conn.execute(
@@ -295,6 +311,15 @@ class PostgresPsqlHomelabRepository(PsqlRepositoryBase):
         )
         return homelab_document_from_json(rows[0]) if rows else None
 
+    def list_homelab_document_paths(self, owner_id: str) -> list[str]:
+        return self._query(
+            f"""
+            SELECT file_path
+            FROM homelab_documents
+            WHERE owner_id = {sql_literal(owner_id)};
+            """
+        )
+
     def upsert_homelab_document_with_chunks(self, document: HomelabDocument, chunks: list[HomelabChunk]) -> None:
         values = [
             "("
@@ -353,6 +378,21 @@ class PostgresPsqlHomelabRepository(PsqlRepositoryBase):
             {chunk_insert}
             """
         )
+
+    def delete_homelab_document(self, owner_id: str, file_path: str) -> bool:
+        document = self.get_homelab_document(owner_id, file_path)
+        if document is None:
+            return False
+        self._execute(
+            f"""
+            DELETE FROM homelab_document_chunks
+            WHERE document_id = {sql_literal(document.id)};
+
+            DELETE FROM homelab_documents
+            WHERE id = {sql_literal(document.id)};
+            """
+        )
+        return True
 
     def list_searchable_homelab_chunks(self, owner_id: str) -> list[tuple[HomelabDocument, HomelabChunk]]:
         rows = self._query_json_lines(

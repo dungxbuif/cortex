@@ -23,6 +23,7 @@ trace:
   tickets:
     - docs/work/tickets/epic-8/CTX-801.md
     - docs/work/tickets/epic-8/CTX-802.md
+    - docs/work/tickets/epic-8/CTX-803.md
   raw_specs:
     - docs/raw_spec/system/source-of-truth-sync.md
     - docs/raw_spec/system/rag-indexing.md
@@ -96,6 +97,24 @@ s3:ObjectRemoved:* event
 
 Deletion behavior must follow the source-of-truth policy: the Obsidian Vault/mirror is canonical for knowledge documents, the PostgreSQL RAG index is derived, and derived chunks must not survive canonical deletion.
 
+### CTX-803: S3-Compatible Full-Resync Trigger
+
+Add a unified S3-compatible webhook. RustFS is treated as one S3-compatible backend, not as a separate integration type:
+
+```text
+S3-compatible event
+  -> POST /api/webhooks/s3
+  -> authenticate X-Cortex-S3-Token
+  -> validate domain and optional path under configured root
+  -> resync the entire configured root for that domain
+  -> delete derived RAG rows for files no longer present
+  -> return 202 Accepted with sync summary
+```
+
+Because the S3-compatible event payload is still being stabilized, Cortex currently treats these payloads as dirty signals instead of relying on exact per-file event semantics. `second_brain` resync scans `CORTEX_S3_SECOND_BRAIN_ROOT`; `homelab` resync scans `CORTEX_S3_HOMELAB_ROOT` using existing redaction/chunking behavior and `delete_missing=True`. `POST /api/webhooks/rustfs` remains a compatibility alias during migration.
+
+For large prefixes, move from full resync per event to hybrid incremental jobs plus periodic reconcile: trusted object events enqueue upsert/delete, rename events enqueue delete-old plus upsert-new, missing-key events enqueue prefix reconcile, and full scans run scheduled/manual with pagination, object size checks, ETag/checksum comparison, bounded embedding batches, retry/backoff, and oversized-file skip/special-job handling.
+
 ## Alternatives Considered
 
 ### Alternative A: Keep synchronous webhook ingestion
@@ -117,7 +136,7 @@ Rejected. It preserves forensic data but violates RAG correctness unless every q
 | API/contract | Webhook success semantics change from synchronous completion to `202 Accepted` job acceptance. |
 | Data model | Adds ingestion job/status records and delete/tombstone handling if approved. |
 | Runtime | Adds worker process or worker loop for ingestion jobs. |
-| Security/audit | Should call Epic 5 capability policy for `second_brain.index_external_source` and audit enqueue/worker/delete events. |
+| Security/audit | n8n keeps its existing token path; S3-compatible webhooks use `X-Cortex-S3-Token` and `CORTEX_S3_WEBHOOK_TOKEN`. |
 | Existing behavior | CTX-204 sync behavior must remain functionally equivalent once jobs complete. |
 | Docs | Source-of-truth, architecture, validation matrix, and changelog need reconciliation. |
 

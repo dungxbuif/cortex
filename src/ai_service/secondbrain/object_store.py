@@ -18,26 +18,26 @@ class ObjectStore(Protocol):
 
 @dataclass(frozen=True)
 class LocalS3ObjectStore:
-    """Filesystem-backed S3/MinIO simulation for local development and tests."""
+    """Filesystem-backed S3-compatible simulation for local development and tests."""
 
     root: Path
 
     @classmethod
     def from_env(cls) -> ObjectStore | None:
-        endpoint = os.getenv("SECOND_BRAIN_MINIO_ENDPOINT")
-        access_key = os.getenv("SECOND_BRAIN_MINIO_ACCESS_KEY")
-        secret_key = os.getenv("SECOND_BRAIN_MINIO_SECRET_KEY")
+        endpoint = _env("SECOND_BRAIN_S3_ENDPOINT", "SECOND_BRAIN_MINIO_ENDPOINT")
+        access_key = _env("SECOND_BRAIN_S3_ACCESS_KEY", "SECOND_BRAIN_MINIO_ACCESS_KEY")
+        secret_key = _env("SECOND_BRAIN_S3_SECRET_KEY", "SECOND_BRAIN_MINIO_SECRET_KEY")
 
         if endpoint and access_key and secret_key:
-            region = os.getenv("SECOND_BRAIN_MINIO_REGION", "us-east-1")
-            return HttpMinIOObjectStore(
+            region = _env("SECOND_BRAIN_S3_REGION", "SECOND_BRAIN_MINIO_REGION") or "us-east-1"
+            return HttpS3ObjectStore(
                 endpoint=endpoint,
                 access_key=access_key,
                 secret_key=secret_key,
                 region=region,
             )
 
-        local_root = os.getenv("SECOND_BRAIN_MINIO_LOCAL_ROOT")
+        local_root = _env("SECOND_BRAIN_S3_LOCAL_ROOT", "SECOND_BRAIN_MINIO_LOCAL_ROOT")
         if not local_root:
             return None
         return cls(Path(local_root))
@@ -56,8 +56,8 @@ class LocalS3ObjectStore:
 
 
 @dataclass(frozen=True)
-class HttpMinIOObjectStore:
-    """Network HTTP-based MinIO/S3 object store wrapper using standard libraries."""
+class HttpS3ObjectStore:
+    """Network HTTP-based S3-compatible object store wrapper using standard libraries."""
 
     endpoint: str
     access_key: str
@@ -157,6 +157,9 @@ def s3_get_object(
         return response.read().decode("utf-8")
 
 
+HttpMinIOObjectStore = HttpS3ObjectStore
+
+
 def normalize_object_key(object_key: str) -> str:
     if not object_key or not object_key.strip():
         raise ValueError("object_key is required")
@@ -174,3 +177,6 @@ def _is_relative_to(path: Path, base: Path) -> bool:
     except ValueError:
         return False
 
+
+def _env(primary: str, fallback: str) -> str | None:
+    return os.getenv(primary) or os.getenv(fallback)

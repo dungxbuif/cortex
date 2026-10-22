@@ -130,7 +130,7 @@ Examples:
 
 ## 7. Sync Safety Rules
 
-- Webhooks enqueue work; they do not run heavy sync inline.
+- Webhooks enqueue work; they do not run heavy sync inline, except the current S3-compatible dirty-signal path which deliberately triggers full local root resync while the event payload contract is still stabilizing.
 - Sync job records source revision, content hash and indexed revision.
 - Indexing must be idempotent by source revision + path + content hash.
 - External docs/config must pass redaction before embedding.
@@ -138,6 +138,7 @@ Examples:
 
 ## 8. Current Cortex Implementation Notes
 
-- Second Brain MinIO/S3 webhook handling persists a `secondbrain_ingestion_jobs` row and returns `202 Accepted`; object fetch, chunking, embedding, and vector writes are handled by the worker execution path.
+- Second Brain S3-compatible webhook handling persists a `secondbrain_ingestion_jobs` row and returns `202 Accepted`; object fetch, chunking, embedding, and vector writes are handled by the worker execution path.
 - Second Brain object delete events are represented as ingestion jobs with `event_type = delete`; worker processing removes matching documents and chunks from active RAG tables.
 - Active Second Brain RAG content remains in PostgreSQL + pgvector tables (`secondbrain_documents`, `secondbrain_document_chunks`); ingestion jobs store only event metadata and processing status.
+- S3-compatible dirty-signal events are accepted at `POST /api/webhooks/s3` using `X-Cortex-S3-Token`; accepted events trigger full resync for the configured Second Brain or Homelab root and remove stale derived RAG rows for Markdown files missing from the current root. `POST /api/webhooks/rustfs` remains a compatibility alias because RustFS is the current S3-compatible backend.

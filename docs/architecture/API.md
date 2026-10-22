@@ -29,7 +29,7 @@ Current local/internal scope uses a single hard-coded user:
 - Token format: HS256 JWT signed with `CORTEX_INTERNAL_JWT_SECRET` or the local default.
 - Expiry: none in this internal-only version.
 
-Application routes ignore client-supplied `owner_id` and use the verified single-user UUID. The n8n webhook keeps `X-Cortex-N8n-Token` authentication.
+Application routes ignore client-supplied `owner_id` and use the verified single-user UUID. The n8n webhook keeps `X-Cortex-N8n-Token` authentication. The S3-compatible webhook uses `X-Cortex-S3-Token` authentication.
 
 ## Domain APIs
 
@@ -54,6 +54,7 @@ AI gateway proxy routes require the internal bearer token unless noted:
 - `GET /api/secondbrain/status`: Return Second Brain indexed document/chunk counts.
 - `POST /api/secondbrain/search`: Search indexed Second Brain knowledge.
 - `POST /api/webhooks/n8n/secondbrain/obsidian-sync`: Authenticated by `X-Cortex-N8n-Token`; validates and persists a Second Brain ingestion job, then returns `202 Accepted`. Object fetch, chunking, embedding, vector writes, and delete cleanup run through the worker processing path.
+- `POST /api/webhooks/s3`: Authenticated by `X-Cortex-S3-Token`; validates an S3-compatible event for `second_brain` or `homelab`, validates optional file paths under configured roots, triggers full root resync for the domain, deletes stale derived RAG rows for missing Markdown files, and returns `202 Accepted` with a sync summary. `POST /api/webhooks/rustfs` remains a compatibility alias.
 - `POST /api/internal/secondbrain/ingestion-jobs/{job_id}/process`: Internal worker endpoint that processes one persisted Second Brain ingestion job.
 - `POST /api/homelab/sync`: Sync/index Homelab markdown docs through the Python AI service.
 - `POST /api/homelab/search`: Search Homelab indexed docs.
@@ -118,8 +119,8 @@ Capture APIs:
 Sync & Document APIs:
 - `GetSyncStatus(query)`: Check the last time the Vault mirror was updated, aggregate stale/failed files.
 - `RecordDocumentSync(command)`: Upsert parsed markdown metadata into the database mirror.
-- `SyncSecondBrainObject(command)`: Fetch a Markdown object from the configured MinIO-compatible mirror, require the `second-brain/` prefix, and index it through the existing checksum-aware Second Brain document pipeline.
-- `SubmitSecondBrainIngestionJob(command)`: Persist a MinIO/S3 object event as an ingestion job without reading object content inline.
+- `SyncSecondBrainObject(command)`: Fetch a Markdown object from the configured S3-compatible mirror, require the `second-brain/` prefix, and index it through the existing checksum-aware Second Brain document pipeline.
+- `SubmitSecondBrainIngestionJob(command)`: Persist an S3-compatible object event as an ingestion job without reading object content inline.
 - `ProcessSecondBrainIngestionJob(command)`: Execute a queued ingestion job. Create/update jobs fetch Markdown, chunk, embed, and write PostgreSQL + pgvector records. Delete jobs remove matching documents and chunks from the active RAG index.
 
 Second Brain Obsidian sync webhook:
@@ -161,9 +162,12 @@ Second Brain Obsidian sync webhook:
 Runtime variables:
 
 - `CORTEX_N8N_API_KEY`: Python gateway webhook token.
-- `SECOND_BRAIN_MINIO_LOCAL_ROOT`: local filesystem root used to simulate a MinIO/S3 bucket in development and tests.
-- `SECOND_BRAIN_MINIO_BUCKET`: allowed bucket name.
-- `SECOND_BRAIN_MINIO_PREFIX`: allowed object prefix, defaults to `second-brain/`.
+- `CORTEX_S3_WEBHOOK_TOKEN`: S3-compatible webhook token.
+- `CORTEX_S3_SECOND_BRAIN_ROOT`: local Second Brain root scanned when S3-compatible dirty-signal events are used.
+- `CORTEX_S3_HOMELAB_ROOT`: local Homelab root scanned when S3-compatible dirty-signal events are used.
+- `SECOND_BRAIN_S3_LOCAL_ROOT`: local filesystem root used to simulate an S3-compatible bucket in development and tests.
+- `SECOND_BRAIN_S3_BUCKET`: allowed bucket name.
+- `SECOND_BRAIN_S3_PREFIX`: allowed object prefix, defaults to `second-brain/`.
 
 RAG Query APIs:
 - `SearchKnowledge(query)`: Vector similarity search over `secondbrain_document_chunks` using `pgvector` (strictly excluding the capture buffer). Executed by Python retrieval pipeline.

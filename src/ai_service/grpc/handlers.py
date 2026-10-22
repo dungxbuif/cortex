@@ -66,7 +66,7 @@ class SecondBrainServicer(cortex_pb2_grpc.SecondBrainServiceServicer):
         return _grpc_guard(
             context,
             lambda: _secondbrain_sync_response(
-                self.service.sync_minio_object(
+                self.service.sync_s3_object(
                     bucket=request.bucket,
                     object_key=request.object_key,
                     owner_id=request.owner_id or "owner",

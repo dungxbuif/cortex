@@ -23,7 +23,7 @@ func TestEvaluateAllowsKnownCapabilityAndAuditsIndexDecision(t *testing.T) {
 		ActorType:  "system",
 		ActorID:    "n8n_worker",
 		RequestID:  "req-1",
-		ToolName:   "second_brain.sync_minio_object",
+		ToolName:   "second_brain.sync_s3_object",
 	})
 	if err != nil {
 		t.Fatalf("evaluate: %v", err)

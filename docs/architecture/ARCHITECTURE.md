@@ -104,15 +104,22 @@ Finance reporting and auditability follow separate time semantics:
 - **Client Flow**: FastAPI serves the React/Tailwind client at `/ui`; the client bootstraps an internal non-expiring JWT from `/api/auth/dev-token`, uses one hard-coded user UUID, and keeps one single chat conversation with tabs reserved for module-specific UIs.
 - **Sync/Index Flow**: Asynchronous jobs pulling from canonical sources or mirrors -> Redaction -> Chunking -> Vector Index.
 - **AI Compatibility Proxy Flow**: Go Echo routes under `/api/secondbrain/*` and `/api/homelab/*` remain thin internal/dev adapters. They map JSON to generated protobuf messages, call the Python AI service over internal gRPC, and return JSON without adding domain logic in Go.
-- **Second Brain Obsidian Sync Flow**: n8n or another MinIO event source posts an authenticated object event to the Python Gateway. The gateway validates `X-Cortex-N8n-Token`, persists an ingestion job, and returns `202 Accepted`. A worker path processes the job: create/update events fetch Markdown from the configured MinIO/S3 mirror, chunk, embed, and write PostgreSQL + pgvector records; delete events remove matching documents/chunks from active RAG search. MinIO remains a mirror/snapshot, not the canonical authoring source.
+- **Second Brain Obsidian Sync Flow**: n8n or another S3-compatible event source posts an authenticated object event to the Python Gateway. The gateway validates `X-Cortex-N8n-Token`, persists an ingestion job, and returns `202 Accepted`. A worker path processes the job: create/update events fetch Markdown from the configured S3-compatible mirror, chunk, embed, and write PostgreSQL + pgvector records; delete events remove matching documents/chunks from active RAG search. S3-compatible storage such as RustFS remains a mirror/snapshot, not the canonical authoring source.
+- **S3-Compatible Dirty-Signal Flow**: RustFS or another S3-compatible source posts an authenticated dirty signal to `POST /api/webhooks/s3`. Cortex validates the domain/root boundary and then performs a full root resync for `second_brain` or `homelab`, including stale derived RAG cleanup for Markdown files no longer present.
 
 ```text
-MinIO/S3 event
+S3-compatible event
   -> Python FastAPI webhook
   -> secondbrain_ingestion_jobs
   -> worker process job
   -> SecondBrainService
   -> secondbrain_documents + secondbrain_document_chunks (pgvector)
+
+S3-compatible dirty signal
+  -> Python FastAPI webhook
+  -> SecondBrainService or HomelabService full root resync
+  -> module documents + chunks (pgvector)
+  -> delete stale derived rows missing from current root
 ```
 
 ## System Audit And Policy
@@ -148,7 +155,7 @@ OpenAI-compatible chat request
 - **Open WebUI**: Compatible frontend chat client through the OpenAI API surface.
 - **LLM Provider**: Gemini / OpenAI for intelligence.
 - **N8n**: External webhook worker.
-- **MinIO-compatible object storage**: Optional Second Brain mirror/snapshot source for Obsidian sync. Local development uses `SECOND_BRAIN_MINIO_LOCAL_ROOT` as a filesystem-backed S3 bucket simulation.
+- **S3-compatible object storage**: Optional Second Brain mirror/snapshot source for Obsidian sync. Local development uses `SECOND_BRAIN_S3_LOCAL_ROOT` as a filesystem-backed bucket simulation. RustFS is one supported S3-compatible implementation.
 
 ## Risks And Tradeoffs
 
